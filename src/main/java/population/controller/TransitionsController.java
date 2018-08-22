@@ -1,5 +1,7 @@
 package population.controller;
 
+import javafx.scene.Node;
+import javafx.scene.control.TableRow;
 import population.App;
 import population.component.UIComponents.TextFieldTableCell;
 import population.controller.base.AbstractController;
@@ -45,7 +47,7 @@ public class TransitionsController extends AbstractController {
     private Button addTransitionExtensionButton;
 
 
-
+    /** states count shown in one table row */
     private int statesInTransitionColumnsCount = 3;
     private TransitionTableRowItemObservableList transitions;
     private ObservableList<Transition> model;
@@ -62,10 +64,16 @@ public class TransitionsController extends AbstractController {
     @Override
     public void initialize() {
         this.model = App.getTransitions();
-        transitions = new TransitionTableRowItemObservableList(model, statesInTransitionColumnsCount);
-        initStatesList();
+        this.initTransitions();
+        this.initStatesList();
         this.initTable();
         this.initButtons();
+    }
+
+
+    private void initTransitions() {
+        transitions = new TransitionTableRowItemObservableList(model, statesInTransitionColumnsCount);
+        transitions.addListener((ListChangeListener<? super TransitionTableRowItem>) c -> this.updateTableRowClassList());
     }
 
 
@@ -121,7 +129,7 @@ public class TransitionsController extends AbstractController {
         this.initIdColumn();
         this.initProbabilityColumn();
         this.initTypeColumn();
-        this.initBlockColumn();
+//        this.initBlockColumn();
         this.initStateColumns();
     }
 
@@ -179,13 +187,21 @@ public class TransitionsController extends AbstractController {
             final int index = i;
 
             TableColumn<TransitionTableRowItem, State> stateColumn = new TableColumn<>(this.getString("transition_state"));
-            stateColumn.setCellValueFactory(param -> param.getValue().getStates().get(index).stateProperty());
+            stateColumn.setCellValueFactory(param -> {
+                if (index >= param.getValue().getStates().size()) {
+                    return null;
+                }
+                return param.getValue().getStates().get(index).stateProperty();
+            });
             stateColumn.setCellFactory(ComboBoxTableCell.forTableColumn(Converter.STATE_STRING_CONVERTER, statesList));
             stateColumn.setSortable(false);
             stateColumn.getStyleClass().add("transition-state");
 
             TableColumn<TransitionTableRowItem, Double> inColumn = new TableColumn<>(this.getString("transition_state_in"));
             inColumn.setCellValueFactory(param -> {
+                if (index >= param.getValue().getStates().size()) {
+                    return null;
+                }
                 StateInTransition state = param.getValue().getStates().get(index);
                 if (state.getState() == null || state.getState().getId() == State.EXTERNAL_ID) {
                     return null;
@@ -197,19 +213,34 @@ public class TransitionsController extends AbstractController {
             inColumn.getStyleClass().add("transition-state-in");
 
             TableColumn<TransitionTableRowItem, Double> outColumn = new TableColumn<>(this.getString("transition_state_out"));
-            outColumn.setCellValueFactory(param -> param.getValue().getStates().get(index).outProperty().asObject());
+            outColumn.setCellValueFactory(param -> {
+                if (index >= param.getValue().getStates().size()) {
+                    return null;
+                }
+                return param.getValue().getStates().get(index).outProperty().asObject();
+            });
             outColumn.setCellFactory(list -> new TextFieldTableCell<>(Converter.DOUBLE_STRING_CONVERTER));
             outColumn.setSortable(false);
             outColumn.getStyleClass().add("transition-state-out");
 
             TableColumn<TransitionTableRowItem, Integer> delayColumn = new TableColumn<>(this.getString("transition_state_delay"));
-            delayColumn.setCellValueFactory(param -> param.getValue().getStates().get(index).delayProperty().asObject());
+            delayColumn.setCellValueFactory(param -> {
+                if (index >= param.getValue().getStates().size()) {
+                    return null;
+                }
+                return param.getValue().getStates().get(index).delayProperty().asObject();
+            });
             delayColumn.setCellFactory(list -> new TextFieldTableCell<>(new IntegerStringConverter()));
             delayColumn.setSortable(false);
             delayColumn.getStyleClass().add("transition-state-delay");
 
             TableColumn<TransitionTableRowItem, Number> modeColumn = new TableColumn<>(this.getString("transition_mode"));
-            modeColumn.setCellValueFactory(param -> param.getValue().getStates().get(index).modeProperty());
+            modeColumn.setCellValueFactory(param -> {
+                if (index >= param.getValue().getStates().size()) {
+                    return null;
+                }
+                return param.getValue().getStates().get(index).modeProperty();
+            });
             modeColumn.setCellFactory(ComboBoxTableCell.forTableColumn(Converter.STATE_IN_TRANSITION_MODE_STRING_CONVERTER, StateMode.MODES));
             modeColumn.setSortable(false);
             modeColumn.getStyleClass().add("transition-state-mode");
@@ -247,6 +278,34 @@ public class TransitionsController extends AbstractController {
      *              FXML Bindings
      *
      *************************************************/
+
+    /**
+     * update css classes for table rows
+     * append .new-transition class for rows in which transition starts
+     * append .with-data class for rows with associated transition
+     */
+    protected void updateTableRowClassList() {
+        int rowIndex = 0;
+        List<TransitionTableRowItem> items = transitionsTable.getItems();
+
+        for (Node node: transitionsTable.lookupAll("TableRow")) {
+            if (node instanceof TableRow) {
+                TableRow row = (TableRow) node;
+
+                if (rowIndex < items.size()) {
+                    row.getStyleClass().add("with-data");
+                    if (!items.get(rowIndex).isExtension()) {
+                        row.getStyleClass().add("new-transition");
+                    }
+                } else {
+                    row.getStyleClass().removeAll("new-transition", "with-data");
+                }
+            }
+
+            rowIndex++;
+        }
+    }
+
 
     @FXML
     public void addTransition() {

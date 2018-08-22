@@ -3,7 +3,12 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import java.net.URL?>
 <VBox xmlns="http://javafx.com/javafx/8.0.71" xmlns:fx="http://javafx.com/fxml/1" fx:controller="population.controller.PrimaryController1">
+    <stylesheets>
+        <URL value="@../style/primary.css" />
+    </stylesheets>
+
     <children>
         <MenuBar VBox.vgrow="NEVER">
             <menus>

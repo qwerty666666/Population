@@ -36,12 +36,12 @@
                         <PropertyValueFactory property="type" />
                     </cellValueFactory>
                 </TableColumn>
-                <TableColumn fx:id="blockColumn" prefWidth="75.0" sortable="false"
-                             text="%transition_block">
-                    <cellValueFactory>
-                        <PropertyValueFactory property="block" />
-                    </cellValueFactory>
-                </TableColumn>
+                <!--<TableColumn fx:id="blockColumn" prefWidth="75.0" sortable="false"-->
+                             <!--text="%transition_block">-->
+                    <!--<cellValueFactory>-->
+                        <!--<PropertyValueFactory property="block" />-->
+                    <!--</cellValueFactory>-->
+                <!--</TableColumn>-->
             </columns>
         </TableView>
         <HBox layoutX="14.0" layoutY="14.0" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0">
