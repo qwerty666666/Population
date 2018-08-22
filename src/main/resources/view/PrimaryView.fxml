@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/8.0.71" xmlns:fx="http://javafx.com/fxml/1" fx:controller="population.controller.PrimaryController1">
+    <children>
+        <MenuBar VBox.vgrow="NEVER">
+            <menus>
+                <Menu mnemonicParsing="false" text="%task">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#clearTask" text="%clear" />
+                        <MenuItem mnemonicParsing="false" onAction="#openTask" text="%open" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem mnemonicParsing="false" onAction="#saveTask" text="%save" />
+                        <MenuItem mnemonicParsing="false" onAction="#saveTaskAs" text="%save_as" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem mnemonicParsing="false" onAction="#quit" text="%quit" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="%lang">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#selectLangRussian" text="%lang_ru" />
+                        <MenuItem mnemonicParsing="false" onAction="#selectLangEnglish" text="%lang_en" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="%help">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#about" text="%about" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+        <Button layoutX="75.0" layoutY="14.0" mnemonicParsing="false" onAction="#debug" text="debug"/>
+        <TabPane fx:id="mMainTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+            <tabs>
+                <Tab text="%states">
+                    <content>
+                        <fx:include source="Task/States.fxml"/>
+                    </content>
+                </Tab>
+                <Tab text="%transitions">
+                    <content>
+                        <fx:include source="Task/Transitions.fxml"/>
+                    </content>
+                </Tab>
+                <Tab text="%calculations">
+                    <content>
+                        <fx:include source="Calculation/Calculation.fxml"/>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </children>
+</VBox>

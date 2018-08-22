@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import java.net.URL?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/8.0.71" xmlns:fx="http://javafx.com/fxml/1" fx:controller="population.controller.TransitionsController">
+    <stylesheets>
+        <URL value="@../../style/transitions.css" />
+    </stylesheets>
+
+    <children>
+        <TableView fx:id="transitionsTable" editable="true" layoutX="14.0" layoutY="49.0"
+                   AnchorPane.bottomAnchor="49.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0"
+                   AnchorPane.topAnchor="14.0">
+            <columns>
+                <TableColumn fx:id="idColumn" prefWidth="75.0" sortable="false"
+                             text="%transition_id" editable="false">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="number" />
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn fx:id="probabilityColumn" prefWidth="75.0" sortable="false"
+                             text="%transition_probability">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="probability" />
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn fx:id="typeColumn" prefWidth="75.0" sortable="false"
+                             text="%transition_type">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="type" />
+                    </cellValueFactory>
+                </TableColumn>
+                <TableColumn fx:id="blockColumn" prefWidth="75.0" sortable="false"
+                             text="%transition_block">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="block" />
+                    </cellValueFactory>
+                </TableColumn>
+            </columns>
+        </TableView>
+        <HBox layoutX="14.0" layoutY="14.0" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0">
+            <children>
+                <Button fx:id="addTransitionButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false"
+                        onAction="#addTransition" text="%add"/>
+                <Button fx:id="addTransitionExtensionButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false"
+                        onAction="#addTransitionExtension" text="%add_transition_extension"/>
+                <Button fx:id="removeTransitionButton" layoutX="75.0" layoutY="14.0" mnemonicParsing="false"
+                        onAction="#removeTransition" text="%remove"/>
+            </children>
+        </HBox>
+        <!--<HBox layoutX="523.0" layoutY="14.0" spacing="10.0" AnchorPane.bottomAnchor="14.0"-->
+              <!--AnchorPane.rightAnchor="14.0">-->
+            <!--<children>-->
+                <!--<Button fx:id="mMoveTransitionUpButton" layoutX="523.0" layoutY="14.0" mnemonicParsing="false"-->
+                        <!--onAction="#moveTransitionUp" text="%move_up"/>-->
+                <!--<Button fx:id="mMoveTransitionDownButton" layoutX="585.0" layoutY="14.0" mnemonicParsing="false"-->
+                        <!--onAction="#moveTransitionDown" text="%move_down"/>-->
+            <!--</children>-->
+        <!--</HBox>-->
+    </children>
+</AnchorPane>

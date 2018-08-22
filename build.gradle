@@ -1,0 +1,40 @@
+plugins {
+    id 'java'
+}
+
+group 'Population'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation (
+        'org.junit.jupiter:junit-jupiter-api:5.2.0',
+        'org.junit.jupiter:junit-jupiter-params:5.2.0'
+    )
+    testRuntimeOnly (
+        'org.junit.jupiter:junit-jupiter-engine:5.2.0'
+    )
+}
+
+
+jar {
+    manifest {
+        attributes(
+            'Main-Class': 'population.PopulationApplication'
+        )
+    }
+}
+
+
+tasks.replace("processResources").doLast {
+    // copy resource files to custom directory for backward compatibility
+    copy {
+        from '/src/main/resources'
+        into "/${buildDir}/classes/java/main/population/resource"
+    }
+}

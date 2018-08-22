@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.AnchorPane?>
+
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
+
+<!-- TODO move only chart tabs to controller instead of whole TabPane -->
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<TabPane xmlns="http://javafx.com/javafx/8.0.71"
+         xmlns:fx="http://javafx.com/fxml/1"
+         fx:controller="population.controller.Calculation.ResultChartController"
+         layoutY="68.0" prefHeight="395.0" prefWidth="870.0"
+         side="BOTTOM"
+         tabClosingPolicy="UNAVAILABLE"
+         AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="66.0"
+>
+    <tabs>
+        <Tab text="%result_chart">
+            <content>
+                <AnchorPane fx:id="resultsChartContainer">
+                    <children>
+                        <LineChart fx:id="resultsChart" layoutX="14.0" layoutY="14.0" legendSide="RIGHT" prefHeight="311.0" prefWidth="860.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="0.0">
+                            <xAxis>
+                                <NumberAxis side="BOTTOM" />
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis side="LEFT" />
+                            </yAxis>
+                        </LineChart>
+                    </children>
+                </AnchorPane>
+            </content>
+        </Tab>
+        <Tab text="%result_chart_settings">
+            <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                    <children>
+                        <TableView fx:id="resultsChartSettingsTable" editable="true" layoutX="14.0" layoutY="14.0" AnchorPane.bottomAnchor="49.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="10.0">
+                            <columns>
+                                <TableColumn fx:id="chartSettingsTableVisibilityColumn" prefWidth="100.0" sortable="false" text="%visibility">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="visibility" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn fx:id="chartSettingsTableNameColumn" prefWidth="150.0" sortable="false" text="%state_name">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="name" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn fx:id="chartSettingsTableColorColumn" prefWidth="125.0" sortable="false" text="%color">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="color" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn fx:id="chartSettingsTableDashColumn" prefWidth="125.0" sortable="false" text="%dash">
+                                        <cellValueFactory>
+                                        <PropertyValueFactory property="dash" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                                <TableColumn fx:id="chartSettingsTableThicknessColumn" prefWidth="125.0" sortable="false" text="%thickness">
+                                    <cellValueFactory>
+                                        <PropertyValueFactory property="thickness" />
+                                    </cellValueFactory>
+                                </TableColumn>
+                            </columns>
+                        </TableView>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0">
+                            <children>
+                                <Button mnemonicParsing="false" text="%clear" onAction="#clear" />
+                            </children>
+                        </HBox>
+                    </children>
+                </AnchorPane>
+            </content>
+        </Tab>
+        <Tab text="%result_table">
+            <content>
+                <fx:include source="ResultTable.fxml"/>
+            </content>
+        </Tab>
+
+
+        <!--<Tab text="%parametric_portrait_tab_label">
+            <AnchorPane>
+                <fx:include id="mParametricPortraitTab" source="ParametricPortraitTab.fxml"
+                            AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="15.0" />
+            </AnchorPane>
+        </Tab>-->
+
+
+
+    </tabs>
+</TabPane>
