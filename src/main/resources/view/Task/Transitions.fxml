@@ -24,7 +24,7 @@
                         <PropertyValueFactory property="number" />
                     </cellValueFactory>
                 </TableColumn>
-                <TableColumn fx:id="probabilityColumn" prefWidth="75.0" sortable="false"
+                <TableColumn fx:id="probabilityColumn" prefWidth="85.0" sortable="false"
                              text="%transition_probability">
                     <cellValueFactory>
                         <PropertyValueFactory property="probability" />
