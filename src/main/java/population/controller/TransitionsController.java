@@ -1,9 +1,8 @@
 package population.controller;
 
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.util.Callback;
-import javafx.util.StringConverter;
 import population.App;
 import population.component.UIComponents.TextFieldTableCell;
 import population.controller.base.AbstractController;
@@ -25,6 +24,7 @@ import javafx.util.converter.IntegerStringConverter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class TransitionsController extends AbstractController {
@@ -73,7 +73,6 @@ public class TransitionsController extends AbstractController {
 
     private void initTransitions() {
         transitions = new TransitionTableRowItemObservableList(model, statesInTransitionColumnsCount);
-        transitions.addListener((ListChangeListener<? super TransitionTableRowItem>) c -> this.updateTableRowClassList());
     }
 
 
@@ -120,6 +119,32 @@ public class TransitionsController extends AbstractController {
 //        });
 
         transitionsTable.setItems(transitions.getItems());
+
+        /*
+         * update table styles when it's item list changed
+         */
+        transitionsTable.getItems().addListener(new ListChangeListener<TransitionTableRowItem>() {
+            /*
+             * we will lookup through the table to find actual TableRows with data,
+             * so we should do it after table layout update.
+             * We'll call it in GUI thread and to prevent redundant calls, we'll use called flag
+             * which will be set to false every time item list changed and to true when GUI thread has updated
+             */
+            AtomicBoolean called = new AtomicBoolean(true);
+            @Override
+            public void onChanged(Change<? extends TransitionTableRowItem> c) {
+                if (called.get()) {
+                    called.set(false);
+                    Platform.runLater(() -> {
+                        called.set(true);
+                        transitionsTable.layout();
+                        updateTableRowClassList();
+                    });
+                } else {
+                    called.set(false);
+                }
+            }
+        });
 
         this.initIdColumn();
         this.initProbabilityColumn();
