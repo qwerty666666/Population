@@ -7,7 +7,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class State {
-    public static final int EXTERNAL_ID = -1;
+    /**
+     * used to show empty states in transitions table
+     */
+    public static final int EMPTY_STATE_ID = -1;
 
     private int id;
     private static final AtomicInteger ID_COUNTER = new AtomicInteger();
@@ -62,11 +65,11 @@ public class State {
     }
 
     public void setId(int id) {
-        this.id = EXTERNAL_ID;
+        this.id = id;
     }
 
-    public boolean isExternal() {
-        return this.id == EXTERNAL_ID;
+    public boolean isEmptyState() {
+        return this.id == EMPTY_STATE_ID;
     }
 
     public double getCount() {

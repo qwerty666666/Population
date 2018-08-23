@@ -62,7 +62,7 @@ public class Transition {
 
     public List<StateInTransition> getActualStates() {
         return this.states.stream()
-                .filter(state -> state != null && state.getState() != null)
+                .filter(state -> state != null && state.getState() != null && !state.getState().isEmptyState())
                 .collect(Collectors.toList());
     }
 
