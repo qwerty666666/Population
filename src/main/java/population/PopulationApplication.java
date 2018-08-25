@@ -17,6 +17,9 @@
  */
 package population;
 
+import javafx.event.EventHandler;
+import javafx.scene.control.Button;
+import javafx.stage.WindowEvent;
 import population.controller.PrimaryController;
 import population.controller.base.AbstractAboutController;
 import population.controller.base.AbstractController;
@@ -33,12 +36,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.concurrent.ThreadFactory;
 
 import javafx.application.Application;
@@ -157,6 +155,34 @@ public final class PopulationApplication extends Application {
         App.setResources(mResources);
     }
 
+
+    /**
+     * exit confirmation dialog
+     */
+    protected EventHandler<WindowEvent> confirmCloseEventHandler = event -> {
+        Alert closeConfirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        closeConfirmation.setTitle(this.getResources().getString("ExitConfirmation.Title"));
+        closeConfirmation.setHeaderText(this.getResources().getString("ExitConfirmation.ConfirmationText"));
+        closeConfirmation.initModality(Modality.APPLICATION_MODAL);
+        closeConfirmation.initOwner(mPrimaryStage);
+
+        closeConfirmation.getDialogPane().setPrefWidth(400);
+
+        ((Button)closeConfirmation.getDialogPane()
+            .lookupButton(ButtonType.OK))
+            .setText(this.getResources().getString("ExitConfirmation.OkButton"));
+
+        ((Button)closeConfirmation.getDialogPane()
+            .lookupButton(ButtonType.CANCEL))
+            .setText(this.getResources().getString("ExitConfirmation.CancelButton"));
+
+        Optional<ButtonType> closeResponse = closeConfirmation.showAndWait();
+        if (!ButtonType.OK.equals(closeResponse.orElse(null))) {
+            event.consume();
+        }
+    };
+
+
     private void showPrimaryStage(Stage primaryStage) {
         mPrimaryStage = primaryStage;
         mPrimaryStage.setTitle(mResources.getString("application_name"));
@@ -224,6 +250,9 @@ public final class PopulationApplication extends Application {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+
+        this.getPrimaryStage().setOnCloseRequest(this.confirmCloseEventHandler);
     }
 
     @Override

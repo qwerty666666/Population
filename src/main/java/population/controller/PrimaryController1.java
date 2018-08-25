@@ -17,6 +17,8 @@
  */
 package population.controller;
 
+import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import population.App;
 import population.PopulationApplication;
 import population.controller.base.AbstractController;
@@ -90,6 +92,7 @@ public class PrimaryController1 extends AbstractController {
         int a = 0;
     }
 
+
     @Override
     public void initialize() {
 //        mMainTabPane.getSelectionModel().select(2);
@@ -97,11 +100,13 @@ public class PrimaryController1 extends AbstractController {
 //        openTaskFromFile(file);
     }
 
+
     public void openTask() {
         File file = getTaskFileChooser(getString("open_task"))
                 .showOpenDialog(mMainTabPane.getScene().getWindow());
         openTaskFromFile(file);
     }
+
 
     public void openTaskFromFile(File file) {
         if (file == null) {
@@ -122,11 +127,13 @@ public class PrimaryController1 extends AbstractController {
         App.setTask(task);
     }
 
+
     public void clearTask() {
         taskFile = null;
         App.clearTask();
         setTitle(null);
     }
+
 
     public void saveTaskAs() {
         File file = getTaskFileChooser(getString("save_task"))
@@ -147,6 +154,7 @@ public class PrimaryController1 extends AbstractController {
         setTitle(this.getTaskNameFromFile(file));
     }
 
+
     public void saveTask() {
         if (taskFile == null) {
             saveTaskAs();
@@ -155,21 +163,27 @@ public class PrimaryController1 extends AbstractController {
         }
     }
 
+
     public void about() {
         getApplication().showAboutDialog();
     }
 
+
     public void quit() {
-        Platform.exit();
+        Stage stage = this.getApplication().getPrimaryStage();
+        stage.fireEvent(new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
+
 
     public void selectLangRussian() {
         selectLanguage("ru");
     }
 
+
     public void selectLangEnglish() {
         selectLanguage("en");
     }
+
 
     private void selectLanguage(String langTag) {
         PopulationApplication application = getApplication();
