@@ -269,6 +269,7 @@ public class TransitionsController extends AbstractController {
         });
 
         inColumn.setSortable(false);
+        inColumn.setPrefWidth(30);
         inColumn.getStyleClass().add("transition-state-in");
 
         return inColumn;
@@ -292,6 +293,7 @@ public class TransitionsController extends AbstractController {
         });
 
         outColumn.setSortable(false);
+        outColumn.setPrefWidth(30);
         outColumn.getStyleClass().add("transition-state-out");
 
         return outColumn;
@@ -316,6 +318,7 @@ public class TransitionsController extends AbstractController {
         });
 
         delayColumn.setSortable(false);
+        delayColumn.setPrefWidth(30);
         delayColumn.getStyleClass().add("transition-state-delay");
 
         return delayColumn;
