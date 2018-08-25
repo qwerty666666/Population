@@ -1,8 +1,29 @@
-.transition-state-in,
+/*.transition-state-in,
 .transition-state-out,
 .transition-state-delay {
-    -fx-pref-width: 40px;
-}
+    -fx-pref-width: 30;
+}*/
 .table-view .column-header {
     -fx-font-weight: normal;
 }
+
+/* cell borders */
+
+.table-view {
+    bold-border-color: #b8b8b8;
+}
+
+.column-header.transition-state {
+    -fx-border-color: transparent -fx-table-header-border-color transparent bold-border-color;
+}
+.with-data .transition-state {
+    -fx-border-color: transparent -fx-table-cell-border-color transparent bold-border-color;
+}
+
+/*
+.new-transition .table-cell.transition-state {
+    -fx-border-color: bold-border-color -fx-table-cell-border-color transparent bold-border-color;
+}
+.new-transition .table-cell {
+    -fx-border-color: bold-border-color -fx-table-cell-border-color transparent -fx-table-cell-border-color ;
+}*/

@@ -19,49 +19,16 @@ package population.controller;
 
 import population.App;
 import population.PopulationApplication;
-import population.component.Calculator;
-import population.component.ChartSeries;
-import population.component.TickLabelFormatter;
 import population.controller.base.AbstractController;
 import population.model.*;
 import population.util.TaskParser;
-import population.util.Utils;
 import javafx.application.Platform;
-import javafx.beans.Observable;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.Point2D;
-import javafx.scene.Node;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.cell.ChoiceBoxTableCell;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
-import javafx.util.Callback;
-import javafx.util.StringConverter;
 
 import java.io.File;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 
 public class PrimaryController1 extends AbstractController {
@@ -89,15 +56,34 @@ public class PrimaryController1 extends AbstractController {
         return fileChooser;
     }
 
-    private void setTitle(File file) {
-        String applicationName = getString("application_name");
-        getStage().setTitle(
-                file == null ? applicationName : file.getName() + " - " + applicationName);
+
+    /**
+     * set title for main window
+     * @param title title
+     */
+    private void setTitle(String title) {
+        getStage().setTitle(title == null || title.isEmpty() ? this.getDefaultTitle() : title);
     }
 
-    private void setTitle() {
-        setTitle(null);
+
+    /**
+     * @return task name from file or empty string if file is null
+     */
+    private String getTaskNameFromFile(File file) {
+        if (file == null) {
+            return "";
+        }
+        return file.getName();
     }
+
+
+    /**
+     * @return title displayed by default
+     */
+    private String getDefaultTitle() {
+        return getString("application_name");
+    }
+
 
     @FXML
     public void debug() {
@@ -114,7 +100,6 @@ public class PrimaryController1 extends AbstractController {
     public void openTask() {
         File file = getTaskFileChooser(getString("open_task"))
                 .showOpenDialog(mMainTabPane.getScene().getWindow());
-
         openTaskFromFile(file);
     }
 
@@ -132,13 +117,15 @@ public class PrimaryController1 extends AbstractController {
 
         getApplication().setWorkDirectory(file.getParent());
 
+        this.setTitle(this.getTaskNameFromFile(file));
+
         App.setTask(task);
     }
 
     public void clearTask() {
         taskFile = null;
         App.clearTask();
-        setTitle();
+        setTitle(null);
     }
 
     public void saveTaskAs() {
@@ -157,7 +144,7 @@ public class PrimaryController1 extends AbstractController {
         TaskParser.encodeV4(file, App.getTask());
         taskFile = file;
         getApplication().setWorkDirectory(file.getParent());
-        setTitle(file);
+        setTitle(this.getTaskNameFromFile(file));
     }
 
     public void saveTask() {

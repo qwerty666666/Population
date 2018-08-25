@@ -1,21 +1,21 @@
 package population.controller;
 
+import javafx.application.Platform;
+import javafx.scene.Node;
+import javafx.scene.control.*;
 import population.App;
 import population.component.UIComponents.TextFieldTableCell;
 import population.controller.base.AbstractController;
 import population.model.StateModel.State;
+import population.model.StateModel.StateFactory;
 import population.model.TransitionModel.*;
 import population.model.TransitionType;
 import population.util.Converter;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.input.MouseEvent;
 import javafx.util.converter.DefaultStringConverter;
@@ -24,6 +24,7 @@ import javafx.util.converter.IntegerStringConverter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class TransitionsController extends AbstractController {
@@ -45,12 +46,13 @@ public class TransitionsController extends AbstractController {
     private Button addTransitionExtensionButton;
 
 
-
+    /**
+     * states count shown in one table row
+     */
     private int statesInTransitionColumnsCount = 3;
     private TransitionTableRowItemObservableList transitions;
     private ObservableList<Transition> model;
     private final ObservableList<State> statesList = FXCollections.observableArrayList();
-
 
 
     /**************************************************
@@ -62,20 +64,20 @@ public class TransitionsController extends AbstractController {
     @Override
     public void initialize() {
         this.model = App.getTransitions();
-        transitions = new TransitionTableRowItemObservableList(model, statesInTransitionColumnsCount);
-        initStatesList();
+        this.initTransitions();
+        this.initStatesList();
         this.initTable();
         this.initButtons();
     }
 
 
+    private void initTransitions() {
+        transitions = new TransitionTableRowItemObservableList(model, statesInTransitionColumnsCount);
+    }
+
+
     private void initStatesList() {
-        // add external state
-        State external = new State();
-        external.setId(State.EXTERNAL_ID);
-        external.setName(App.getString("state_external"));
-        external.setAlias(App.getString("state_external"));
-        statesList.add(external);
+        statesList.add(new StateFactory().createEmptyState());
 
         // listen for changes in State Table
         App.getStates().addListener((ListChangeListener<State>) c -> {
@@ -118,10 +120,36 @@ public class TransitionsController extends AbstractController {
 
         transitionsTable.setItems(transitions.getItems());
 
+        /*
+         * update table styles when it's item list changed
+         */
+        transitionsTable.getItems().addListener(new ListChangeListener<TransitionTableRowItem>() {
+            /*
+             * we will lookup through the table to find actual TableRows with data,
+             * so we should do it after table layout update.
+             * We'll call it in GUI thread and to prevent redundant calls, we'll use called flag
+             * which will be set to false every time item list changed and to true when GUI thread has updated
+             */
+            AtomicBoolean called = new AtomicBoolean(true);
+            @Override
+            public void onChanged(Change<? extends TransitionTableRowItem> c) {
+                if (called.get()) {
+                    called.set(false);
+                    Platform.runLater(() -> {
+                        called.set(true);
+                        transitionsTable.layout();
+                        updateTableRowClassList();
+                    });
+                } else {
+                    called.set(false);
+                }
+            }
+        });
+
         this.initIdColumn();
         this.initProbabilityColumn();
         this.initTypeColumn();
-        this.initBlockColumn();
+//        this.initBlockColumn();
         this.initStateColumns();
     }
 
@@ -139,7 +167,7 @@ public class TransitionsController extends AbstractController {
         probabilityColumn.setCellFactory(list -> new TextFieldTableCell<TransitionTableRowItem, Double>(Converter.DOUBLE_STRING_CONVERTER) {
             @Override
             public void startEdit() {
-                if (((TransitionTableRowItem)this.getTableRow().getItem()).isExtension()) {
+                if (((TransitionTableRowItem) this.getTableRow().getItem()).isExtension()) {
                     return;
                 }
                 super.startEdit();
@@ -157,7 +185,7 @@ public class TransitionsController extends AbstractController {
         typeColumn.setCellFactory(list -> new ComboBoxTableCell<TransitionTableRowItem, Number>(Converter.TRANSITION_TYPE_STRING_CONVERTER, TransitionType.TYPES) {
             @Override
             public void startEdit() {
-                if (((TransitionTableRowItem)this.getTableRow().getItem()).isExtension()) {
+                if (((TransitionTableRowItem) this.getTableRow().getItem()).isExtension()) {
                     return;
                 }
                 super.startEdit();
@@ -175,57 +203,149 @@ public class TransitionsController extends AbstractController {
     }
 
     private void initStateColumns() {
-        for (int i = 0; i < this.statesInTransitionColumnsCount; i++) {
-            final int index = i;
-
-            TableColumn<TransitionTableRowItem, State> stateColumn = new TableColumn<>(this.getString("transition_state"));
-            stateColumn.setCellValueFactory(param -> param.getValue().getStates().get(index).stateProperty());
-            stateColumn.setCellFactory(ComboBoxTableCell.forTableColumn(Converter.STATE_STRING_CONVERTER, statesList));
-            stateColumn.setSortable(false);
-            stateColumn.getStyleClass().add("transition-state");
-
-            TableColumn<TransitionTableRowItem, Double> inColumn = new TableColumn<>(this.getString("transition_state_in"));
-            inColumn.setCellValueFactory(param -> {
-                StateInTransition state = param.getValue().getStates().get(index);
-                if (state.getState() == null || state.getState().getId() == State.EXTERNAL_ID) {
-                    return null;
-                }
-                return param.getValue().getStates().get(index).inProperty().asObject();
-            });
-            inColumn.setCellFactory(list -> new TextFieldTableCell<>(Converter.DOUBLE_STRING_CONVERTER));
-            inColumn.setSortable(false);
-            inColumn.getStyleClass().add("transition-state-in");
-
-            TableColumn<TransitionTableRowItem, Double> outColumn = new TableColumn<>(this.getString("transition_state_out"));
-            outColumn.setCellValueFactory(param -> param.getValue().getStates().get(index).outProperty().asObject());
-            outColumn.setCellFactory(list -> new TextFieldTableCell<>(Converter.DOUBLE_STRING_CONVERTER));
-            outColumn.setSortable(false);
-            outColumn.getStyleClass().add("transition-state-out");
-
-            TableColumn<TransitionTableRowItem, Integer> delayColumn = new TableColumn<>(this.getString("transition_state_delay"));
-            delayColumn.setCellValueFactory(param -> param.getValue().getStates().get(index).delayProperty().asObject());
-            delayColumn.setCellFactory(list -> new TextFieldTableCell<>(new IntegerStringConverter()));
-            delayColumn.setSortable(false);
-            delayColumn.getStyleClass().add("transition-state-delay");
-
-            TableColumn<TransitionTableRowItem, Number> modeColumn = new TableColumn<>(this.getString("transition_mode"));
-            modeColumn.setCellValueFactory(param -> param.getValue().getStates().get(index).modeProperty());
-            modeColumn.setCellFactory(ComboBoxTableCell.forTableColumn(Converter.STATE_IN_TRANSITION_MODE_STRING_CONVERTER, StateMode.MODES));
-            modeColumn.setSortable(false);
-            modeColumn.getStyleClass().add("transition-state-mode");
-
+        for (int index = 0; index < this.statesInTransitionColumnsCount; index++) {
             final List<TableColumn<TransitionTableRowItem, ?>> columns = Arrays.asList(
-                    stateColumn,
-                    inColumn,
-                    outColumn,
-                    delayColumn,
-                    modeColumn
+                this.getStateColumn(index),
+                this.getInColumn(index),
+                this.getOutColumn(index),
+                this.getDelayColumn(index),
+                this.getModeColumn(index)
             );
             for (int j = 0; j < columns.size(); j++) {
                 transitionsTable.getColumns().add(3 + j + index * columns.size(), columns.get(j));
             }
-
         }
+    }
+
+
+    private TableColumn<TransitionTableRowItem, State> getStateColumn(int index) {
+        TableColumn<TransitionTableRowItem, State> stateColumn = new TableColumn<>(this.getString("transition_state"));
+
+        stateColumn.setCellValueFactory(param -> {
+            if (index >= param.getValue().getStates().size()) {
+                return null;
+            }
+            return param.getValue().getStates().get(index).stateProperty();
+        });
+
+        stateColumn.setCellFactory(ComboBoxTableCell.forTableColumn(Converter.STATE_STRING_CONVERTER, statesList));
+        stateColumn.setSortable(false);
+        stateColumn.getStyleClass().add("transition-state");
+
+        stateColumn.setOnEditCommit(event -> {
+            State newValue = event.getNewValue();
+            if (newValue != null && newValue.isEmptyState()) {
+                StateInTransition stateInTransition = event.getRowValue().getStates().get(index);
+                stateInTransition.setIn(0);
+                stateInTransition.setOut(0);
+                stateInTransition.setDelay(0);
+                stateInTransition.setMode(StateMode.SIMPLE);
+            }
+        });
+
+        return stateColumn;
+    }
+
+
+    private TableColumn<TransitionTableRowItem, Double> getInColumn(int index) {
+        TableColumn<TransitionTableRowItem, Double> inColumn = new TableColumn<>(this.getString("transition_state_in"));
+
+        inColumn.setCellValueFactory(param -> {
+            if (index >= param.getValue().getStates().size()) {
+                return null;
+            }
+            StateInTransition state = param.getValue().getStates().get(index);
+            if (state.getState() == null || state.getState().isEmptyState()) {
+                return null;
+            }
+            return state.inProperty().asObject();
+        });
+
+        inColumn.setCellFactory(list -> {
+            Converter.HideDefaultValueDecoratorConverter<Double> converter = new Converter.HideDefaultValueDecoratorConverter<>(
+                Converter.DOUBLE_STRING_CONVERTER, 0., Double::compare
+            );
+            return new TextFieldTableCell<>(converter);
+        });
+
+        inColumn.setSortable(false);
+        inColumn.setPrefWidth(30);
+        inColumn.getStyleClass().add("transition-state-in");
+
+        return inColumn;
+    }
+
+
+    private TableColumn<TransitionTableRowItem, Double> getOutColumn(int index) {
+        TableColumn<TransitionTableRowItem, Double> outColumn = new TableColumn<>(this.getString("transition_state_out"));
+        outColumn.setCellValueFactory(param -> {
+            if (index >= param.getValue().getStates().size()) {
+                return null;
+            }
+            return param.getValue().getStates().get(index).outProperty().asObject();
+        });
+
+        outColumn.setCellFactory(list -> {
+            Converter.HideDefaultValueDecoratorConverter<Double> converter = new Converter.HideDefaultValueDecoratorConverter<>(
+                Converter.DOUBLE_STRING_CONVERTER, 0., Double::compare
+            );
+            return new TextFieldTableCell<>(converter);
+        });
+
+        outColumn.setSortable(false);
+        outColumn.setPrefWidth(30);
+        outColumn.getStyleClass().add("transition-state-out");
+
+        return outColumn;
+    }
+
+
+    private TableColumn<TransitionTableRowItem, Integer> getDelayColumn(int index) {
+        TableColumn<TransitionTableRowItem, Integer> delayColumn = new TableColumn<>(this.getString("transition_state_delay"));
+
+        delayColumn.setCellValueFactory(param -> {
+            if (index >= param.getValue().getStates().size()) {
+                return null;
+            }
+            return param.getValue().getStates().get(index).delayProperty().asObject();
+        });
+
+        delayColumn.setCellFactory(list -> {
+            Converter.HideDefaultValueDecoratorConverter<Integer> converter = new Converter.HideDefaultValueDecoratorConverter<>(
+                new IntegerStringConverter(), 0, Integer::compare
+            );
+            return new TextFieldTableCell<>(converter);
+        });
+
+        delayColumn.setSortable(false);
+        delayColumn.setPrefWidth(30);
+        delayColumn.getStyleClass().add("transition-state-delay");
+
+        return delayColumn;
+    }
+
+
+    private TableColumn<TransitionTableRowItem, Integer> getModeColumn(int index) {
+        TableColumn<TransitionTableRowItem, Integer> modeColumn = new TableColumn<>(this.getString("transition_mode"));
+
+        modeColumn.setCellValueFactory(param -> {
+            if (index >= param.getValue().getStates().size()) {
+                return null;
+            }
+            return param.getValue().getStates().get(index).modeProperty().asObject();
+        });
+
+        modeColumn.setCellFactory(list -> {
+            Converter.HideDefaultValueDecoratorConverter<Integer> converter = new Converter.HideDefaultValueDecoratorConverter<>(
+                Converter.STATE_IN_TRANSITION_MODE_STRING_CONVERTER, StateMode.SIMPLE, Integer::compare
+            );
+            return new ComboBoxTableCell<>(converter, FXCollections.observableList(StateMode.MODES));
+        });
+
+        modeColumn.setSortable(false);
+        modeColumn.getStyleClass().add("transition-state-mode");
+
+        return modeColumn;
     }
 
 
@@ -247,6 +367,34 @@ public class TransitionsController extends AbstractController {
      *              FXML Bindings
      *
      *************************************************/
+
+    /**
+     * update css classes for table rows
+     * append .new-transition class for rows in which transition starts
+     * append .with-data class for rows with associated transition
+     */
+    protected void updateTableRowClassList() {
+        int rowIndex = 0;
+        List<TransitionTableRowItem> items = transitionsTable.getItems();
+
+        for (Node node: transitionsTable.lookupAll("TableRow")) {
+            if (node instanceof TableRow) {
+                TableRow row = (TableRow) node;
+
+                if (rowIndex < items.size()) {
+                    row.getStyleClass().add("with-data");
+                    if (!items.get(rowIndex).isExtension()) {
+                        row.getStyleClass().add("new-transition");
+                    }
+                } else {
+                    row.getStyleClass().removeAll("new-transition", "with-data");
+                }
+            }
+
+            rowIndex++;
+        }
+    }
+
 
     @FXML
     public void addTransition() {
