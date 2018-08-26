@@ -16,11 +16,11 @@
         <TableView fx:id="resultTable" layoutX="14.0" layoutY="14.0" AnchorPane.bottomAnchor="49.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="10.0" />
         <HBox alignment="CENTER_LEFT" layoutX="14.0" layoutY="329.0" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0">
             <children>
-                <Button fx:id="clearResultsTableButton" mnemonicParsing="false" onAction="#clear" text="%clear" />
+                <Button fx:id="clearResultsTableButton" mnemonicParsing="false" onAction="#clear" text="%TopMenu.Task.Clear" />
                 <!-- TODO export -->
                 <!--<Button fx:id="exportResultsButton" mnemonicParsing="false" onAction="#export" text="%export" />-->
                 <Pane HBox.hgrow="ALWAYS" />
-                <Label text="%precision" />
+                <Label text="%Transitions.Settings.Precision" />
                 <TextField fx:id="precisionTextField" onAction="#applyPrecision" text="3" />
             </children>
         </HBox>

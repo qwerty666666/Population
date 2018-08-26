@@ -162,7 +162,7 @@ public class PrimaryController extends AbstractController {
                 .setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<String>() {
                     @Override
                     public String toString(String object) {
-                        return Utils.isNullOrEmpty(object) ? getString("unnamed") : object;
+                        return Utils.isNullOrEmpty(object) ? getString("App.UnnamedStub") : object;
                     }
 
                     @Override
@@ -366,7 +366,7 @@ public class PrimaryController extends AbstractController {
                 .setCellFactory(ChoiceBoxTableCell.forTableColumn(new StringConverter<Number>() {
                     @Override
                     public String toString(Number object) {
-                        return ChartSeries.Color.getName(object.intValue(), getResources());
+                        return ChartSeries.Color.getName(object.intValue());
                     }
 
                     @Override
@@ -388,7 +388,7 @@ public class PrimaryController extends AbstractController {
                 .setCellFactory(ChoiceBoxTableCell.forTableColumn(new StringConverter<Number>() {
                     @Override
                     public String toString(Number object) {
-                        return ChartSeries.Dash.getName(object.intValue(), getResources());
+                        return ChartSeries.Dash.getName(object.intValue());
                     }
 
                     @Override
@@ -409,7 +409,7 @@ public class PrimaryController extends AbstractController {
                 .setCellFactory(ChoiceBoxTableCell.forTableColumn(new StringConverter<Number>() {
                     @Override
                     public String toString(Number object) {
-                        return ChartSeries.Thickness.getName(object.intValue(), getResources());
+                        return ChartSeries.Thickness.getName(object.intValue());
                     }
 
                     @Override
@@ -587,7 +587,7 @@ public class PrimaryController extends AbstractController {
                 }
                 String name = state.getName();
                 if (Utils.isNullOrEmpty(name)) {
-                    return getString("unnamed");
+                    return getString("App.UnnamedStub");
                 }
                 return name;
             }
@@ -698,7 +698,7 @@ public class PrimaryController extends AbstractController {
     private FileChooser getTaskFileChooser(String title) {
         FileChooser fileChooser = getFileChooser(title);
         fileChooser.getExtensionFilters()
-                .add(new FileChooser.ExtensionFilter(getString("task"), "*.pmt"));
+                .add(new FileChooser.ExtensionFilter(getString("TopMenu.Task"), "*.pmt"));
         return fileChooser;
     }
 
@@ -998,7 +998,7 @@ public class PrimaryController extends AbstractController {
         mResultsTable.getItems().clear();
         mResultsTable.getColumns().clear();
         TableColumn<ArrayList<TableResult>, Number> numberColumn = new TableColumn<>();
-        numberColumn.setText(getString("step"));
+        numberColumn.setText(getString("Transitions.Settings.Step"));
         numberColumn.setCellFactory(integerCell(x -> true, 0));
         numberColumn.setMinWidth(30);
         numberColumn.setSortable(false);
@@ -1176,13 +1176,13 @@ public class PrimaryController extends AbstractController {
 
     public void calculate() {
         if (mStates.size() == 0) {
-            getApplication().showAlert(getString("alert_error"), null, getString("states_missing"),
+            getApplication().showAlert(getString("App.ErrorAlert.Title"), null, getString("states_missing"),
                     Alert.AlertType.WARNING);
             return;
         }
         if (mTransitions.size() == 0) {
             getApplication()
-                    .showAlert(getString("alert_error"), null, getString("transitions_missing"),
+                    .showAlert(getString("App.ErrorAlert.Title"), null, getString("transitions_missing"),
                             Alert.AlertType.WARNING);
             return;
         }
@@ -1190,7 +1190,7 @@ public class PrimaryController extends AbstractController {
             if (transition.getSourceState() == State.UNDEFINED ||
                     transition.getOperandState() == State.UNDEFINED ||
                     transition.getResultState() == State.UNDEFINED) {
-                getApplication().showAlert(getString("alert_error"), null,
+                getApplication().showAlert(getString("App.ErrorAlert.Title"), null,
                         getString("transitions_incorrect"), Alert.AlertType.WARNING);
                 return;
             }
@@ -1200,7 +1200,7 @@ public class PrimaryController extends AbstractController {
             startPoint = Integer.parseInt(mStartPointField.getText());
         } catch (NumberFormatException e) {
             getApplication()
-                    .showAlert(getString("alert_error"), null, getString("start_point_invalid"),
+                    .showAlert(getString("App.ErrorAlert.Title"), null, getString("start_point_invalid"),
                             Alert.AlertType.WARNING);
             return;
         }
@@ -1209,13 +1209,13 @@ public class PrimaryController extends AbstractController {
             stepsCount = Integer.parseInt(mStepsCountField.getText());
             if (stepsCount < 1 || stepsCount == Integer.MAX_VALUE) {
                 getApplication()
-                        .showAlert(getString("alert_error"), null, getString("steps_count_invalid"),
+                        .showAlert(getString("App.ErrorAlert.Title"), null, getString("steps_count_invalid"),
                                 Alert.AlertType.WARNING);
                 return;
             }
         } catch (NumberFormatException e) {
             getApplication()
-                    .showAlert(getString("alert_error"), null, getString("steps_count_invalid"),
+                    .showAlert(getString("App.ErrorAlert.Title"), null, getString("steps_count_invalid"),
                             Alert.AlertType.WARNING);
             return;
         }
@@ -1349,7 +1349,7 @@ public class PrimaryController extends AbstractController {
         if (mCalculating) {
             return;
         }
-        File file = getTaskFileChooser(getString("open_task"))
+        File file = getTaskFileChooser(getString("App.OpenTaskDialogTitle"))
                 .showOpenDialog(mCalculateButton.getScene().getWindow());
         if (file == null) {
             return;
@@ -1419,7 +1419,7 @@ public class PrimaryController extends AbstractController {
     }
 
     public void saveTaskAs() {
-        File file = getTaskFileChooser(getString("save_task"))
+        File file = getTaskFileChooser(getString("App.SaveTaskDialogTitle"))
                 .showSaveDialog(mStatesTable.getScene().getWindow());
         if (file == null) {
             return;
@@ -1453,7 +1453,7 @@ public class PrimaryController extends AbstractController {
     }
 
     public void exportResults() {
-        getApplication().showExportDialog(mResultsTableData, mTaskSettings);
+        //getApplication().showExportDialog(mResultsTableData, mTaskSettings);
     }
 
     public void applyResultsTablePrecision() {
@@ -1506,8 +1506,8 @@ public class PrimaryController extends AbstractController {
         PopulationApplication application = getApplication();
         if (application.selectLanguage(langTag)) {
             ResourceBundle resources = getResources();
-            application.showAlert(resources.getString("lang"), null,
-                    resources.getString("lang_change"), Alert.AlertType.INFORMATION);
+            application.showAlert(resources.getString("TopMenu.Lang"), null,
+                    resources.getString("App.ChangeLang.Info"), Alert.AlertType.INFORMATION);
         }
     }
 }

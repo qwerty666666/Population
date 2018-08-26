@@ -23,8 +23,8 @@ import population.App;
 import population.PopulationApplication;
 import population.controller.base.AbstractController;
 import population.model.*;
+import population.util.Resource;
 import population.util.TaskParser;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
@@ -41,7 +41,7 @@ public class PrimaryController1 extends AbstractController {
     private FileChooser getTaskFileChooser(String title) {
         FileChooser fileChooser = getFileChooser(title);
         fileChooser.getExtensionFilters()
-                .add(new FileChooser.ExtensionFilter(getString("task"), "*.pmt"));
+                .add(new FileChooser.ExtensionFilter(getString("TopMenu.Task"), "*.pmt"));
         return fileChooser;
     }
 
@@ -83,7 +83,7 @@ public class PrimaryController1 extends AbstractController {
      * @return title displayed by default
      */
     private String getDefaultTitle() {
-        return getString("application_name");
+        return Resource.getString("App.WindowTitle");
     }
 
 
@@ -102,7 +102,7 @@ public class PrimaryController1 extends AbstractController {
 
 
     public void openTask() {
-        File file = getTaskFileChooser(getString("open_task"))
+        File file = getTaskFileChooser(getString("App.OpenTaskDialogTitle"))
                 .showOpenDialog(mMainTabPane.getScene().getWindow());
         openTaskFromFile(file);
     }
@@ -136,7 +136,7 @@ public class PrimaryController1 extends AbstractController {
 
 
     public void saveTaskAs() {
-        File file = getTaskFileChooser(getString("save_task"))
+        File file = getTaskFileChooser(getString("App.SaveTaskDialogTitle"))
                 .showSaveDialog(this.getStage().getScene().getWindow());
         if (file == null) {
             return;
@@ -165,7 +165,7 @@ public class PrimaryController1 extends AbstractController {
 
 
     public void about() {
-        getApplication().showAboutDialog();
+//        getApplication().showAboutDialog();
     }
 
 
@@ -189,8 +189,8 @@ public class PrimaryController1 extends AbstractController {
         PopulationApplication application = getApplication();
         if (application.selectLanguage(langTag)) {
             ResourceBundle resources = getResources();
-            application.showAlert(resources.getString("lang"), null,
-                    resources.getString("lang_change"), Alert.AlertType.INFORMATION);
+            application.showAlert(resources.getString("TopMenu.Lang"), null,
+                    resources.getString("App.ChangeLang.Info"), Alert.AlertType.INFORMATION);
         }
     }
 }

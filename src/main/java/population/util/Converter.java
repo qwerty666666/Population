@@ -108,7 +108,7 @@ public class Converter {
             }
 
             String name = state.getName().trim();
-            return name.length() > 0 ? name : App.getString("unnamed");
+            return name.length() > 0 ? name : Resource.getString("App.UnnamedStub");
         }
 
         @Override
@@ -147,7 +147,7 @@ public class Converter {
     public static final StringConverter<Number> COLOR_STRING_CONVERTER = new StringConverter<Number>() {
         @Override
         public String toString(Number object) {
-            return ChartSeries.Color.getName(object.intValue(), App.getResources());
+            return ChartSeries.Color.getName(object.intValue());
         }
 
         @Override
@@ -160,7 +160,7 @@ public class Converter {
     public static final StringConverter<Number> DASH_STRING_CONVERTER = new StringConverter<Number>() {
         @Override
         public String toString(Number object) {
-            return ChartSeries.Dash.getName(object.intValue(), App.getResources());
+            return ChartSeries.Dash.getName(object.intValue());
         }
 
         @Override
@@ -173,7 +173,7 @@ public class Converter {
     public static final StringConverter<Number> THICKNESS_STRING_CONVERTER = new StringConverter<Number>() {
         @Override
         public String toString(Number object) {
-            return ChartSeries.Thickness.getName(object.intValue(), App.getResources());
+            return ChartSeries.Thickness.getName(object.intValue());
         }
 
         @Override

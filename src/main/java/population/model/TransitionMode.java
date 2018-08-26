@@ -37,7 +37,7 @@ public final class TransitionMode {
     public static String getName(int mode, ResourceBundle resources) {
         switch (mode) {
             case SIMPLE: {
-                return resources.getString("mode_simple");
+                return resources.getString("States.Mode.Simple");
             }
             case RETAINING: {
                 return resources.getString("mode_retaining");
@@ -46,13 +46,13 @@ public final class TransitionMode {
                 return resources.getString("mode_removing");
             }
             case RESIDUAL: {
-                return resources.getString("mode_residual");
+                return resources.getString("States.Mode.Residual");
             }
             case INHIBITOR: {
-                return resources.getString("mode_inhibitor");
+                return resources.getString("States.Mode.Inhibitor");
             }
             default: {
-                return resources.getString("unnamed");
+                return resources.getString("App.UnnamedStub");
             }
         }
     }
