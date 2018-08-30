@@ -77,7 +77,7 @@ public class TransitionsController extends AbstractController {
 
 
     private void initStatesList() {
-        statesList.add(new StateFactory().createEmptyState());
+        statesList.add(new StateFactory().makeEmptyState());
 
         // listen for changes in State Table
         App.getStates().addListener((ListChangeListener<State>) c -> {
@@ -202,6 +202,10 @@ public class TransitionsController extends AbstractController {
         blockColumn.setCellFactory(list -> new TextFieldTableCell<>(new DefaultStringConverter()));
     }
 
+
+    /**
+     * initialize states columns (state, in, out, delay)
+     */
     private void initStateColumns() {
         for (int index = 0; index < this.statesInTransitionColumnsCount; index++) {
             final List<TableColumn<TransitionTableRowItem, ?>> columns = Arrays.asList(
@@ -218,6 +222,10 @@ public class TransitionsController extends AbstractController {
     }
 
 
+    /**
+     * @param index index of StateInTransition in table row
+     * @return state column
+     */
     private TableColumn<TransitionTableRowItem, State> getStateColumn(int index) {
         TableColumn<TransitionTableRowItem, State> stateColumn = new TableColumn<>(this.getString("transition_state"));
 
@@ -234,8 +242,11 @@ public class TransitionsController extends AbstractController {
 
         stateColumn.setOnEditCommit(event -> {
             State newValue = event.getNewValue();
+
+            StateInTransition stateInTransition = event.getRowValue().getStates().get(index);
+            stateInTransition.setState(newValue);
+
             if (newValue != null && newValue.isEmptyState()) {
-                StateInTransition stateInTransition = event.getRowValue().getStates().get(index);
                 stateInTransition.setIn(0);
                 stateInTransition.setOut(0);
                 stateInTransition.setDelay(0);
@@ -247,6 +258,10 @@ public class TransitionsController extends AbstractController {
     }
 
 
+    /**
+     * @param index index of StateInTransition in table row
+     * @return in property column for state
+     */
     private TableColumn<TransitionTableRowItem, Double> getInColumn(int index) {
         TableColumn<TransitionTableRowItem, Double> inColumn = new TableColumn<>(this.getString("transition_state_in"));
 
@@ -254,11 +269,7 @@ public class TransitionsController extends AbstractController {
             if (index >= param.getValue().getStates().size()) {
                 return null;
             }
-            StateInTransition state = param.getValue().getStates().get(index);
-            if (state.getState() == null || state.getState().isEmptyState()) {
-                return null;
-            }
-            return state.inProperty().asObject();
+            return param.getValue().getStates().get(index).inProperty().asObject();
         });
 
         inColumn.setCellFactory(list -> {
@@ -269,13 +280,17 @@ public class TransitionsController extends AbstractController {
         });
 
         inColumn.setSortable(false);
-        inColumn.setPrefWidth(30);
+        inColumn.setPrefWidth(40);
         inColumn.getStyleClass().add("transition-state-in");
 
         return inColumn;
     }
 
 
+    /**
+     * @param index index of StateInTransition in table row
+     * @return out property column for state
+     */
     private TableColumn<TransitionTableRowItem, Double> getOutColumn(int index) {
         TableColumn<TransitionTableRowItem, Double> outColumn = new TableColumn<>(this.getString("transition_state_out"));
         outColumn.setCellValueFactory(param -> {
@@ -293,13 +308,17 @@ public class TransitionsController extends AbstractController {
         });
 
         outColumn.setSortable(false);
-        outColumn.setPrefWidth(30);
+        outColumn.setPrefWidth(40);
         outColumn.getStyleClass().add("transition-state-out");
 
         return outColumn;
     }
 
 
+    /**
+     * @param index index of StateInTransition in table row
+     * @return delay property column for state
+     */
     private TableColumn<TransitionTableRowItem, Integer> getDelayColumn(int index) {
         TableColumn<TransitionTableRowItem, Integer> delayColumn = new TableColumn<>(this.getString("transition_state_delay"));
 
@@ -318,7 +337,7 @@ public class TransitionsController extends AbstractController {
         });
 
         delayColumn.setSortable(false);
-        delayColumn.setPrefWidth(30);
+        delayColumn.setPrefWidth(40);
         delayColumn.getStyleClass().add("transition-state-delay");
 
         return delayColumn;

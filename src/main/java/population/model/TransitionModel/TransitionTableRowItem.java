@@ -5,6 +5,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import population.model.StateModel.StateFactory;
 
 /**
  * represents each row in transition table.
@@ -28,7 +29,9 @@ public class TransitionTableRowItem extends Transition {
         this.isExtension.setValue(isExtension);
         this.statesCount.setValue(statesCount);
         for (int i = 0; i < statesCount; i++) {
-            this.states.add(new StateInTransition());
+            StateInTransition stateInTransition = new StateInTransition();
+            stateInTransition.setState(new StateFactory().makeEmptyState());
+            this.states.add(stateInTransition);
         }
     }
 
