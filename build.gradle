@@ -4,14 +4,18 @@ plugins {
     id 'java'
 }
 
-
 group 'Population'
 version '1.0-SNAPSHOT'
 sourceCompatibility = 1.8
 
 
+class BuildType {
+    static DEV = 'DEV';
+    static PROD = 'PROD';
+}
+
 ext {
-    buildType = 'DEBUG' // DEV, PROD
+    buildType = BuildType.DEV
 }
 
 
@@ -40,12 +44,8 @@ jar {
 }
 
 
-sourceSets {
-    // copy resource files to custom directory for backward compatibility
-    main.output.resourcesDir "${buildDir}/classes/java/main/population/resource"
-}
-
-
+// copy resource files to custom directory for backward compatibility
+sourceSets.main.output.resourcesDir = "${buildDir}/classes/java/main/population/resource"
 processResources {
     // set up ResourceBundle files
     filesMatching '**/*.properties', {
