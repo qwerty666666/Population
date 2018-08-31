@@ -23,7 +23,7 @@ import population.App;
 import population.PopulationApplication;
 import population.controller.base.AbstractController;
 import population.model.*;
-import population.util.Resource;
+import population.util.Resources.StringResource;
 import population.util.TaskParser;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -83,7 +83,7 @@ public class PrimaryController1 extends AbstractController {
      * @return title displayed by default
      */
     private String getDefaultTitle() {
-        return Resource.getString("App.WindowTitle");
+        return StringResource.getString("App.WindowTitle");
     }
 
 
@@ -95,6 +95,7 @@ public class PrimaryController1 extends AbstractController {
 
     @Override
     public void initialize() {
+        this.setTitle(this.getDefaultTitle());
 //        mMainTabPane.getSelectionModel().select(2);
 //        File file = new File("C:\\Users\\user\\Desktop\\test.pmt");
 //        openTaskFromFile(file);

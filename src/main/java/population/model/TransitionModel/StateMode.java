@@ -1,12 +1,10 @@
 package population.model.TransitionModel;
 
 
-import population.App;
-import population.util.Resource;
+import population.util.Resources.StringResource;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.ResourceBundle;
 
 
 public class StateMode {
@@ -20,13 +18,13 @@ public class StateMode {
     public static String getName(int type) {
         switch (type) {
             case SIMPLE: {
-                return Resource.getString("States.Mode.Simple");
+                return StringResource.getString("States.Mode.Simple");
             }
             case INHIBITOR: {
-                return Resource.getString("States.Mode.Inhibitor");
+                return StringResource.getString("States.Mode.Inhibitor");
             }
             case RESIDUAL: {
-                return Resource.getString("States.Mode.Residual");
+                return StringResource.getString("States.Mode.Residual");
             }
             default: {
                 return "";

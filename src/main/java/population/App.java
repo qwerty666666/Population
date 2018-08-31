@@ -10,6 +10,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import population.util.Resources.AppResource;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -28,6 +29,16 @@ public class App {
     public static void init() {
         initTask();
     }
+
+
+    public static boolean isDev() {
+        return AppResource.getString("buildType").equals("DEV");
+    }
+
+    public static String getVersion() {
+        return AppResource.getString("version");
+    }
+
 
     /************************************************
      *

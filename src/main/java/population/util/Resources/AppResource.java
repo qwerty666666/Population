@@ -1,15 +1,15 @@
-package population.util;
+package population.util.Resources;
 
 import java.util.ResourceBundle;
 
 /**
- * Class for retrieving i18n ResourceBundles
+ * Class for retrieving application properties
  */
-public class Resource {
+public class AppResource {
     /**
-     * root directory for resources
+     * property files
      */
-    protected static final String BASE_NAME = "population/resource/strings";
+    protected static final String BASE_NAME = "population/resource/application";
 
     /**
      * @return {@link ResourceBundle#getBundle(String)}

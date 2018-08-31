@@ -17,12 +17,9 @@
  */
 package population.model;
 
-import java.util.ResourceBundle;
-
-import population.App;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import population.util.Resource;
+import population.util.Resources.StringResource;
 
 public final class TransitionType {
     public static final int LINEAR = 0;
@@ -37,16 +34,16 @@ public final class TransitionType {
     public static String getName(int type) {
         switch (type) {
             case LINEAR: {
-                return Resource.getString("Transitions.Type.Linear");
+                return StringResource.getString("Transitions.Type.Linear");
             }
             case SOLUTE: {
-                return Resource.getString("Transitions.Type.Solute");
+                return StringResource.getString("Transitions.Type.Solute");
             }
             case BLEND: {
-                return Resource.getString("Transitions.Type.Blend");
+                return StringResource.getString("Transitions.Type.Blend");
             }
             default: {
-                return Resource.getString("App.UnnamedStub");
+                return StringResource.getString("App.UnnamedStub");
             }
         }
     }

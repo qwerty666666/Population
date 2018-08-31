@@ -1,7 +1,6 @@
 package population.util;
 
 
-import population.App;
 import population.component.ChartSeries;
 import population.model.Expression.ExpressionManager;
 import population.model.StateModel.State;
@@ -9,6 +8,7 @@ import population.model.TransitionModel.StateMode;
 import population.model.TransitionType;
 import javafx.util.StringConverter;
 import javafx.util.converter.DoubleStringConverter;
+import population.util.Resources.StringResource;
 
 import java.util.Comparator;
 
@@ -108,7 +108,7 @@ public class Converter {
             }
 
             String name = state.getName().trim();
-            return name.length() > 0 ? name : Resource.getString("App.UnnamedStub");
+            return name.length() > 0 ? name : StringResource.getString("App.UnnamedStub");
         }
 
         @Override

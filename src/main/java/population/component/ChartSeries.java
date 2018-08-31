@@ -18,7 +18,6 @@
 package population.component;
 
 import java.util.Arrays;
-import java.util.ResourceBundle;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -31,7 +30,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Path;
-import population.util.Resource;
+import population.util.Resources.StringResource;
 
 public class ChartSeries {
     private static final String[] STROKE_COLORS =
@@ -208,52 +207,52 @@ public class ChartSeries {
         public static String getName(int color) {
             switch (color) {
                 case RED_ORANGE: {
-                    return Resource.getString("Color.RedOrange");
+                    return StringResource.getString("Color.RedOrange");
                 }
                 case LIGHT_ORANGE: {
-                    return Resource.getString("Color.LightOrange");
+                    return StringResource.getString("Color.LightOrange");
                 }
                 case SOFT_GREEN: {
-                    return Resource.getString("Color.SoftGreen");
+                    return StringResource.getString("Color.SoftGreen");
                 }
                 case LIGHT_BLUE: {
-                    return Resource.getString("Color.LightBlue");
+                    return StringResource.getString("Color.LightBlue");
                 }
                 case VIOLET_BLUE: {
-                    return Resource.getString("Color.VioletBlue");
+                    return StringResource.getString("Color.VioletBlue");
                 }
                 case DARK_PURPLE: {
-                    return Resource.getString("Color.DarkPurple");
+                    return StringResource.getString("Color.DarkPurple");
                 }
                 case DARK_PINK: {
-                    return Resource.getString("Color.DarkPink");
+                    return StringResource.getString("Color.DarkPink");
                 }
                 case YELLOW: {
-                    return Resource.getString("Color.Yellow");
+                    return StringResource.getString("Color.Yellow");
                 }
                 case MAGENTA: {
-                    return Resource.getString("Color.Magenta");
+                    return StringResource.getString("Color.Magenta");
                 }
                 case CYAN: {
-                    return Resource.getString("Color.Cyan");
+                    return StringResource.getString("Color.Cyan");
                 }
                 case RED: {
-                    return Resource.getString("Color.Red");
+                    return StringResource.getString("Color.Red");
                 }
                 case GREEN: {
-                    return Resource.getString("Color.Green");
+                    return StringResource.getString("Color.Green");
                 }
                 case BLUE: {
-                    return Resource.getString("Color.Blue");
+                    return StringResource.getString("Color.Blue");
                 }
                 case GRAY: {
-                    return Resource.getString("Color.Gray");
+                    return StringResource.getString("Color.Gray");
                 }
                 case BLACK: {
-                    return Resource.getString("Color.Black");
+                    return StringResource.getString("Color.Black");
                 }
                 default: {
-                    return Resource.getString("App.UnnamedStub");
+                    return StringResource.getString("App.UnnamedStub");
                 }
             }
         }
@@ -274,19 +273,19 @@ public class ChartSeries {
         public static String getName(int dash) {
             switch (dash) {
                 case NONE: {
-                    return Resource.getString("Dash.Solid");
+                    return StringResource.getString("Dash.Solid");
                 }
                 case SMALL: {
-                    return Resource.getString("Dash.Small");
+                    return StringResource.getString("Dash.Small");
                 }
                 case MEDIUM: {
-                    return Resource.getString("Dash.Medium");
+                    return StringResource.getString("Dash.Medium");
                 }
                 case LARGE: {
-                    return Resource.getString("Dash.Large");
+                    return StringResource.getString("Dash.Large");
                 }
                 default: {
-                    return Resource.getString("App.UnnamedStub");
+                    return StringResource.getString("App.UnnamedStub");
                 }
             }
         }
@@ -307,16 +306,16 @@ public class ChartSeries {
 
             switch (thickness) {
                 case THIN: {
-                    return Resource.getString("Thickness.Thin");
+                    return StringResource.getString("Thickness.Thin");
                 }
                 case MEDIUM: {
-                    return Resource.getString("Thickness.Medium");
+                    return StringResource.getString("Thickness.Medium");
                 }
                 case THICK: {
-                    return Resource.getString("Thickness.Large");
+                    return StringResource.getString("Thickness.Large");
                 }
                 default: {
-                    return Resource.getString("App.UnnamedStub");
+                    return StringResource.getString("App.UnnamedStub");
                 }
             }
         }
