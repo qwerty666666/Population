@@ -47,27 +47,6 @@ public class App {
 
     /************************************************
      *
-     *              Resource Bundle
-     *
-     ***********************************************/
-
-    private static ResourceBundle resources;
-
-    static void setResources(ResourceBundle resources) {
-        App.resources = resources;
-    }
-
-    public static ResourceBundle getResources() {
-        return resources;
-    }
-
-    public static String getString(String key) {
-        return resources.getString(key);
-    }
-
-
-    /************************************************
-     *
      *                  Global Task
      *
      ***********************************************/

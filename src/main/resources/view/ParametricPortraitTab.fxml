@@ -75,7 +75,7 @@
                     <padding>
                         <Insets top="25" />
                     </padding>
-                    <Label text="%precision" wrapText="true">
+                    <Label text="%Transitions.Settings.Precision" wrapText="true">
                         <padding>
                             <Insets right = "25" />
                         </padding>

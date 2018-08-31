@@ -23,7 +23,7 @@
          AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="66.0"
 >
     <tabs>
-        <Tab text="%result_chart">
+        <Tab text="%Calculations.ResultChart.TabName">
             <content>
                 <AnchorPane fx:id="resultsChartContainer">
                     <children>
@@ -39,33 +39,33 @@
                 </AnchorPane>
             </content>
         </Tab>
-        <Tab text="%result_chart_settings">
+        <Tab text="%Calculations.ResultChart.Settings">
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                     <children>
                         <TableView fx:id="resultsChartSettingsTable" editable="true" layoutX="14.0" layoutY="14.0" AnchorPane.bottomAnchor="49.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="10.0">
                             <columns>
-                                <TableColumn fx:id="chartSettingsTableVisibilityColumn" prefWidth="100.0" sortable="false" text="%visibility">
+                                <TableColumn fx:id="chartSettingsTableVisibilityColumn" prefWidth="100.0" sortable="false" text="%Transitions.Settings.Visibility">
                                     <cellValueFactory>
                                         <PropertyValueFactory property="visibility" />
                                     </cellValueFactory>
                                 </TableColumn>
-                                <TableColumn fx:id="chartSettingsTableNameColumn" prefWidth="150.0" sortable="false" text="%state_name">
+                                <TableColumn fx:id="chartSettingsTableNameColumn" prefWidth="150.0" sortable="false" text="%States.Name">
                                     <cellValueFactory>
                                         <PropertyValueFactory property="name" />
                                     </cellValueFactory>
                                 </TableColumn>
-                                <TableColumn fx:id="chartSettingsTableColorColumn" prefWidth="125.0" sortable="false" text="%color">
+                                <TableColumn fx:id="chartSettingsTableColorColumn" prefWidth="125.0" sortable="false" text="%Transitions.Settings.Color">
                                     <cellValueFactory>
                                         <PropertyValueFactory property="color" />
                                     </cellValueFactory>
                                 </TableColumn>
-                                <TableColumn fx:id="chartSettingsTableDashColumn" prefWidth="125.0" sortable="false" text="%dash">
+                                <TableColumn fx:id="chartSettingsTableDashColumn" prefWidth="125.0" sortable="false" text="%Transitions.Settings.Dash">
                                         <cellValueFactory>
                                         <PropertyValueFactory property="dash" />
                                     </cellValueFactory>
                                 </TableColumn>
-                                <TableColumn fx:id="chartSettingsTableThicknessColumn" prefWidth="125.0" sortable="false" text="%thickness">
+                                <TableColumn fx:id="chartSettingsTableThicknessColumn" prefWidth="125.0" sortable="false" text="%Transitions.Settings.Thickness">
                                     <cellValueFactory>
                                         <PropertyValueFactory property="thickness" />
                                     </cellValueFactory>
@@ -74,14 +74,14 @@
                         </TableView>
                         <HBox alignment="CENTER_LEFT" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0">
                             <children>
-                                <Button mnemonicParsing="false" text="%clear" onAction="#clear" />
+                                <Button mnemonicParsing="false" text="%TopMenu.Task.Clear" onAction="#clear" />
                             </children>
                         </HBox>
                     </children>
                 </AnchorPane>
             </content>
         </Tab>
-        <Tab text="%result_table">
+        <Tab text="%Calculations.ResultTable.TabName">
             <content>
                 <fx:include source="ResultTable.fxml"/>
             </content>

@@ -6,8 +6,6 @@ import population.controller.base.AbstractController;
 import population.model.Expression.ExpressionManager;
 import population.model.StateModel.State;
 import population.util.Converter;
-import javafx.beans.Observable;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -18,7 +16,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.util.StringConverter;
 import javafx.util.converter.DefaultStringConverter;
 
-import java.util.ArrayList;
 import java.util.Collections;
 
 
@@ -55,7 +52,7 @@ public class StatesController extends AbstractController {
         @Override
         public String toString(String object) {
             if (object == null) return "";
-            return object.isEmpty() ? getString("unnamed") : object;
+            return object.isEmpty() ? getString("App.UnnamedStub") : object;
         }
         @Override
         public String fromString(String string) {

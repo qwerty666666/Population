@@ -19,19 +19,19 @@
                    AnchorPane.topAnchor="14.0">
             <columns>
                 <TableColumn fx:id="idColumn" prefWidth="75.0" sortable="false"
-                             text="%transition_id" editable="false">
+                             text="%Transitions.Id" editable="false">
                     <cellValueFactory>
                         <PropertyValueFactory property="number" />
                     </cellValueFactory>
                 </TableColumn>
                 <TableColumn fx:id="probabilityColumn" prefWidth="85.0" sortable="false"
-                             text="%transition_probability">
+                             text="%Transitions.Probability">
                     <cellValueFactory>
                         <PropertyValueFactory property="probability" />
                     </cellValueFactory>
                 </TableColumn>
                 <TableColumn fx:id="typeColumn" prefWidth="75.0" sortable="false"
-                             text="%transition_type">
+                             text="%Transitions.TransitionType">
                     <cellValueFactory>
                         <PropertyValueFactory property="type" />
                     </cellValueFactory>
@@ -47,11 +47,11 @@
         <HBox layoutX="14.0" layoutY="14.0" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0">
             <children>
                 <Button fx:id="addTransitionButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false"
-                        onAction="#addTransition" text="%add"/>
+                        onAction="#addTransition" text="%Transitions.AddButton"/>
                 <Button fx:id="addTransitionExtensionButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false"
-                        onAction="#addTransitionExtension" text="%add_transition_extension"/>
+                        onAction="#addTransitionExtension" text="%Transitions.AddTransitionExtension"/>
                 <Button fx:id="removeTransitionButton" layoutX="75.0" layoutY="14.0" mnemonicParsing="false"
-                        onAction="#removeTransition" text="%remove"/>
+                        onAction="#removeTransition" text="%Transitions.RemoveButton"/>
             </children>
         </HBox>
         <!--<HBox layoutX="523.0" layoutY="14.0" spacing="10.0" AnchorPane.bottomAnchor="14.0"-->
