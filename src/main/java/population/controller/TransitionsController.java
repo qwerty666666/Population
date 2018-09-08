@@ -309,6 +309,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
         TransitionTableRowItem rowItem = (TransitionTableRowItem) cell.getTableRow().getItem();
         if (rowItem != null && rowItem.getStates().get(stateIndex).getState().isEmptyState()) {
             cell.setTooltip(chooseStateTooltip);
+            rowItem.getStates().get(stateIndex).stateProperty().addListener(stateChangeListener);
         }
     }
 
@@ -374,6 +375,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
             private void initTooltip() {
                 // add tooltip
                 this.setTooltip(this.defaultTooltip);
+                this.defaultTooltip.setText(converter.toString(this.getItem()));
 
                 // update tooltip text every time value changed
                 this.itemProperty().addListener((observable, oldValue, newValue) -> {
