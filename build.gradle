@@ -10,8 +10,8 @@ sourceCompatibility = 1.8
 
 
 class BuildType {
-    static DEV = 'DEV';
-    static PROD = 'PROD';
+    static DEV = 'dev';
+    static PROD = 'prod';
 }
 
 ext {

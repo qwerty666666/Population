@@ -1,10 +1,15 @@
 package population.controller;
 
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.util.StringConverter;
 import population.App;
 import population.component.UIComponents.TextFieldTableCell;
+import population.component.ui.TableUtils;
 import population.controller.base.AbstractController;
 import population.model.StateModel.State;
 import population.model.StateModel.StateFactory;
@@ -20,6 +25,7 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.input.MouseEvent;
 import javafx.util.converter.DefaultStringConverter;
 import javafx.util.converter.IntegerStringConverter;
+import population.util.Resources.StringResource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,8 +33,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
-public class TransitionsController extends AbstractController {
-    @FXML
+    public class TransitionsController extends AbstractController {
+        @FXML
     private TableView<TransitionTableRowItem> transitionsTable;
     @FXML
     private TableColumn<TransitionTableRowItem, Integer> idColumn;
@@ -153,15 +159,23 @@ public class TransitionsController extends AbstractController {
         this.initStateColumns();
     }
 
-
+    /**
+     * id column
+     */
     private void initIdColumn() {
         // hide numbers for transition extensions
         idColumn.setCellValueFactory(param -> {
             TransitionTableRowItem item = param.getValue();
             return item.isExtension() ? null : item.numberProperty().asObject();
         });
+
+        // add tooltip to header
+        TableUtils.setColumnHeaderTextWithTooltip(idColumn, StringResource.getBundle(), "Transitions.IdColumnHeader");
     }
 
+    /**
+     * probability column
+     */
     private void initProbabilityColumn() {
         // set probability editable only for transition Head
         probabilityColumn.setCellFactory(list -> new TextFieldTableCell<TransitionTableRowItem, Double>(Converter.DOUBLE_STRING_CONVERTER) {
@@ -173,31 +187,64 @@ public class TransitionsController extends AbstractController {
                 super.startEdit();
             }
         });
+
         // and hide value for extensions
         probabilityColumn.setCellValueFactory(param -> {
             TransitionTableRowItem item = param.getValue();
             return item.isExtension() ? null : item.probabilityProperty().asObject();
         });
+
+        // add tooltip to header
+        TableUtils.setColumnHeaderTextWithTooltip(probabilityColumn, StringResource.getBundle(), "Transitions.ProbabilityColumnHeader");
     }
 
+    /**
+     * transition type column
+     */
     private void initTypeColumn() {
         // set type editable only for transition Head
-        typeColumn.setCellFactory(list -> new ComboBoxTableCell<TransitionTableRowItem, Number>(Converter.TRANSITION_TYPE_STRING_CONVERTER, TransitionType.TYPES) {
-            @Override
-            public void startEdit() {
-                if (((TransitionTableRowItem) this.getTableRow().getItem()).isExtension()) {
-                    return;
+        typeColumn.setCellFactory(list -> {
+            ComboBoxTableCell<TransitionTableRowItem, Number> cell = new ComboBoxTableCell<TransitionTableRowItem, Number>(
+                new Converter.TransitionTypeStringConverter(true), TransitionType.TYPES
+            ) {
+                @Override
+                public void startEdit() {
+                    if (((TransitionTableRowItem) this.getTableRow().getItem()).isExtension()) {
+                        return;
+                    }
+                    super.startEdit();
                 }
-                super.startEdit();
-            }
+            };
+
+            // set tooltip
+            Tooltip tooltip = new Tooltip();
+            cell.itemProperty().addListener(new ChangeListener<Number>() {
+                StringConverter<Number> converter = new Converter.TransitionTypeStringConverter(false);
+                @Override
+                public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                    tooltip.setText(converter.toString(newValue));
+                }
+            });
+            cell.setTooltip(tooltip);
+            //TableUtils.hideCellTooltipInEmptyRow(cell);
+
+            return cell;
         });
+
         // and hide value for extensions
         typeColumn.setCellValueFactory(param -> {
             TransitionTableRowItem item = param.getValue();
             return item.isExtension() ? null : item.typeProperty();
         });
+
+        // add tooltip to header
+        TableUtils.setColumnHeaderTextWithTooltip(typeColumn, StringResource.getBundle(), "Transitions.TransitionTypeColumnHeader");
     }
 
+
+    /**
+     *
+     */
     private void initBlockColumn() {
         blockColumn.setCellFactory(list -> new TextFieldTableCell<>(new DefaultStringConverter()));
     }
@@ -223,11 +270,139 @@ public class TransitionsController extends AbstractController {
 
 
     /**
+     * Set tooltip to table cells which will contain "choose state" text every time
+     * associated State will be empty, in other time default tooltip will be shown
+     *
+     * @param cell table cell wo which tooltip will be applied
+     * @param stateIndex index of associated state in table row
+     */
+    private <T> void showChooseStateCellTooltip(TableCell<TransitionTableRowItem, T> cell, int stateIndex) {
+        ObjectProperty<TransitionTableRowItem> rowItemProperty = cell.getTableRow().itemProperty();
+
+        Tooltip tooltip = cell.getTooltip();
+        Tooltip chooseStateTooltip = new Tooltip(StringResource.getString("Transitions.ChooseStateTooltip"));
+
+        // set "choose state" text when state is empty
+        ChangeListener<State> stateChangeListener = (observable, oldValue, newValue) -> {
+            if (newValue.isEmptyState()) {
+                cell.setTooltip(chooseStateTooltip);
+            } else {
+                cell.setTooltip(tooltip);
+            }
+        };
+
+        // update listener binding every time row item changes
+        rowItemProperty.addListener((observable, oldValue, newValue) -> {
+            if (oldValue != null) {
+                oldValue.getStates().get(stateIndex).stateProperty().removeListener(stateChangeListener);
+            }
+            if (newValue != null) {
+                newValue.getStates().get(stateIndex).stateProperty().addListener(stateChangeListener);
+            }
+
+            if (newValue != null && newValue.getStates().get(stateIndex).getState().isEmptyState()) {
+                cell.setTooltip(chooseStateTooltip);
+            }
+        });
+
+        // set initial tooltip text
+        TransitionTableRowItem rowItem = (TransitionTableRowItem) cell.getTableRow().getItem();
+        if (rowItem != null && rowItem.getStates().get(stateIndex).getState().isEmptyState()) {
+            cell.setTooltip(chooseStateTooltip);
+        }
+    }
+
+
+    /**
+     * initialize cell tooltip to specific StateInTransition property features
+     *
+     * @param cell table cell
+     * @param stateIndex associated State index in table row item
+     */
+    private <T> void initStateInTransitionPropertyTooltip(TableCell<TransitionTableRowItem, T> cell, int stateIndex) {
+        // and show "choose state" text when associated State is empty
+        showChooseStateCellTooltip(cell, stateIndex);
+
+        // hide tooltip when row item is null
+        TableUtils.hideCellTooltipInEmptyRow(cell);
+    }
+
+
+    /**
+     * @param converter cell item to string converter
+     * @param stateIndex index of associated State in table row
+     * @param <T> cell item type
+     * @return TextFieldTableCell specific to StateInTransition property
+     */
+    private <T> TableCell<TransitionTableRowItem, T> getStatePropertyTextFieldTableCell(StringConverter<T> converter, int stateIndex) {
+        return new TextFieldTableCell<TransitionTableRowItem, T>(converter) {
+            private boolean isTooltipInitialized = false;
+
+            private void initTooltip() {
+                initStateInTransitionPropertyTooltip(this, stateIndex);
+            }
+
+            @Override
+            public void updateItem(T item, boolean empty) {
+                // set tooltip there because at this point we can get row item property
+                if (!this.isTooltipInitialized) {
+                    this.initTooltip();
+                    this.isTooltipInitialized = true;
+                }
+                super.updateItem(item, empty);
+            }
+        };
+    }
+
+
+    /**
+     *
+     * @param converter string converter for ComboBox items
+     * @param tooltipConverter string converter for ComboBox items for tooltip
+     * @param itemList list of items in ComboBox
+     * @param stateIndex index of associated state in table row
+     * @param <T> cell item type
+     * @return ComboBoxTableCell specific to StateInTransition property
+     */
+    private <T> TableCell<TransitionTableRowItem, T> getStatePropertyComboBoxTableCell(
+        StringConverter<T> converter, StringConverter<T> tooltipConverter, List<T> itemList, int stateIndex
+    ) {
+        return new ComboBoxTableCell<TransitionTableRowItem, T>(converter, FXCollections.observableList(itemList)) {
+            private boolean isTooltipInitialized = false;
+            private Tooltip defaultTooltip = new Tooltip();
+
+            private void initTooltip() {
+                // add tooltip
+                this.setTooltip(this.defaultTooltip);
+
+                // update tooltip text every time value changed
+                this.itemProperty().addListener((observable, oldValue, newValue) -> {
+                    this.defaultTooltip.setText(tooltipConverter.toString(newValue));
+                });
+
+                initStateInTransitionPropertyTooltip(this, stateIndex);
+            }
+
+            @Override
+            public void updateItem(T item, boolean empty) {
+                // set tooltip there because at this point we can get row item property
+                if (!this.isTooltipInitialized) {
+                    this.initTooltip();
+                    this.isTooltipInitialized = true;
+                }
+                super.updateItem(item, empty);
+            }
+        };
+    }
+
+
+    /**
      * @param index index of StateInTransition in table row
      * @return state column
      */
     private TableColumn<TransitionTableRowItem, State> getStateColumn(int index) {
-        TableColumn<TransitionTableRowItem, State> stateColumn = new TableColumn<>(this.getString("Transitions.State"));
+        TableColumn<TransitionTableRowItem, State> stateColumn = new TableColumn<>();
+        TableUtils.setColumnHeaderTextWithTooltip(stateColumn, StringResource.getBundle(), "Transitions.StateColumnHeader");
 
         stateColumn.setCellValueFactory(param -> {
             if (index >= param.getValue().getStates().size()) {
@@ -236,10 +411,19 @@ public class TransitionsController extends AbstractController {
             return param.getValue().getStates().get(index).stateProperty();
         });
 
-        stateColumn.setCellFactory(ComboBoxTableCell.forTableColumn(Converter.STATE_STRING_CONVERTER, statesList));
+        // show state's full name Tooltip
+        stateColumn.setCellFactory(list -> {
+            StringConverter converter = new Converter.StateStringConverter(true);
+            StringConverter tooltipConverter = new Converter.StateStringConverter(false);
+            return this.getStatePropertyComboBoxTableCell(converter, tooltipConverter, statesList, index);
+        });
+
+        // stylizing
         stateColumn.setSortable(false);
+        stateColumn.setPrefWidth(60);
         stateColumn.getStyleClass().add("transition-state");
 
+        // hide in, out and delay values on Empty State choose
         stateColumn.setOnEditCommit(event -> {
             State newValue = event.getNewValue();
 
@@ -263,7 +447,8 @@ public class TransitionsController extends AbstractController {
      * @return in property column for state
      */
     private TableColumn<TransitionTableRowItem, Double> getInColumn(int index) {
-        TableColumn<TransitionTableRowItem, Double> inColumn = new TableColumn<>(this.getString("Transitions.StateIn"));
+        TableColumn<TransitionTableRowItem, Double> inColumn = new TableColumn<>();
+        TableUtils.setColumnHeaderTextWithTooltip(inColumn, StringResource.getBundle(), "Transitions.StateInColumnHeader");
 
         inColumn.setCellValueFactory(param -> {
             if (index >= param.getValue().getStates().size()) {
@@ -276,7 +461,7 @@ public class TransitionsController extends AbstractController {
             Converter.HideDefaultValueDecoratorConverter<Double> converter = new Converter.HideDefaultValueDecoratorConverter<>(
                 Converter.DOUBLE_STRING_CONVERTER, 0., Double::compare
             );
-            return new TextFieldTableCell<>(converter);
+            return getStatePropertyTextFieldTableCell(converter, index);
         });
 
         inColumn.setSortable(false);
@@ -292,7 +477,9 @@ public class TransitionsController extends AbstractController {
      * @return out property column for state
      */
     private TableColumn<TransitionTableRowItem, Double> getOutColumn(int index) {
-        TableColumn<TransitionTableRowItem, Double> outColumn = new TableColumn<>(this.getString("Transitions.StateOut"));
+        TableColumn<TransitionTableRowItem, Double> outColumn = new TableColumn<>();
+        TableUtils.setColumnHeaderTextWithTooltip(outColumn, StringResource.getBundle(), "Transitions.StateOutColumnHeader");
+
         outColumn.setCellValueFactory(param -> {
             if (index >= param.getValue().getStates().size()) {
                 return null;
@@ -304,7 +491,7 @@ public class TransitionsController extends AbstractController {
             Converter.HideDefaultValueDecoratorConverter<Double> converter = new Converter.HideDefaultValueDecoratorConverter<>(
                 Converter.DOUBLE_STRING_CONVERTER, 0., Double::compare
             );
-            return new TextFieldTableCell<>(converter);
+            return getStatePropertyTextFieldTableCell(converter, index);
         });
 
         outColumn.setSortable(false);
@@ -320,7 +507,8 @@ public class TransitionsController extends AbstractController {
      * @return delay property column for state
      */
     private TableColumn<TransitionTableRowItem, Integer> getDelayColumn(int index) {
-        TableColumn<TransitionTableRowItem, Integer> delayColumn = new TableColumn<>(this.getString("Transitions.StateDelay"));
+        TableColumn<TransitionTableRowItem, Integer> delayColumn = new TableColumn<>();
+        TableUtils.setColumnHeaderTextWithTooltip(delayColumn, StringResource.getBundle(), "Transitions.StateDelayColumnHeader");
 
         delayColumn.setCellValueFactory(param -> {
             if (index >= param.getValue().getStates().size()) {
@@ -333,7 +521,7 @@ public class TransitionsController extends AbstractController {
             Converter.HideDefaultValueDecoratorConverter<Integer> converter = new Converter.HideDefaultValueDecoratorConverter<>(
                 new IntegerStringConverter(), 0, Integer::compare
             );
-            return new TextFieldTableCell<>(converter);
+            return getStatePropertyTextFieldTableCell(converter, index);
         });
 
         delayColumn.setSortable(false);
@@ -344,8 +532,13 @@ public class TransitionsController extends AbstractController {
     }
 
 
+    /**
+     * @param index index of StateInTransition in table row
+     * @return mode property column for state
+     */
     private TableColumn<TransitionTableRowItem, Integer> getModeColumn(int index) {
-        TableColumn<TransitionTableRowItem, Integer> modeColumn = new TableColumn<>(this.getString("Transitions.StateMode"));
+        TableColumn<TransitionTableRowItem, Integer> modeColumn = new TableColumn<>();
+        TableUtils.setColumnHeaderTextWithTooltip(modeColumn, StringResource.getBundle(), "Transitions.StateModeColumnHeader");
 
         modeColumn.setCellValueFactory(param -> {
             if (index >= param.getValue().getStates().size()) {
@@ -355,19 +548,24 @@ public class TransitionsController extends AbstractController {
         });
 
         modeColumn.setCellFactory(list -> {
-            Converter.HideDefaultValueDecoratorConverter<Integer> converter = new Converter.HideDefaultValueDecoratorConverter<>(
-                Converter.STATE_IN_TRANSITION_MODE_STRING_CONVERTER, StateMode.SIMPLE, Integer::compare
+            StringConverter converter = new Converter.HideDefaultValueDecoratorConverter<>(
+                new Converter.StateInTransitionModeStringConverter(true), StateMode.SIMPLE, Integer::compare
             );
-            return new ComboBoxTableCell<>(converter, FXCollections.observableList(StateMode.MODES));
+            StringConverter tooltipConverter = new Converter.StateInTransitionModeStringConverter(false);
+            return this.getStatePropertyComboBoxTableCell(converter, tooltipConverter, StateMode.MODES, index);
         });
 
         modeColumn.setSortable(false);
+        modeColumn.setPrefWidth(60);
         modeColumn.getStyleClass().add("transition-state-mode");
 
         return modeColumn;
     }
 
 
+    /**
+     * initialize table buttons
+     */
     private void initButtons() {
         EventHandler<MouseEvent> eventHandler = event -> {
             // request focus back to table

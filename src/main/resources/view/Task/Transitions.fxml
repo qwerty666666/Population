@@ -18,20 +18,17 @@
                    AnchorPane.bottomAnchor="49.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0"
                    AnchorPane.topAnchor="14.0">
             <columns>
-                <TableColumn fx:id="idColumn" prefWidth="75.0" sortable="false"
-                             text="%Transitions.Id" editable="false">
+                <TableColumn fx:id="idColumn" prefWidth="60.0" sortable="false" editable="false">
                     <cellValueFactory>
                         <PropertyValueFactory property="number" />
                     </cellValueFactory>
                 </TableColumn>
-                <TableColumn fx:id="probabilityColumn" prefWidth="85.0" sortable="false"
-                             text="%Transitions.Probability">
+                <TableColumn fx:id="probabilityColumn" prefWidth="60.0" sortable="false">
                     <cellValueFactory>
                         <PropertyValueFactory property="probability" />
                     </cellValueFactory>
                 </TableColumn>
-                <TableColumn fx:id="typeColumn" prefWidth="75.0" sortable="false"
-                             text="%Transitions.TransitionType">
+                <TableColumn fx:id="typeColumn" prefWidth="60.0" sortable="false">
                     <cellValueFactory>
                         <PropertyValueFactory property="type" />
                     </cellValueFactory>

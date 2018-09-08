@@ -31,20 +31,34 @@ public final class TransitionType {
     private TransitionType() {
     }
 
-    public static String getName(int type) {
+    public static String getName(int type, boolean useAbbreviation) {
         switch (type) {
             case LINEAR: {
-                return StringResource.getString("Transitions.Type.Linear");
+                return StringResource.getString(
+                    useAbbreviation ? "Transitions.Type.LinearAbbreviation" : "Transitions.Type.Linear"
+                );
             }
             case SOLUTE: {
-                return StringResource.getString("Transitions.Type.Solute");
+                return StringResource.getString(
+                    useAbbreviation ? "Transitions.Type.SoluteAbbreviation" : "Transitions.Type.Solute"
+                );
             }
             case BLEND: {
-                return StringResource.getString("Transitions.Type.Blend");
+                return StringResource.getString(
+                    useAbbreviation ? "Transitions.Type.BlendAbbreviation" : "Transitions.Type.Blend"
+                );
             }
             default: {
                 return StringResource.getString("App.UnnamedStub");
             }
         }
+    }
+
+    public static String getName(int type) {
+        return getName(type, false);
+    }
+
+    public static String getAbbreviation(int type) {
+        return getName(type, true);
     }
 }

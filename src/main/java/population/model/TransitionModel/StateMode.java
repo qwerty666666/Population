@@ -15,20 +15,34 @@ public class StateMode {
     public static final List<Integer> MODES =
             Arrays.asList(INHIBITOR, RESIDUAL, SIMPLE);
 
-    public static String getName(int type) {
+    public static String getName(int type, boolean useAbbreviation) {
         switch (type) {
             case SIMPLE: {
-                return StringResource.getString("States.Mode.Simple");
+                return StringResource.getString(
+                    useAbbreviation ? "States.Mode.SimpleAbbreviation" : "States.Mode.Simple"
+                );
             }
             case INHIBITOR: {
-                return StringResource.getString("States.Mode.Inhibitor");
+                return StringResource.getString(
+                    useAbbreviation ? "States.Mode.InhibitorAbbreviation" : "States.Mode.Inhibitor"
+                );
             }
             case RESIDUAL: {
-                return StringResource.getString("States.Mode.Residual");
+                return StringResource.getString(
+                    useAbbreviation ? "States.Mode.ResidualAbbreviation" : "States.Mode.Residual"
+                );
             }
             default: {
                 return "";
             }
         }
+    }
+
+    public static String getName(int type) {
+        return getName(type, false);
+    }
+
+    public static String getAbbreviation(int type) {
+        return getName(type, true);
     }
 }

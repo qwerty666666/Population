@@ -32,7 +32,7 @@ public class App {
 
 
     public static boolean isDev() {
-        return AppResource.getString("buildType").equals("DEV");
+        return AppResource.getString("buildType").equals("dev");
     }
 
     public static String getVersion() {
