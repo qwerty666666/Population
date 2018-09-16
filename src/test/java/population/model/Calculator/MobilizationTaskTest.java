@@ -53,9 +53,9 @@ public class MobilizationTaskTest {
             new StateInTransition(diedState, 0, 1, 0, StateMode.SIMPLE)
         );
         transitions.get(1).getStates().addAll(
-                new StateInTransition(aliveState, 1, 1, 0, StateMode.SIMPLE),
-                new StateInTransition(diedState, 1, 0, 0, StateMode.SIMPLE),
-                new StateInTransition(aliveState, 0, 1, 0, StateMode.SIMPLE)
+            new StateInTransition(aliveState, 1, 1, 0, StateMode.SIMPLE),
+            new StateInTransition(diedState, 1, 0, 0, StateMode.SIMPLE),
+            new StateInTransition(aliveState, 0, 1, 0, StateMode.SIMPLE)
         );
 
 
@@ -73,110 +73,110 @@ public class MobilizationTaskTest {
 
     static Stream<Arguments> getTaskParameters() {
         return Stream.of(
-                //1
-                Arguments.of(
-                        20, 80,
-                        0.6, TransitionType.LINEAR,
-                        0.2, TransitionType.LINEAR,
-                        0, 100,
-                        100, 0.001
-                ),
-                // 2
-                Arguments.of(
-                        20, 80,
-                        0.2, TransitionType.LINEAR,
-                        0.6, TransitionType.LINEAR,
-                        75, 25,
-                        100, 0.001
-                ),
-                // 3
-                Arguments.of(
-                        80, 20,
-                        0.2, TransitionType.LINEAR,
-                        0.2, TransitionType.LINEAR,
-                        50, 50,
-                        100, 0.001
-                ),
-                // 4
-                Arguments.of(
-                        20, 80,
-                        0.2, TransitionType.LINEAR,
-                        0.6, TransitionType.SOLUTE,
-                        66.666, 33.333,
-                        100, 0.001
-                ),
-                // 5
-                Arguments.of(
-                        20, 80,
-                        0.2, TransitionType.LINEAR,
-                        0.6, TransitionType.BLEND,
-                        66.666, 33.333,
-                        100, 0.001
-                ),
-                // 6
-                Arguments.of(
-                        20, 80,
-                        0.6, TransitionType.LINEAR,
-                        0.2, TransitionType.BLEND,
-                        0, 100,
-                        100, 0.001
-                ),
-                // 7
-                Arguments.of(
-                        20, 80,
-                        0.6, TransitionType.LINEAR,
-                        0.2, TransitionType.SOLUTE,
-                        0, 100,
-                        100, 0.001
-                ),
-                // 8
-                Arguments.of(
-                        20, 80,
-                        1, TransitionType.SOLUTE,
-                        0.225, TransitionType.LINEAR,
-                        45, 55,
-                        100, 0.001
-                ),
-                // 9
-                Arguments.of(
-                        20, 80,
-                        0.2, TransitionType.SOLUTE,
-                        0.6, TransitionType.LINEAR,
-                        87.298, 12.702,
-                        100, 0.001
-                ),
-                // 10
-                Arguments.of(
-                        20, 80,
-                        0.2, TransitionType.SOLUTE,
-                        0.6, TransitionType.SOLUTE,
-                        85.714, 14.286,
-                        100, 0.001
-                ),
-                // 11
-                Arguments.of(
-                        20, 80,
-                        0.6, TransitionType.BLEND,
-                        0.2, TransitionType.LINEAR,
-                        0, 100,
-                        100, 0.001
-                ),
-                // 12
-                Arguments.of(
-                        20, 80,
-                        0.2, TransitionType.BLEND,
-                        0.6, TransitionType.LINEAR,
-                        85.714, 14.286,
-                        100, 0.001
-                ),
-                // 13
-                Arguments.of(
-                        20, 80,
-                        0.2, TransitionType.BLEND,
-                        0.6, TransitionType.BLEND,
-                        83.333, 16.666,
-                        100, 0.001
-                )
+            //1
+            Arguments.of(
+                20, 80,
+                0.6, TransitionType.LINEAR,
+                0.2, TransitionType.LINEAR,
+                0, 100,
+                100, 0.001
+            ),
+            // 2
+            Arguments.of(
+                20, 80,
+                0.2, TransitionType.LINEAR,
+                0.6, TransitionType.LINEAR,
+                75, 25,
+                100, 0.001
+            ),
+            // 3
+            Arguments.of(
+                80, 20,
+                0.2, TransitionType.LINEAR,
+                0.2, TransitionType.LINEAR,
+                50, 50,
+                100, 0.001
+            ),
+            // 4
+            Arguments.of(
+                20, 80,
+                0.2, TransitionType.LINEAR,
+                0.6, TransitionType.SOLUTE,
+                66.666, 33.333,
+                100, 0.001
+            ),
+            // 5
+            Arguments.of(
+                20, 80,
+                0.2, TransitionType.LINEAR,
+                0.6, TransitionType.BLEND,
+                66.666, 33.333,
+                100, 0.001
+            ),
+            // 6
+            Arguments.of(
+                20, 80,
+                0.6, TransitionType.LINEAR,
+                0.2, TransitionType.BLEND,
+                0, 100,
+                100, 0.001
+            ),
+            // 7
+            Arguments.of(
+                20, 80,
+                0.6, TransitionType.LINEAR,
+                0.2, TransitionType.SOLUTE,
+                0, 100,
+                100, 0.001
+            ),
+            // 8
+            Arguments.of(
+                20, 80,
+                1, TransitionType.SOLUTE,
+                0.225, TransitionType.LINEAR,
+                45, 55,
+                100, 0.001
+            ),
+            // 9
+            Arguments.of(
+                20, 80,
+                0.2, TransitionType.SOLUTE,
+                0.6, TransitionType.LINEAR,
+                87.298, 12.702,
+                100, 0.001
+            ),
+            // 10
+            Arguments.of(
+                20, 80,
+                0.2, TransitionType.SOLUTE,
+                0.6, TransitionType.SOLUTE,
+                85.714, 14.286,
+                100, 0.001
+            ),
+            // 11
+            Arguments.of(
+                20, 80,
+                0.6, TransitionType.BLEND,
+                0.2, TransitionType.LINEAR,
+                54.858, 45.141,
+                100, 0.001
+            ),
+            // 12
+            Arguments.of(
+                20, 80,
+                0.2, TransitionType.BLEND,
+                0.6, TransitionType.LINEAR,
+                87.298, 12.701,
+                100, 0.001
+            ),
+            // 13
+            Arguments.of(
+                20, 80,
+                0.2, TransitionType.BLEND,
+                0.6, TransitionType.BLEND,
+                85.714, 14.285,
+                100, 0.001
+            )
         );
     }
 

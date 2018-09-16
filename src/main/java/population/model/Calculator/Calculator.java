@@ -300,7 +300,7 @@ public class Calculator {
 
             case TransitionType.BLEND: {
                 return transition.getActualStates().stream()
-                        .filter(stateInTransition -> stateInTransition.getIn() > 0)
+                        //.filter(stateInTransition -> stateInTransition.getIn() > 0)
                         // remain only distinct states
                         .filter(new Predicate<StateInTransition>() {
                             Set<State> set = new HashSet<>();
