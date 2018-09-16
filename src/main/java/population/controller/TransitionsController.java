@@ -300,16 +300,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
                 newValue.getStates().get(stateIndex).stateProperty().addListener(stateChangeListener);
             }
 
-            if (newValue != null && newValue.getStates().get(stateIndex).getState().isEmptyState()) {
-                cell.setTooltip(chooseStateTooltip);
+            if (newValue != null) {
+                State state = newValue.getStates().get(stateIndex).getState();
+                if (state != null && !state.isEmptyState()) {
+                    cell.setTooltip(chooseStateTooltip);
+                }
             }
         });
 
         // set initial tooltip text
         TransitionTableRowItem rowItem = (TransitionTableRowItem) cell.getTableRow().getItem();
-        if (rowItem != null && rowItem.getStates().get(stateIndex).getState().isEmptyState()) {
-            cell.setTooltip(chooseStateTooltip);
-            rowItem.getStates().get(stateIndex).stateProperty().addListener(stateChangeListener);
+        if (rowItem != null) {
+            State state = rowItem.getStates().get(stateIndex).getState();
+            if (state != null && !state.isEmptyState()) {
+                cell.setTooltip(chooseStateTooltip);
+                rowItem.getStates().get(stateIndex).stateProperty().addListener(stateChangeListener);
+            }
         }
     }
 
