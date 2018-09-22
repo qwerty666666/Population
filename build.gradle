@@ -1,23 +1,36 @@
+import org.apache.tools.ant.filters.EscapeUnicode
+
 plugins {
     id 'java'
 }
 
 group 'Population'
 version '1.0-SNAPSHOT'
-
 sourceCompatibility = 1.8
+
+
+class BuildType {
+    static DEV = 'dev';
+    static PROD = 'prod';
+}
+
+ext {
+    buildType = BuildType.PROD
+}
+
 
 repositories {
     mavenCentral()
 }
 
+
 dependencies {
     testImplementation (
-        'org.junit.jupiter:junit-jupiter-api:5.2.0',
-        'org.junit.jupiter:junit-jupiter-params:5.2.0'
+            'org.junit.jupiter:junit-jupiter-api:5.2.0',
+            'org.junit.jupiter:junit-jupiter-params:5.2.0'
     )
     testRuntimeOnly (
-        'org.junit.jupiter:junit-jupiter-engine:5.2.0'
+            'org.junit.jupiter:junit-jupiter-engine:5.2.0'
     )
 }
 
@@ -25,16 +38,19 @@ dependencies {
 jar {
     manifest {
         attributes(
-            'Main-Class': 'population.PopulationApplication'
+                'Main-Class': 'population.PopulationApplication'
         )
     }
 }
 
 
-tasks.replace("processResources").doLast {
-    // copy resource files to custom directory for backward compatibility
-    copy {
-        from '/src/main/resources'
-        into "/${buildDir}/classes/java/main/population/resource"
+// copy resource files to custom directory for backward compatibility
+sourceSets.main.output.resourcesDir = "${buildDir}/classes/java/main/population/resource"
+processResources {
+    // set up ResourceBundle files
+    filesMatching '**/*.properties', {
+        expand project.properties
+        // ResourceBundle support only ISO-8859-1 encoding
+        filter(EscapeUnicode)
     }
 }

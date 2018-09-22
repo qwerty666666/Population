@@ -17,13 +17,14 @@
  */
 package population.controller;
 
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import population.App;
 import population.PopulationApplication;
 import population.controller.base.AbstractController;
 import population.model.*;
-import population.util.Resource;
+import population.util.Resources.StringResource;
 import population.util.TaskParser;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -34,8 +35,8 @@ import java.util.*;
 
 
 public class PrimaryController1 extends AbstractController {
-    // TODO remove in view
-    public TabPane mMainTabPane;
+    @FXML
+    protected HBox debugPanel;
     protected File taskFile = null;
 
     private FileChooser getTaskFileChooser(String title) {
@@ -83,7 +84,7 @@ public class PrimaryController1 extends AbstractController {
      * @return title displayed by default
      */
     private String getDefaultTitle() {
-        return Resource.getString("App.WindowTitle");
+        return StringResource.getString("App.WindowTitle");
     }
 
 
@@ -95,6 +96,10 @@ public class PrimaryController1 extends AbstractController {
 
     @Override
     public void initialize() {
+        debugPanel.setVisible(App.isDev());
+        debugPanel.setManaged(App.isDev());
+
+        this.setTitle(this.getDefaultTitle());
 //        mMainTabPane.getSelectionModel().select(2);
 //        File file = new File("C:\\Users\\user\\Desktop\\test.pmt");
 //        openTaskFromFile(file);
@@ -103,7 +108,7 @@ public class PrimaryController1 extends AbstractController {
 
     public void openTask() {
         File file = getTaskFileChooser(getString("App.OpenTaskDialogTitle"))
-                .showOpenDialog(mMainTabPane.getScene().getWindow());
+                .showOpenDialog(this.getStage().getScene().getWindow());
         openTaskFromFile(file);
     }
 

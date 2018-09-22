@@ -23,11 +23,9 @@ import javafx.stage.WindowEvent;
 import population.controller.PrimaryController;
 import population.controller.base.AbstractAboutController;
 import population.controller.base.AbstractController;
-import population.controller.base.AbstractExportController;
-import population.model.Result;
 import population.util.CsvParser;
 import population.util.PopulationThreadFactory;
-import population.util.Resource;
+import population.util.Resources.StringResource;
 import population.util.StringRow;
 import population.util.StringTable;
 import population.util.Utils;
@@ -66,7 +64,7 @@ public final class PopulationApplication extends Application {
     private final Thread.UncaughtExceptionHandler mUncaughtExceptionHandler =
             (thread, throwable) -> {
                 throwable.printStackTrace();
-                ResourceBundle resources = Resource.getBundle();
+                ResourceBundle resources = StringResource.getBundle();
                 showAlert(resources.getString("App.ErrorAlert.Title"),
                         resources.getString("App.ErrorAlert.Header"),
                         Utils.buildErrorText(throwable, 10, resources.getString("App.ErrorAlert.StackTrace")),
@@ -158,8 +156,8 @@ public final class PopulationApplication extends Application {
      */
     protected EventHandler<WindowEvent> confirmCloseEventHandler = event -> {
         Alert closeConfirmation = new Alert(Alert.AlertType.CONFIRMATION);
-        closeConfirmation.setTitle(Resource.getString("ExitConfirmation.Title"));
-        closeConfirmation.setHeaderText(Resource.getString("ExitConfirmation.ConfirmationText"));
+        closeConfirmation.setTitle(StringResource.getString("ExitConfirmation.Title"));
+        closeConfirmation.setHeaderText(StringResource.getString("ExitConfirmation.ConfirmationText"));
         closeConfirmation.initModality(Modality.APPLICATION_MODAL);
         closeConfirmation.initOwner(mPrimaryStage);
 
@@ -167,11 +165,11 @@ public final class PopulationApplication extends Application {
 
         ((Button)closeConfirmation.getDialogPane()
             .lookupButton(ButtonType.OK))
-            .setText(Resource.getString("ExitConfirmation.OkButton"));
+            .setText(StringResource.getString("ExitConfirmation.OkButton"));
 
         ((Button)closeConfirmation.getDialogPane()
             .lookupButton(ButtonType.CANCEL))
-            .setText(Resource.getString("ExitConfirmation.CancelButton"));
+            .setText(StringResource.getString("ExitConfirmation.CancelButton"));
 
         Optional<ButtonType> closeResponse = closeConfirmation.showAndWait();
         if (!ButtonType.OK.equals(closeResponse.orElse(null))) {
@@ -182,14 +180,14 @@ public final class PopulationApplication extends Application {
 
     private void showPrimaryStage(Stage primaryStage) {
         mPrimaryStage = primaryStage;
-        mPrimaryStage.setTitle(Resource.getString("application_name"));
+        mPrimaryStage.setTitle(StringResource.getString("application_name"));
         mPrimaryStage.setMinWidth(PRIMARY_STAGE_MIN_WIDTH);
         mPrimaryStage.setMinHeight(PRIMARY_STAGE_MIN_HEIGHT);
         mPrimaryStage.getIcons()
                 .add(new Image(getClass().getResourceAsStream("resource/images/icon.png")));
         FXMLLoader sceneLoader =
                 new FXMLLoader(getClass().getResource("resource/view/PrimaryView.fxml"),
-                        Resource.getBundle());
+                        StringResource.getBundle());
         sceneLoader.setControllerFactory(controllerClass -> {
             try {
                 Object controller = controllerClass.newInstance();
@@ -241,7 +239,6 @@ public final class PopulationApplication extends Application {
         }
         try {
             Scene primaryScene = new Scene(sceneLoader.load(), 1, 1);
-            primaryScene.getStylesheets().add("com//population/resource/style/primary.css");
             mPrimaryStage.setScene(primaryScene);
             mPrimaryStage.show();
         } catch (IOException e) {
@@ -273,10 +270,10 @@ public final class PopulationApplication extends Application {
         Stage primaryStage = mPrimaryStage;
         aboutStage.initOwner(primaryStage.getOwner());
         aboutStage.setResizable(false);
-        aboutStage.setTitle(Resource.getString("TopMenu.Help.About"));
+        aboutStage.setTitle(StringResource.getString("TopMenu.Help.About"));
         FXMLLoader sceneLoader =
                 new FXMLLoader(getClass().getResource("resource/view/AboutView.fxml"));
-        sceneLoader.setResources(Resource.getBundle());
+        sceneLoader.setResources(StringResource.getBundle());
         sceneLoader.setControllerFactory(controllerClass -> {
             try {
                 Object controller = controllerClass.newInstance();
@@ -333,7 +330,7 @@ public final class PopulationApplication extends Application {
             alert.setHeaderText(header);
             alert.setContentText(content);
             alert.getButtonTypes().clear();
-            alert.getButtonTypes().add(new ButtonType(Resource.getString("App.ErrorAlert.Close"),
+            alert.getButtonTypes().add(new ButtonType(StringResource.getString("App.ErrorAlert.Close"),
                     ButtonBar.ButtonData.OK_DONE));
             alert.showAndWait();
         });

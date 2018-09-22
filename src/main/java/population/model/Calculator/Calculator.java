@@ -200,7 +200,8 @@ public class Calculator {
             case TransitionType.SOLUTE:
             case TransitionType.BLEND: {
                 final double totalCount = this.getTotalCount(transition, step);
-                intensity = states.stream()
+                if (totalCount != 0) {
+                    intensity = states.stream()
                         .mapToDouble(stateInTransition -> {
                             double cur = getDelayedStateCount(stateInTransition, step);
                             double in = stateInTransition.getIn();
@@ -211,6 +212,7 @@ public class Calculator {
                             return res;
                         })
                         .reduce(1, (a, b) -> a * b);
+                }
 
                 break;
             }
@@ -298,7 +300,7 @@ public class Calculator {
 
             case TransitionType.BLEND: {
                 return transition.getActualStates().stream()
-                        .filter(stateInTransition -> stateInTransition.getIn() > 0)
+                        //.filter(stateInTransition -> stateInTransition.getIn() > 0)
                         // remain only distinct states
                         .filter(new Predicate<StateInTransition>() {
                             Set<State> set = new HashSet<>();

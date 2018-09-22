@@ -430,7 +430,7 @@ public class ParametricPortraitTabController extends AbstractController {
      * transition property items shown in Properties ComboBoxes
      */
     public static class TransitionPropertyChooseList {
-        public final static String PROBABILITY = "Transitions.Probability";
+        public final static String PROBABILITY = "Transitions.ProbabilityColumnHeader";
         public final static String SOURCE_DELAY = "transition_source_delay";
         public final static String OPERAND_DELAY = "transition_operand_delay";
         public final static String SOURCE_COEFF = "transition_source_coefficient";

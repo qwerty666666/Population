@@ -46,7 +46,7 @@ public class CalculatorTest {
 
         transitions.get(0).getStates().addAll(
                 new StateInTransition(state1, 1, 1, 1, StateMode.SIMPLE),
-                new StateInTransition(state1, 0, 1, 0, StateMode.SIMPLE)
+                new StateInTransition(state2, 0, 1, 0, StateMode.SIMPLE)
         );
         transitions.get(1).getStates().addAll(
                 new StateInTransition(state1, 1, 1, 2, StateMode.SIMPLE),
@@ -81,13 +81,11 @@ public class CalculatorTest {
         Assertions.assertEquals(expected, calc.getTotalCount(task.getTransitions().get(0), 0));
 
         task.getTransitions().get(0).setType(TransitionType.SOLUTE);
-        expected = task.getStates().stream()
-                .mapToDouble(State::getCount)
-                .sum();
+        expected = 150;
         Assertions.assertEquals(expected, calc.getTotalCount(task.getTransitions().get(0), 0));
 
         task.getTransitions().get(0).setType(TransitionType.BLEND);
-        expected = task.getStates().get(0).getCount();
+        expected = 150;
         Assertions.assertEquals(expected, calc.getTotalCount(task.getTransitions().get(0), 0));
     }
 

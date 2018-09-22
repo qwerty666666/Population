@@ -1,12 +1,10 @@
 package population.model.TransitionModel;
 
 
-import population.App;
-import population.util.Resource;
+import population.util.Resources.StringResource;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.ResourceBundle;
 
 
 public class StateMode {
@@ -17,20 +15,34 @@ public class StateMode {
     public static final List<Integer> MODES =
             Arrays.asList(INHIBITOR, RESIDUAL, SIMPLE);
 
-    public static String getName(int type) {
+    public static String getName(int type, boolean useAbbreviation) {
         switch (type) {
             case SIMPLE: {
-                return Resource.getString("States.Mode.Simple");
+                return StringResource.getString(
+                    useAbbreviation ? "States.Mode.SimpleAbbreviation" : "States.Mode.Simple"
+                );
             }
             case INHIBITOR: {
-                return Resource.getString("States.Mode.Inhibitor");
+                return StringResource.getString(
+                    useAbbreviation ? "States.Mode.InhibitorAbbreviation" : "States.Mode.Inhibitor"
+                );
             }
             case RESIDUAL: {
-                return Resource.getString("States.Mode.Residual");
+                return StringResource.getString(
+                    useAbbreviation ? "States.Mode.ResidualAbbreviation" : "States.Mode.Residual"
+                );
             }
             default: {
                 return "";
             }
         }
+    }
+
+    public static String getName(int type) {
+        return getName(type, false);
+    }
+
+    public static String getAbbreviation(int type) {
+        return getName(type, true);
     }
 }
