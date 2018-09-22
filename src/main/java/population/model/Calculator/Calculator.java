@@ -15,7 +15,6 @@ import java.math.RoundingMode;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 public class Calculator {
@@ -117,7 +116,7 @@ public class Calculator {
             return;
         }
 
-        this.applyNormalTransition(transition, step);
+        this.applyCommonTransition(transition, step);
     }
 
 
@@ -135,8 +134,6 @@ public class Calculator {
         transition.getActualStates().stream()
                 .filter(state -> state.getMode() == StateMode.RESIDUAL)
                 .forEach(state -> {
-//                    double coef = this.getStateInTransitionCoefficient(state);
-//                    double count = coef * (this.statesCount[step][this.getStateIndex(state.getState())] - intensity);
                     this.statesCount[step][this.getStateIndex(state.getState())] -=
                             this.statesCount[step][this.getStateIndex(state.getState())] - intensity;
                 });
@@ -151,7 +148,7 @@ public class Calculator {
     }
 
 
-    protected void applyNormalTransition(Transition transition, int step) {
+    protected void applyCommonTransition(Transition transition, int step) {
         final double intensity = this.getIntensity(transition, step - 1) * this.getTotalCount(transition, step - 1) *
                 transition.getProbability();
 

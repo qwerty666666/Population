@@ -27,6 +27,10 @@ public class State {
         id = ID_COUNTER.incrementAndGet();
     }
 
+    protected State(int id) {
+        this.id = id;
+    }
+
 
     public StringProperty nameProperty() {
         return this.name;
@@ -91,6 +95,15 @@ public class State {
 
     @Override
     public boolean equals(Object obj) {
-        return obj != null && this.id == ((State)obj).id;
+        return obj instanceof State && this.id == ((State)obj).id;
+    }
+
+    @Override
+    public Object clone() {
+        State clone = new State(this.id);
+        clone.setName(this.getName());
+        clone.setAlias(this.getAlias());
+        clone.setCount(this.getCount());
+        return clone;
     }
 }

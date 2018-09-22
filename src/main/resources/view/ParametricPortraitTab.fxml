@@ -20,9 +20,14 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import population.component.parametricPortrait.ParametricPortraitProperties?>
 
-<?import javafx.geometry.Pos?>
-<SplitPane fx:id="rootSplitPane" dividerPositions="0.5, 0.5" xmlns="http://javafx.com/javafx/8.0.71" xmlns:fx="http://javafx.com/fxml/1" fx:controller="population.controller.ParametricPortraitTabController">
+<SplitPane fx:id="rootSplitPane"
+           dividerPositions="0.5, 0.5"
+           xmlns="http://javafx.com/javafx/8.0.71"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="population.controller.ParametricPortraitTabController"
+>
         <stylesheets>
             <URL value="@../style/primary.css" />
             <URL value="@../style/parametricPortrait.css" />
@@ -84,10 +89,17 @@
                 </HBox>
                 <!-- <CheckBox fx:id="humanLike" text="humanLike" /> -->
 
+                <ParametricPortraitProperties HBox.hgrow="ALWAYS">
+
+                </ParametricPortraitProperties>
+
                 <HBox alignment="CENTER" spacing="25">
                     <padding>
                         <Insets top="25" />
                     </padding>
+
+
+
                     <GridPane hgap="20" vgap="12" HBox.hgrow="ALWAYS">
                         <Label text="%parametric_portrait_instance_label" wrapText="true" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                         <ComboBox fx:id="cbInstance1" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0" />

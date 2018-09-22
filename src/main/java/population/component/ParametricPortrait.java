@@ -1,9 +1,10 @@
 package population.component;
 
 import population.PopulationApplication;
-import population.controller.ParametricPortraitTabController;
+import population.model.ParametricPortrait.StateSettings;
+import population.model.ParametricPortrait.StateSettingsGroup;
 import population.controller.PrimaryController;
-import population.model.State;
+import population.model.StateModel.State;
 import population.model.Task;
 import population.model.Transition;
 import javafx.application.Platform;
@@ -27,7 +28,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
-import javafx.scene.shape.Polygon;
 import javafx.scene.text.Font;
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -59,7 +59,7 @@ public class ParametricPortrait extends GridPane {
     /** task transitions */
     private List<Transition> transitions;
     /** state settings */
-    private ParametricPortraitTabController.StateSettingsGroup stateSettingsGroup;
+    private StateSettingsGroup stateSettingsGroup;
 
     /** max GridPane width */
     private DoubleProperty availableWidth = new SimpleDoubleProperty();
@@ -86,8 +86,7 @@ public class ParametricPortrait extends GridPane {
 
 
 
-    public ParametricPortrait(PopulationApplication application,
-                              ParametricPortraitTabController.StateSettingsGroup stateSettingsGroup) {
+    public ParametricPortrait(PopulationApplication application, StateSettingsGroup stateSettingsGroup) {
         this.application = application;
         this.primaryController = application.getPrimaryController();
         this.stateSettingsGroup = stateSettingsGroup;
@@ -224,7 +223,7 @@ public class ParametricPortrait extends GridPane {
     }
 
 
-    public ParametricPortraitTabController.StateSettingsGroup getStateSettingsGroup() {
+    public StateSettingsGroup getStateSettingsGroup() {
         return stateSettingsGroup;
     }
 
@@ -302,8 +301,9 @@ public class ParametricPortrait extends GridPane {
 
         cellContainer.updateGrid(stepsCnt.get(0), stepsCnt.get(1));
         setAxisUnits();
-        xLabel.setText(getInstanceString(states, instances.get(0)) + " : " + primaryController.getString(properties.get(0)));
-        yLabel.setText(getInstanceString(states, instances.get(1)) + " : " + primaryController.getString(properties.get(1)));
+        // TODO
+        /*xLabel.setText(getInstanceString(states, instances.get(0)) + " : " + primaryController.getString(properties.get(0)));
+        yLabel.setText(getInstanceString(states, instances.get(1)) + " : " + primaryController.getString(properties.get(1)));*/
         updateParametricPortraitFill();
         updateSize();
     }
@@ -315,7 +315,7 @@ public class ParametricPortrait extends GridPane {
      * @param id state id
      * @return stateSettingsGroup from states with id, null if it doesn't exist
      */
-    private ParametricPortraitTabController.StateSettings getStateSettingsById(int id) {
+    private StateSettings getStateSettingsById(int id) {
         return stateSettingsGroup.getStateSettingsList().stream()
                 .filter(x -> x.getState().getId() == id)
                 .findFirst()
@@ -384,16 +384,8 @@ public class ParametricPortrait extends GridPane {
 
         else if (instance instanceof Transition){
             switch (property) {
-                case TransitionPropertyChooseList.SOURCE_COEFF: {
+                case TransitionPropertyChooseList.STATE_OUT: {
                     ((Transition)instance).setSourceCoefficient((int)val);
-                    break;
-                }
-                case TransitionPropertyChooseList.OPERAND_COEFF: {
-                    ((Transition)instance).setOperandCoefficient((int)val);
-                    break;
-                }
-                case TransitionPropertyChooseList.RESULT_COEFF: {
-                    ((Transition)instance).setResultCoefficient((int)val);
                     break;
                 }
                 case TransitionPropertyChooseList.PROBABILITY: {
@@ -404,7 +396,7 @@ public class ParametricPortrait extends GridPane {
                     ((Transition)instance).setSourceDelay((int)val);
                     break;
                 }
-                case TransitionPropertyChooseList.OPERAND_DELAY: {
+                case TransitionPropertyChooseList.STATE_IN: {
                     ((Transition)instance).setOperandDelay((int)val);
                     break;
                 }
@@ -423,7 +415,8 @@ public class ParametricPortrait extends GridPane {
         List<Object> instancesByDescription = new ArrayList<>();
         instancesByDescription.add(instance);
 
-        if (instance instanceof State) {
+        // TODO do it on id
+        /*if (instance instanceof State) {
             String description = ((State)instance).getDescription().trim();
             if (!description.equals("")) {
                 instancesByDescription.addAll(commonTask.getStates().stream()
@@ -438,7 +431,7 @@ public class ParametricPortrait extends GridPane {
                         .filter(x -> x.getDescription().trim().equals(description))
                         .collect(Collectors.toList()));
             }
-        }
+        }*/
 
         return instancesByDescription;
     }
@@ -452,7 +445,8 @@ public class ParametricPortrait extends GridPane {
      */
     private Task getTask(int[] steps) {
         Task task = new Task(commonTask);
-        task.setAllowNegative(false);
+        // TODO
+        /*task.setAllowNegative(false);
 
         // set cloned states and transition to task for modify their fields without impact
         List<Transition> clonedTransitions = getListDeepCopy(transitions);
@@ -480,7 +474,7 @@ public class ParametricPortrait extends GridPane {
                 setPropertyValue(selectedInstance, selectedProperty, val);
             }
         }
-
+*/
         return task;
     }
 
@@ -500,8 +494,10 @@ public class ParametricPortrait extends GridPane {
                                List<Double> startValues,
                                List<Double> endValues,
                                List<Integer> stepsCnt,
-                               int scale) {
-        List<State> primaryStates = commonTask.getStates();
+                               int scale
+    ) {
+        // TODO
+        /*List<State> primaryStates = commonTask.getStates();
         List<Transition> primaryTransitions = commonTask.getTransitions();
 
         // clone task
@@ -528,7 +524,7 @@ public class ParametricPortrait extends GridPane {
 
         cellContainer.newTaskCellsList(stepsCnt.get(0), stepsCnt.get(1));
 
-        this.scale = scale;
+        this.scale = scale;*/
     }
 
 
@@ -555,8 +551,8 @@ public class ParametricPortrait extends GridPane {
         setParameters(commonTask, instances, properties, startValues, endValues, stepsCnt, scale);
 
         statesListShownOnParametricPortrait = stateSettingsGroup.getStateSettingsList().stream()
-                .filter(ParametricPortraitTabController.StateSettings::getShow)
-                .map(ParametricPortraitTabController.StateSettings::getState)
+                .filter(StateSettings::getShow)
+                .map(StateSettings::getState)
                 .collect(Collectors.toList());
 
         if (commonTask.isParallel())
@@ -935,7 +931,7 @@ public class ParametricPortrait extends GridPane {
 
         TaskCell() {
             this.numCols = this.numRows = (int)Math.ceil(Math.sqrt(stateSettingsGroup.getStateSettingsList().stream()
-                    .filter(ParametricPortraitTabController.StateSettings::getShow)
+                    .filter(StateSettings::getShow)
                     .collect(Collectors.toList())
                     .size()
             ));
@@ -978,7 +974,8 @@ public class ParametricPortrait extends GridPane {
                 Calculator.ProgressCallback progressCallback,
                 Calculator.CompleteCallback<Double> completeCallback
         ) {
-            final TaskAnalyser taskAnalyser = new TaskAnalyser(task);
+            // TODO
+            /*final TaskAnalyser taskAnalyser = new TaskAnalyser(task);
             taskAnalyser.setStablePrecision(scale);
             taskAnalyser.buildGraph();
             taskAnalyser.setAnalysedStatesList(statesListShownOnParametricPortrait);
@@ -995,7 +992,7 @@ public class ParametricPortrait extends GridPane {
                                 TaskCellType.CYCLIC;
                         completeCallback.onComplete((Double)result);
                     }
-            );
+            );*/
 
 
         }
@@ -1072,7 +1069,7 @@ public class ParametricPortrait extends GridPane {
          */
         private Color getStateColor(State state) {
             Color color = null;
-            ParametricPortraitTabController.StateSettings stateSettings = getStateSettingsById(state.getId());
+            StateSettings stateSettings = getStateSettingsById(state.getId());
             if (stateSettings != null)
                 color = stateSettings.getColor();
 

@@ -1358,7 +1358,7 @@ public class PrimaryController extends AbstractController {
         if (task == null) {
             return;
         }
-        mParametricPortraitTabController.clearEnvironment();
+//        mParametricPortraitTabController.clearEnvironment();
         setTask(task);
         mTaskFile = file;
         getApplication().setWorkDirectory(file.getParent());
@@ -1379,7 +1379,7 @@ public class PrimaryController extends AbstractController {
         }
         mTaskFile = null;
         buildSettings();
-        mParametricPortraitTabController.clearEnvironment();
+//        mParametricPortraitTabController.clearEnvironment();
         mStates.clear();
         mTransitions.clear();
         mStates.addAll(task.getStates());
@@ -1392,7 +1392,7 @@ public class PrimaryController extends AbstractController {
         if (mCalculating) {
             return;
         }
-        mParametricPortraitTabController.clearEnvironment();
+//        mParametricPortraitTabController.clearEnvironment();
         mStates.clear();
         mTransitions.clear();
         mStartPointField.setText("0");
