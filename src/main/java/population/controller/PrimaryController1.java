@@ -39,6 +39,9 @@ public class PrimaryController1 extends AbstractController {
     protected HBox debugPanel;
     protected File taskFile = null;
 
+    @FXML
+    private TabPane mainTabPane;
+
     private FileChooser getTaskFileChooser(String title) {
         FileChooser fileChooser = getFileChooser(title);
         fileChooser.getExtensionFilters()
@@ -100,9 +103,10 @@ public class PrimaryController1 extends AbstractController {
         debugPanel.setManaged(App.isDev());
 
         this.setTitle(this.getDefaultTitle());
-//        mMainTabPane.getSelectionModel().select(2);
-//        File file = new File("C:\\Users\\user\\Desktop\\test.pmt");
-//        openTaskFromFile(file);
+
+        mainTabPane.getSelectionModel().select(3);
+        File file = new File("C:\\Users\\user\\Desktop\\3.pmt");
+        openTaskFromFile(file);
     }
 
 

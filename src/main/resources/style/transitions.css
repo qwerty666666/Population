@@ -20,6 +20,13 @@
     -fx-border-color: transparent -fx-table-cell-border-color transparent bold-border-color;
 }
 
+.table-view .combo-box-base {
+    -fx-background-color: transparent;
+}
+.table-view .combo-box > .list-cell {
+    -fx-padding: 0;
+}
+
 /*
 .new-transition .table-cell.transition-state {
     -fx-border-color: bold-border-color -fx-table-cell-border-color transparent bold-border-color;

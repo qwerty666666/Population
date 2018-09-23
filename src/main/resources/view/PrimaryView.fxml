@@ -39,7 +39,7 @@
         <HBox fx:id="debugPanel">
             <Button layoutX="75.0" layoutY="14.0" mnemonicParsing="false" onAction="#debug" text="debug"/>
         </HBox>
-        <TabPane fx:id="mMainTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+        <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
             <tabs>
                 <Tab text="%States.TabName">
                     <content>

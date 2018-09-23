@@ -10,10 +10,3 @@
 .table-view:focused {
     -fx-background-color: transparent, -fx-box-border, -fx-control-inner-background;
 }
-
-.table-view .combo-box-base {
-    -fx-background-color: transparent;
-}
-.table-view .combo-box > .list-cell {
-    -fx-padding: 0;
-}

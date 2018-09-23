@@ -1,23 +1,23 @@
 package population.controller;
 
+import javafx.collections.FXCollections;
 import population.App;
 import population.component.Calculator;
 import population.component.ParametricPortrait;
 import population.component.UIComponents.ColorTableCell;
 import population.component.UIComponents.DraggableVerticalScrollPane;
 import population.component.UIComponents.IconButton;
-import population.model.ParametricPortrait.StateSettings;
-import population.model.ParametricPortrait.StateSettingsGroup;
+import population.component.parametricPortrait.ParametricPortraitPropertiesNode;
+import population.component.parametricPortrait.StateSettingsTable;
+import population.model.ParametricPortrait.PortraitProperties;
+import population.model.ParametricPortrait.SimpleColorGenerator;
+import population.model.ParametricPortrait.StateSetting;
 import population.controller.base.AbstractController;
 import population.model.StateModel.State;
 import population.model.TaskV4;
 import population.model.TransitionModel.Transition;
-import population.util.Resources.StringResource;
 import population.util.Utils;
-import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
@@ -35,7 +35,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
-import javafx.util.StringConverter;
 
 import javax.imageio.ImageIO;
 import java.awt.image.RenderedImage;
@@ -61,6 +60,10 @@ public class ParametricPortraitTabController extends AbstractController {
     @FXML
     private StackPane parametricPortraitSection;
     @FXML
+    private StackPane portraitPropertiesContainer;
+    @FXML
+    private StackPane stateSettingsContainer;
+    @FXML
     private ScrollPane parametricPortraitSectionContainer;
     @FXML
     private TextField tfStartValue1;
@@ -85,13 +88,13 @@ public class ParametricPortraitTabController extends AbstractController {
     @FXML
     private ComboBox<String> cbProperty2;
     @FXML
-    private TableView<StateSettings> stateSettingsTable;
+    private TableView<StateSetting> stateSettingsTable;
     @FXML
-    private TableColumn<StateSettings, Boolean> stateSettingsTableVisibilityColumn;
+    private TableColumn<StateSetting, Boolean> stateSettingsTableVisibilityColumn;
     @FXML
-    private TableColumn<StateSettings, String> stateSettingsTableNameColumn;
+    private TableColumn<StateSetting, String> stateSettingsTableNameColumn;
     @FXML
-    private TableColumn<StateSettings, Color> stateSettingsTableColorColumn;
+    private TableColumn<StateSetting, Color> stateSettingsTableColorColumn;
 
     private List<TextField> startValueTextFields = new ArrayList<>();
     private List<TextField> endValueTextFields = new ArrayList<>();
@@ -128,8 +131,6 @@ public class ParametricPortraitTabController extends AbstractController {
 
     /** ParametricPortrait shown on scene */
     private ParametricPortrait shownParametricPortrait;
-    /** current stateSettingsGroup */
-    private StateSettingsGroup stateSettingsGroup;
 
     /** parametric portraits history */
     private History history = new History();
@@ -140,17 +141,6 @@ public class ParametricPortraitTabController extends AbstractController {
      */
     private void initTask() {
         task = App.getTask();
-        task.getStates().addListener(updateInstanceListOnStateChangeListener);
-        task.getTransitions().addListener(updateInstanceListOnTransitionChangeListener);
-    }
-
-
-    /**
-     * initialize state settings group
-     */
-    private void initStateSettingsGroup() {
-        this.stateSettingsGroup = new StateSettingsGroup();
-        this.stateSettingsGroup.bindToStateList(this.task.getStates());
     }
 
 
@@ -161,228 +151,17 @@ public class ParametricPortraitTabController extends AbstractController {
      *********************************/
 
     /**
-     * transition property items shown in Properties ComboBoxes
-     */
-    public static class TransitionPropertyChooseList {
-        public final static String PROBABILITY = "Transitions.ProbabilityColumnHeader";
-        public final static String SOURCE_DELAY = "Transitions.StateDelayColumnHeader";
-        public final static String STATE_IN = "Transitions.StateInColumnHeader";
-        public final static String STATE_OUT = "Transitions.StateOutColumnHeader";
-    }
-
-    /**
-     * state property items shown in Properties ComboBoxes
-     */
-    public static class StatePropertyChooseList {
-        public final static String COUNT = "States.Count";
-    }
-
-
-    /**
      * initialize property section
      */
     private void initPropertiesSection() {
-        startValueTextFields.addAll(Arrays.asList(tfStartValue1, tfStartValue2));
-        startValues = Arrays.asList(new Double[startValueTextFields.size()]);
+        ParametricPortrait parametricPortrait = new ParametricPortrait();
+        PortraitProperties portraitProperties = parametricPortrait.getPortraitProperties();
+        ParametricPortraitPropertiesNode propNode = new ParametricPortraitPropertiesNode(App.getTask(), portraitProperties.getDimensions());
+        propNode.setPortraitProperties(portraitProperties);
+        portraitPropertiesContainer.getChildren().add(propNode);
 
-        endValueTextFields.addAll(Arrays.asList(tfEndValue1, tfEndValue2));
-        endValues = Arrays.asList(new Double[endValueTextFields.size()]);
-
-        stepCountTextFields.addAll(Arrays.asList(tfStepsCnt1, tfStepsCnt2));
-        stepsCnt = new ArrayList<>(Collections.nCopies(stepCountTextFields.size(), 0));
-
-        propertyComboBoxes.addAll(Arrays.asList(cbProperty1, cbProperty2));
-        properties = Arrays.asList(new String[propertyComboBoxes.size()]);
-
-        instanceComboBoxes.addAll(Arrays.asList(cbInstance1, cbInstance2));
-        instances = Arrays.asList(new Object[instanceComboBoxes.size()]);
-
-        initInstancesComboBoxes();
-        initPropertiesComboBoxes();
         initStateSettingsTable();
     }
-
-
-    /**
-     * bind changes from transitions to instanceList
-     * (transitions placed immediately after states in instanceList)
-     */
-    private ListChangeListener<Object> updateInstanceListOnTransitionChangeListener = new ListChangeListener<Object>() {
-        @Override
-        public void onChanged(Change<?> c) {
-            int startInd = task.getStates().size();
-
-            while (c.next()) {
-                if (c.wasUpdated()) {
-                    for (int i = c.getFrom(); i < c.getTo(); i++) {
-                        instancesList.set(startInd + i, c.getList().get(i));
-                    }
-
-                } else if (c.wasPermutated()) {
-                    int from = c.getFrom(), to = c.getTo();
-                    List<Object> copy = new ArrayList<>(instancesList.subList(startInd + from, startInd + to));
-                    for (int oldIndex = from; oldIndex < to; oldIndex++) {
-                        int newIndex = c.getPermutation(oldIndex);
-                        instancesList.set(startInd + newIndex, copy.get(oldIndex - from));
-                    }
-
-                } else if (c.wasAdded()) {
-                    int i = 0;
-                    for (Object o: c.getAddedSubList()) {
-                        instancesList.add(c.getFrom() + i + startInd, o);
-                        i++;
-                    }
-
-                } else if (c.wasRemoved()) {
-                    instancesList.remove(c.getFrom() + startInd, c.getFrom() + startInd + c.getRemovedSize());
-                }
-            }
-        }
-    };
-
-    /**
-     * bind changes from task's states to instanceList
-     * (states placed on firsts positions in instanceList)
-     */
-    private ListChangeListener<Object> updateInstanceListOnStateChangeListener = new ListChangeListener<Object>() {
-        @Override
-        public void onChanged(Change<?> c) {
-            while (c.next()) {
-                if (c.wasUpdated()) {
-                    for (int i = c.getFrom(); i < c.getTo(); i++) {
-                        instancesList.set(i, c.getList().get(i));
-                    }
-
-                } else if (c.wasPermutated()) {
-                    int from = c.getFrom(), to = c.getTo();
-                    List<Object> copy = new ArrayList<>(instancesList.subList(from, to));
-                    for (int oldIndex = from; oldIndex < to; oldIndex++) {
-                        int newIndex = c.getPermutation(oldIndex);
-                        instancesList.set(newIndex, copy.get(oldIndex - from));
-                    }
-
-                } else if (c.wasAdded()) {
-                    int i = 0;
-                    for (Object o: c.getAddedSubList()) {
-                        instancesList.add(c.getFrom() + i, o);
-                        i++;
-                    }
-
-                } else if (c.wasRemoved()) {
-                    instancesList.remove(c.getFrom(), c.getFrom() + c.getRemovedSize());
-                }
-            }
-        }
-    };
-
-
-    /**
-     * convert instance to string
-     */
-    private StringConverter<Object> instanceStringConverter = new StringConverter<Object>() {
-        @Override
-        public String toString(Object instance) {
-            if (instance == null) {
-                return "";
-            }
-            if (instance instanceof State)
-                return (((State) instance).getName());
-            else if (instance instanceof Transition) {
-                return Integer.toString(((Transition)instance).getId());
-            }
-            return "";
-        }
-
-        @Override
-        public Object fromString(String string) {
-            return null;
-        }
-    };
-
-
-    /**
-     * init instance ComboBoxes
-     */
-    private void initInstancesComboBoxes() {
-        instancesList = FXCollections.observableList(new ArrayList<>(),
-            (Object o) -> {
-                List<Observable> list = new ArrayList<>();
-                if (o instanceof State) {
-                    list.add(((State) o).nameProperty());
-                }
-                if (o instanceof Transition) {
-                    list.add(((Transition) o).probabilityProperty());
-                        /*((Transition)o).getActualStates()
-                            .forEach(state -> {
-                                Collections.addAll(list,
-                                    state.inProperty(),
-                                    state.outProperty(),
-                                    state.delayProperty()
-                                );
-                            });*/
-                }
-                Observable[] res = new Observable[list.size()];
-                return list.toArray(res);
-            });
-
-        for (int i = 0; i < instanceComboBoxes.size(); i++) {
-            ComboBox<Object> cbInstance = instanceComboBoxes.get(i);
-            cbInstance.setConverter(instanceStringConverter);
-            cbInstance.setItems(instancesList);
-
-            final int finalInd = i;
-            cbInstance.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-                instances.set(finalInd, instanceComboBoxes.get(finalInd).getValue());
-            });
-        }
-    }
-
-
-    /**
-     * initialize properties ComboBoxes
-     */
-    private void initPropertiesComboBoxes() {
-        final ObservableList<String> transitionChooseList = FXCollections.observableArrayList(
-            TransitionPropertyChooseList.PROBABILITY
-//                TransitionPropertyChooseList.SOURCE_DELAY,
-//                TransitionPropertyChooseList.STATE_IN,
-//                TransitionPropertyChooseList.STATE_OUT
-        );
-        final ObservableList<String> stateChooseList = FXCollections.observableArrayList(
-            StatePropertyChooseList.COUNT
-        );
-
-        StringConverter<String> stringConverter = new StringConverter<String>() {
-            @Override
-            public String toString(String item) {
-                return StringResource.getString(item);
-            }
-
-            @Override
-            public String fromString(String userId) {
-                return null;
-            }
-        };
-
-        for (int i = 0; i < instanceComboBoxes.size(); i++) {
-            final int finalInd = i;
-            propertyComboBoxes.get(i).setConverter(stringConverter);
-            instanceComboBoxes.get(i).getSelectionModel().selectedIndexProperty().addListener(
-                (observable, oldValue, newValue) -> {
-                    if (newValue.intValue() < 0) {
-                        propertyComboBoxes.get(finalInd).setItems(FXCollections.observableArrayList());
-                        return;
-                    }
-                    if (newValue.intValue() < task.getStates().size())
-                        propertyComboBoxes.get(finalInd).setItems(stateChooseList);
-                    else
-                        propertyComboBoxes.get(finalInd).setItems(transitionChooseList);
-                }
-            );
-
-        }
-    }
-
 
 
 
@@ -399,7 +178,6 @@ public class ParametricPortraitTabController extends AbstractController {
     @Override
     public void initialize() {
         initTask();
-        initStateSettingsGroup();
         initPropertiesSection();
 //        initParametricPortraitSection();
 //        initHistory();
@@ -438,25 +216,9 @@ public class ParametricPortraitTabController extends AbstractController {
      * initialize state settings table
      */
     private void initStateSettingsTable() {
-        stateSettingsGroup = new StateSettingsGroup();
-        stateSettingsTable.setItems(stateSettingsGroup.getStateSettingsList());
-
-        stateSettingsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        stateSettingsTableNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-        stateSettingsTableNameColumn.setCellValueFactory(param -> param.getValue().getState().nameProperty());
-
-        stateSettingsTableVisibilityColumn.setCellFactory(
-            CheckBoxTableCell.forTableColumn(stateSettingsTableVisibilityColumn));
-        stateSettingsTableVisibilityColumn.setCellValueFactory(param -> param.getValue().showProperty());
-
-        stateSettingsTableColorColumn.setCellFactory(param -> new ColorTableCell<>(stateSettingsTableColorColumn));
-        stateSettingsTableColorColumn.setCellValueFactory(param -> param.getValue().colorProperty());
-        stateSettingsTableColorColumn.setOnEditCommit(t -> {
-            StateSettings stateSettings = t.getTableView().getItems().get(t.getTablePosition().getRow());
-            stateSettings.setColor(t.getNewValue());
-            stateSettingsGroup.updateGroup();
-            history.update(stateSettingsGroup);
-        });
+        StateSettingsTable table = new StateSettingsTable(App.getTask());
+        table.setColorGenerator(new SimpleColorGenerator());
+        stateSettingsContainer.getChildren().add(table);
     }
 
 
@@ -637,8 +399,8 @@ public class ParametricPortraitTabController extends AbstractController {
 
             for (TextField tf: startValueTextFields) {
                 String property = propertyComboBoxes.get(i).getValue();
-                if (property.equals(TransitionPropertyChooseList.SOURCE_DELAY)
-                        || property.equals(TransitionPropertyChooseList.STATE_IN))
+                if (property.equals(ParametricPortrait.Property.SOURCE_DELAY)
+                        || property.equals(ParametricPortrait.Property.STATE_IN))
                     propertyValue = Integer.parseInt(tf.getText());
                 else
                     propertyValue = Double.parseDouble(tf.getText());
@@ -672,8 +434,8 @@ public class ParametricPortraitTabController extends AbstractController {
 
             for (TextField tf: endValueTextFields) {
                 String property = propertyComboBoxes.get(i).getValue();
-                if (property.equals(TransitionPropertyChooseList.SOURCE_DELAY)
-                        || property.equals(TransitionPropertyChooseList.STATE_IN))
+                if (property.equals(ParametricPortrait.Property.SOURCE_DELAY)
+                        || property.equals(ParametricPortrait.Property.STATE_IN))
                     propertyValue = Integer.parseInt(tf.getText());
                 else
                     propertyValue = Double.parseDouble(tf.getText());
@@ -684,8 +446,8 @@ public class ParametricPortraitTabController extends AbstractController {
                 if (propertyValue < startValues.get(i)) {
                     throw new IllegalArgumentException("parametric_portrait_end_value_lower_than_start_value");
                 }
-                if ( ( property.equals(TransitionPropertyChooseList.SOURCE_DELAY)
-                        || property.equals(TransitionPropertyChooseList.STATE_IN) )
+                if ( ( property.equals(ParametricPortrait.Property.SOURCE_DELAY)
+                        || property.equals(ParametricPortrait.Property.STATE_IN) )
                         && ((propertyValue - startValues.get(i)) % (stepsCnt.get(i) - 1) != 0)
                         )
                     throw new IllegalArgumentException("parametric_portrait_unable_discretize");
@@ -817,17 +579,6 @@ public class ParametricPortraitTabController extends AbstractController {
      */
     void clearEnvironment() {
         parametricPortraitSection.getChildren().remove(shownParametricPortrait);
-        setNewStateSettingsGroup();
-    }
-
-
-    /**
-     * create new stateSettingsGroup
-     */
-    void setNewStateSettingsGroup() {
-        // remain old stateSettingsGroup clone in settings table for maintain observe on main state table
-        stateSettingsGroup = stateSettingsGroup.clone();
-        stateSettingsTable.setItems(stateSettingsGroup.getStateSettingsList());
     }
 
 
@@ -873,10 +624,6 @@ public class ParametricPortraitTabController extends AbstractController {
      * @param parametricPortrait parametric portrait
      */
     private void setEnvironmentByParametricPortrait(ParametricPortrait parametricPortrait) {
-        // set settings group
-        this.stateSettingsGroup = parametricPortrait.getStateSettingsGroup();
-        stateSettingsTable.setItems(stateSettingsGroup.getStateSettingsList());
-
         // set application task from parametricPortrait
         // there is no need update settingsGroup, so remove change listener while updated main states table
         // TODO
@@ -916,7 +663,7 @@ public class ParametricPortraitTabController extends AbstractController {
      * @return created ParametricPortrait instance
      */
     private ParametricPortrait getNewParametricPortraitInstance() {
-        ParametricPortrait parametricPortrait = new ParametricPortrait(getApplication(), stateSettingsGroup);
+        ParametricPortrait parametricPortrait = new ParametricPortrait();
         parametricPortrait.setSubareaSelectedCallback(parametricPortraitAreaSelectedCallback);
         return parametricPortrait;
     }
@@ -938,10 +685,6 @@ public class ParametricPortraitTabController extends AbstractController {
         // create new parametric portrait
         parametricPortraitSection.getChildren().remove(shownParametricPortrait);
 
-        // TODO enable group possibility
-        // settingsGroup should be updated on changing state size and states name should be observable in group
-        // remove it
-        setNewStateSettingsGroup();
         shownParametricPortrait = getNewParametricPortraitInstance();
 
 
@@ -1064,14 +807,14 @@ public class ParametricPortraitTabController extends AbstractController {
 
         /**
          * update parametric portraits in history in stateSettingsGroup group
-         * @param stateSettingsGroup stateSettingsGroup defining group
          */
-        void update(StateSettingsGroup stateSettingsGroup) {
-            content.getChildren().stream()
+        void update() {
+            // TODO
+            /*content.getChildren().stream()
                     .filter(x -> x instanceof HistoryItem)
                     .map(HistoryItem.class::cast)
                     .filter(item -> item.getParametricPortrait().getStateSettingsGroup() == stateSettingsGroup)
-                    .forEach(HistoryItem::updateNailImage);
+                    .forEach(HistoryItem::updateNailImage);*/
         }
 
 

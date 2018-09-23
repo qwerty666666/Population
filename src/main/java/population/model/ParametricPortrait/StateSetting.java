@@ -9,26 +9,21 @@ import population.model.StateModel.State;
 
 
 /**
- * parametric portrait state settings
+ * parametric portrait state settings: state color and visibility in portrait
  */
-public class StateSettings {
+public class StateSetting {
     private ObjectProperty<State> state = new SimpleObjectProperty<>();
     /** should state be shown in portrait */
-    private BooleanProperty show = new SimpleBooleanProperty(true);
+    private BooleanProperty show = new SimpleBooleanProperty();
     /** state color in parametric portrait */
     private ObjectProperty<Color> color = new SimpleObjectProperty<>();
-    /** group to which the state setting belongs */
-    private StateSettingsGroup stateSettingsGroup;
 
-    public StateSettings(State state, StateSettingsGroup stateSettingsGroup) {
+    private ColorGenerator colorGenerator;
+
+    public StateSetting(State state, ColorGenerator colorGenerator) {
         this.setState(state);
-        this.stateSettingsGroup = stateSettingsGroup;
-
-        Color color = stateSettingsGroup.getStateColor(state);
-        if (color == null) {
-            color = stateSettingsGroup.getNextColor();
-        }
-        setColor(color);
+        this.colorGenerator = colorGenerator;
+        this.setColor(colorGenerator.getNext());
     }
 
     public ObjectProperty<State> stateProperty() {
@@ -64,7 +59,6 @@ public class StateSettings {
     }
 
     public void setColor(Color color) {
-        this.stateSettingsGroup.setStateColor(state.get(), color);
         this.color.set(color);
     }
 }

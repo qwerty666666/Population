@@ -20,8 +20,10 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import population.component.parametricPortrait.ParametricPortraitProperties?>
+<?import population.component.parametricPortrait.ParametricPortraitPropertiesNode?>
 
+<?import population.controller.ParametricPortraitTabController.History.HistoryItem?>
+<?import population.component.parametricPortrait.StateSettingsTable?>
 <SplitPane fx:id="rootSplitPane"
            dividerPositions="0.5, 0.5"
            xmlns="http://javafx.com/javafx/8.0.71"
@@ -89,81 +91,7 @@
                 </HBox>
                 <!-- <CheckBox fx:id="humanLike" text="humanLike" /> -->
 
-                <ParametricPortraitProperties HBox.hgrow="ALWAYS">
-
-                </ParametricPortraitProperties>
-
-                <HBox alignment="CENTER" spacing="25">
-                    <padding>
-                        <Insets top="25" />
-                    </padding>
-
-
-
-                    <GridPane hgap="20" vgap="12" HBox.hgrow="ALWAYS">
-                        <Label text="%parametric_portrait_instance_label" wrapText="true" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                        <ComboBox fx:id="cbInstance1" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-
-                        <Label text="%parametric_portrait_property_label" wrapText="true" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                        <ComboBox fx:id="cbProperty1" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-
-                        <Label text="%parametric_portrait_start_value_label" wrapText="true" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                        <TextField fx:id="tfStartValue1" text="0.1" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-
-                        <Label text="%parametric_portrait_end_value_label" wrapText="true" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                        <TextField fx:id="tfEndValue1" text="1" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-
-                        <Label text="%parametric_portrait_steps_count_label" wrapText="true" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-                        <TextField fx:id="tfStepsCnt1" text="10" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-
-                        <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="70"/>
-                            <ColumnConstraints hgrow="ALWAYS" minWidth="60"/>
-                        </columnConstraints>
-                        <rowConstraints>
-                            <RowConstraints vgrow="NEVER" />
-                            <RowConstraints vgrow="NEVER" />
-                            <RowConstraints vgrow="NEVER" />
-                            <RowConstraints vgrow="NEVER" />
-                            <RowConstraints vgrow="NEVER" />
-                        </rowConstraints>
-                    </GridPane>
-
-                    <Separator orientation="VERTICAL">
-                        <padding>
-                            <Insets bottom="15" top="15" />
-                        </padding>
-                    </Separator>
-
-                    <GridPane hgap="20" vgap="12" HBox.hgrow="ALWAYS">
-                        <Label text="%parametric_portrait_instance_label" wrapText="true" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                        <ComboBox fx:id="cbInstance2" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-
-                        <Label text="%parametric_portrait_property_label" wrapText="true" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                        <ComboBox fx:id="cbProperty2" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-
-                        <Label text="%parametric_portrait_start_value_label" wrapText="true" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                        <TextField fx:id="tfStartValue2" text="0.1" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-
-                        <Label text="%parametric_portrait_end_value_label" wrapText="true" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                        <TextField fx:id="tfEndValue2" text="1" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-
-                        <Label text="%parametric_portrait_steps_count_label" wrapText="true" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-                        <TextField fx:id="tfStepsCnt2" text="10" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-
-                        <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="70"/>
-                            <ColumnConstraints hgrow="ALWAYS" minWidth="60"/>
-                        </columnConstraints>
-                        <rowConstraints>
-                            <RowConstraints vgrow="NEVER" />
-                            <RowConstraints vgrow="NEVER" />
-                            <RowConstraints vgrow="NEVER" />
-                            <RowConstraints vgrow="NEVER" />
-                            <RowConstraints vgrow="NEVER" />
-                        </rowConstraints>
-                    </GridPane>
-                </HBox>
+                <StackPane fx:id="portraitPropertiesContainer"/>
 
                 <Separator>
                     <padding>
@@ -171,13 +99,7 @@
                     </padding>
                 </Separator>
 
-                <TableView fx:id="stateSettingsTable" editable="true">
-                    <columns>
-                        <TableColumn fx:id="stateSettingsTableNameColumn" editable="false" prefWidth="100.0" sortable="false" text="%parametric_portrait_state_name_header" />
-                        <TableColumn fx:id="stateSettingsTableVisibilityColumn" prefWidth="100.0" sortable="false" text="%parametric_portrait_visibility_header" />
-                        <TableColumn fx:id="stateSettingsTableColorColumn" prefWidth="150.0" sortable="false" text="%parametric_portrait_color_header" />
-                    </columns>
-                </TableView>
+                <StackPane fx:id="stateSettingsContainer" />
 
                 <StackPane>
                     <Button fx:id="saveButton" mnemonicParsing="false" onAction="#save" text="%parametric_portrait_save" StackPane.alignment="CENTER_RIGHT"/>
