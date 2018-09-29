@@ -302,7 +302,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
             if (newValue != null) {
                 State state = newValue.getStates().get(stateIndex).getState();
-                if (state != null && !state.isEmptyState()) {
+                if (state == null || state.isEmptyState()) {
                     cell.setTooltip(chooseStateTooltip);
                 }
             }
@@ -312,7 +312,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
         TransitionTableRowItem rowItem = (TransitionTableRowItem) cell.getTableRow().getItem();
         if (rowItem != null) {
             State state = rowItem.getStates().get(stateIndex).getState();
-            if (state != null && !state.isEmptyState()) {
+            if (state == null || state.isEmptyState()) {
                 cell.setTooltip(chooseStateTooltip);
                 rowItem.getStates().get(stateIndex).stateProperty().addListener(stateChangeListener);
             }
