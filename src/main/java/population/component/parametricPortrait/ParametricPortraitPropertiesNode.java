@@ -13,7 +13,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.util.StringConverter;
-import population.component.ParametricPortrait;
+import population.model.ParametricPortrait.ParametricPortrait;
 import population.model.ParametricPortrait.PortraitProperties;
 import population.model.StateModel.State;
 import population.model.TaskV4;
@@ -46,28 +46,7 @@ public class ParametricPortraitPropertiesNode extends HBox {
     private List<ComboBox<Object>> instanceComboBoxes = new ArrayList<>();
     private List<ComboBox<ParametricPortrait.Property>> propertyComboBoxes = new ArrayList<>();
 
-    /**
-     * convert instance to string
-     */
-    private StringConverter<Object> instanceStringConverter = new StringConverter<Object>() {
-        @Override
-        public String toString(Object instance) {
-            if (instance == null) {
-                return "";
-            }
-            if (instance instanceof State)
-                return (((State) instance).getName());
-            else if (instance instanceof Transition) {
-                return Integer.toString(((Transition)instance).getId());
-            }
-            return "";
-        }
 
-        @Override
-        public Object fromString(String string) {
-            return null;
-        }
-    };
 
 
     public ParametricPortraitPropertiesNode(TaskV4 task, int dimensions) {
@@ -218,7 +197,7 @@ public class ParametricPortraitPropertiesNode extends HBox {
 
         for (int i = 0; i < instanceComboBoxes.size(); i++) {
             ComboBox<Object> cbInstance = instanceComboBoxes.get(i);
-            cbInstance.setConverter(instanceStringConverter);
+            cbInstance.setConverter(ParametricPortrait.INSTANCE_STRING_CONVERTER);
             cbInstance.setItems(instanceList);
 
             final int finalInd = i;
@@ -240,31 +219,11 @@ public class ParametricPortraitPropertiesNode extends HBox {
             ParametricPortrait.Property.COUNT
         );
 
-        final StringConverter<ParametricPortrait.Property> stringConverter = new StringConverter<ParametricPortrait.Property>() {
-            @Override
-            public String toString(ParametricPortrait.Property item) {
-                switch (item) {
-                    case PROBABILITY: {
-                        return StringResource.getString("ParametricPortrait.ProbabilityProperty");
-                    }
-                    case COUNT: {
-                        return StringResource.getString("States.Count");
-                    }
-                }
-                return "";
-            }
-
-            @Override
-            public ParametricPortrait.Property fromString(String userId) {
-                return null;
-            }
-        };
-
         for (int i = 0; i < instanceComboBoxes.size(); i++) {
             final int finalInd = i;
 
             ComboBox<ParametricPortrait.Property> cbProperty = propertyComboBoxes.get(i);
-            cbProperty.setConverter(stringConverter);
+            cbProperty.setConverter(ParametricPortrait.PROPERTY_STRING_CONVERTER);
             cbProperty.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
                 this.portraitProperties.getProperties().get(finalInd).set(cbProperty.getValue());
             });

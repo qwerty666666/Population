@@ -1,5 +1,6 @@
 package population.controller;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import population.App;
 import population.component.Calculator;
@@ -66,55 +67,10 @@ public class ParametricPortraitTabController extends AbstractController {
     @FXML
     private ScrollPane parametricPortraitSectionContainer;
     @FXML
-    private TextField tfStartValue1;
-    @FXML
-    private TextField tfStartValue2;
-    @FXML
-    private TextField tfEndValue1;
-    @FXML
-    private TextField tfEndValue2;
-    @FXML
-    private TextField tfStepsCnt1;
-    @FXML
-    private TextField tfStepsCnt2;
-    @FXML
     private TextField tfPrecision;
-    @FXML
-    private ComboBox<Object> cbInstance1;
-    @FXML
-    private ComboBox<Object> cbInstance2;
-    @FXML
-    private ComboBox<String> cbProperty1;
-    @FXML
-    private ComboBox<String> cbProperty2;
-    @FXML
-    private TableView<StateSetting> stateSettingsTable;
-    @FXML
-    private TableColumn<StateSetting, Boolean> stateSettingsTableVisibilityColumn;
-    @FXML
-    private TableColumn<StateSetting, String> stateSettingsTableNameColumn;
-    @FXML
-    private TableColumn<StateSetting, Color> stateSettingsTableColorColumn;
-
-    private List<TextField> startValueTextFields = new ArrayList<>();
-    private List<TextField> endValueTextFields = new ArrayList<>();
-    private List<TextField> stepCountTextFields = new ArrayList<>();
-    private List<ComboBox<Object>> instanceComboBoxes = new ArrayList<>();
-    private List<ComboBox<String>> propertyComboBoxes = new ArrayList<>();
 
     /** calculation precision used in task (digits after commma) */
     private int taskScale;
-
-    /** start property value */
-    private List<Double> startValues = new ArrayList<>();
-    /** end property value */
-    private List<Double> endValues = new ArrayList<>();
-    /** steps count in parametric portrait */
-    private List<Integer> stepsCnt = new ArrayList<>();
-    /** selected properties */
-    private List<String> properties = new ArrayList<>();
-    /** selected instances */
-    private List<Object> instances = new ArrayList<>();
 
     /** List of states and transitions which user can select in instance ComboBoxes */
     private ObservableList<Object> instancesList;
@@ -179,36 +135,19 @@ public class ParametricPortraitTabController extends AbstractController {
     public void initialize() {
         initTask();
         initPropertiesSection();
-//        initParametricPortraitSection();
+        initParametricPortraitSection();
 //        initHistory();
 //
-//        Platform.runLater(() ->
-//                rootSplitPane.setDividerPositions(
-//                        history.getMinWidth() / rootSplitPane.getWidth(),
-//                        1 - propertiesSection.getMinWidth() / rootSplitPane.getWidth())
-//        );
+        Platform.runLater(() ->
+                rootSplitPane.setDividerPositions(
+                        history.getMinWidth() / rootSplitPane.getWidth(),
+                        1 - propertiesSection.getMinWidth() / rootSplitPane.getWidth())
+        );
 //
 //
 //        if (getApplication().IS_DEVELOP) {
 //            test();
 //        }
-    }
-
-
-    public void test() {
-        primaryController.openTaskFromFile("C:\\Users\\user\\Desktop\\популяция ОНД 1000 тактов.pmt");
-
-        this.cbInstance1.getSelectionModel().select(9);
-        this.cbProperty1.getSelectionModel().select(0);
-
-        this.cbInstance2.getSelectionModel().select(13);
-        this.cbProperty2.getSelectionModel().select(0);
-
-        //this.primaryController.mStepsCountField.setText("1000");
-
-        //this.tfStartValue1.setText();
-
-        calculate();
     }
 
 
@@ -222,50 +161,16 @@ public class ParametricPortraitTabController extends AbstractController {
     }
 
 
-
-
     /**
-     * get state from states which id equal id
-     * @param states states list
-     * @param id searching id
-     * @return state if exist, null otherwise
+     * bind properties to parametric portrait
      */
-    private static State getStateById(List<State> states, int id) {
-        return states.stream()
-            .filter(x -> x.getId() == id)
-            .findFirst()
-            .orElse(null);
-    }
-
-
-
-
-
-    public Map<ComboBox, Integer> getSelectionModel() {
-        Map<ComboBox, Integer> result = new HashMap<>();
-        for (ComboBox<Object> cbInstance : instanceComboBoxes) {
-            result.put(cbInstance, cbInstance.getSelectionModel().getSelectedIndex());
-        }
-        for (ComboBox<String> cbProperty : propertyComboBoxes) {
-            result.put(cbProperty, cbProperty.getSelectionModel().getSelectedIndex());
-        }
-        return result;
-    }
-
-    public void setSelectionModel(Map<ComboBox, Integer> map) {
-        List<ComboBox> instances = map.keySet().stream()
-            .filter(x -> instanceComboBoxes.contains(x))
-            .collect(Collectors.toList());
-        for (ComboBox cb: instances) {
-            cb.getSelectionModel().select((int)map.get(cb));
-        }
-
-        List<ComboBox> properties = map.keySet().stream()
-            .filter(x -> propertyComboBoxes.contains(x))
-            .collect(Collectors.toList());
-        for (ComboBox cb: properties) {
-            cb.getSelectionModel().select((int)map.get(cb));
-        }
+    private void initParametricPortraitSection() {
+        // set parametric portrait size on resize
+        ChangeListener<? super Number> changeListener = (observable, oldValue, newValue) -> {
+            updateShownParametricPortraitSize();
+        };
+        parametricPortraitSectionContainer.widthProperty().addListener(changeListener);
+        parametricPortraitSectionContainer.heightProperty().addListener(changeListener);
     }
 
 
@@ -285,17 +190,6 @@ public class ParametricPortraitTabController extends AbstractController {
 
 
     /**
-     * bind properties to parametric portrait
-     */
-    private void initParametricPortraitSection() {
-        // set parametric portrait size on resize
-        ChangeListener<? super Number> changeListener = (observable, oldValue, newValue) -> updateShownParametricPortraitSize();
-        parametricPortraitSectionContainer.widthProperty().addListener(changeListener);
-        parametricPortraitSectionContainer.heightProperty().addListener(changeListener);
-    }
-
-
-    /**
      * initialize history section
      */
     private void initHistory() {
@@ -304,23 +198,20 @@ public class ParametricPortraitTabController extends AbstractController {
         history.setFitToWidth(true);
         history.setFitToHeight(true);
         history.setPadding(new Insets(20));
-
-        /*for (int i = 0; i < 10; i++)
-            history.addItem(0, new Label(Integer.toString(i)));*/
     }
 
 
     private boolean validateStatesInput() {
-        if (this.task.getStates().size() == 0) {
+        /*if (this.task.getStates().size() == 0) {
             getApplication().showAlert(getString("App.ErrorAlert.Title"),
                     null, getString("states_missing"), Alert.AlertType.WARNING);
             return false;
-        }
+        }*/
         return true;
     }
 
     private boolean validateTransitionsInput() {
-        if (this.task.getTransitions().size() == 0) {
+        /*if (this.task.getTransitions().size() == 0) {
             getApplication().showAlert(getString("App.ErrorAlert.Title"),
                     null, getString("transitions_missing"), Alert.AlertType.WARNING);
             return false;
@@ -328,20 +219,20 @@ public class ParametricPortraitTabController extends AbstractController {
 
         for (Transition transition : this.task.getTransitions()) {
             // TODO
-            /*if (transition.getSourceState() == State.UNDEFINED ||
+            if (transition.getSourceState() == State.UNDEFINED ||
                     transition.getOperandState() == State.UNDEFINED ||
                     transition.getResultState() == State.UNDEFINED) {
                 getApplication().showAlert(getString("App.ErrorAlert.Title"), null,
                         getString("transitions_incorrect"), Alert.AlertType.WARNING);
                 return false;
-            }*/
+            }
         }
-
+*/
         return true;
     }
 
     private boolean validateStepsCountInput() {
-        int stepsCount;
+        /*int stepsCount;
         try {
             stepsCount = Integer.parseInt(primaryController.mStepsCountField.getText());
             if (stepsCount < 1 || stepsCount == Integer.MAX_VALUE) {
@@ -354,12 +245,12 @@ public class ParametricPortraitTabController extends AbstractController {
             return false;
         }
         this.calculateStepsCount = stepsCount + 1;
-
+*/
         return true;
     }
 
     private boolean validateInstanceInputs() {
-        try {
+        /*try {
             for (Object o : instances) {
                 if (o == null)
                     throw new NullPointerException();
@@ -370,12 +261,12 @@ public class ParametricPortraitTabController extends AbstractController {
                             getString("parametric_portrait_invalid_instance"),
                             Alert.AlertType.WARNING);
             return false;
-        }
+        }*/
         return true;
     }
 
     private boolean validatePropertyInputs() {
-        try {
+        /*try {
             int i = 0;
             for (ComboBox<String> cb: propertyComboBoxes) {
                 if (cb.getValue().equals(""))
@@ -388,12 +279,12 @@ public class ParametricPortraitTabController extends AbstractController {
                             getString("parametric_portrait_invalid_property"),
                             Alert.AlertType.WARNING);
             return false;
-        }
+        }*/
         return true;
     }
 
     private boolean validateStartValueInputs() {
-        try {
+        /*try {
             double propertyValue;
             int i = 0;
 
@@ -423,12 +314,12 @@ public class ParametricPortraitTabController extends AbstractController {
                             getString("parametric_portrait_illegal_start_value"),
                             Alert.AlertType.WARNING);
             return false;
-        }
+        }*/
         return true;
     }
 
     private boolean validateEndValueInputs() {
-        try {
+        /*try {
             double propertyValue;
             int i = 0;
 
@@ -467,12 +358,12 @@ public class ParametricPortraitTabController extends AbstractController {
                     .showAlert(getString("App.ErrorAlert.Title"), null, getString(e.getMessage()),
                             Alert.AlertType.WARNING);
             return false;
-        }
+        }*/
         return true;
     }
 
     private boolean validateDiscretizationInputs() {
-        try {
+        /*try {
             int steps;
             int i = 0;
             for (TextField tf: stepCountTextFields) {
@@ -499,12 +390,12 @@ public class ParametricPortraitTabController extends AbstractController {
                     .showAlert(getString("App.ErrorAlert.Title"), null, getString(e.getMessage()),
                             Alert.AlertType.WARNING);
             return false;
-        }
+        }*/
         return true;
     }
 
     private boolean validatePrecisionInput() {
-        try {
+        /*try {
             this.taskScale = Integer.parseInt(tfPrecision.getText());
             if (taskScale < 0
                     || taskScale > Calculator.HIGHER_ACCURACY_SCALE
@@ -530,7 +421,7 @@ public class ParametricPortraitTabController extends AbstractController {
                             getString("parametric_portrait_illegal_precision") + ": " + e.getMessage(),
                             Alert.AlertType.WARNING);
             return false;
-        }
+        }*/
         return true;
     }
 
@@ -636,13 +527,13 @@ public class ParametricPortraitTabController extends AbstractController {
         primaryController.getStates().addListener(updateStateSettingsOnStateChangeListener);*/
 
         // set properties from parametricPortrait
-        for (int i = 0; i < startValueTextFields.size(); i++) {
+        /*for (int i = 0; i < startValueTextFields.size(); i++) {
             instanceComboBoxes.get(i).getSelectionModel().select(parametricPortrait.getInstances().get(i));
             propertyComboBoxes.get(i).getSelectionModel().select(parametricPortrait.getSelectedProperties().get(i));
             startValueTextFields.get(i).setText(parametricPortrait.getStartValues().get(i).toString());
             endValueTextFields.get(i).setText(parametricPortrait.getEndValues().get(i).toString());
             stepCountTextFields.get(i).setText(parametricPortrait.getStepsCnt().get(i).toString());
-        }
+        }*/
     }
 
 

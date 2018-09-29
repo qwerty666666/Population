@@ -56,16 +56,7 @@
                         <fx:include source="Calculation/Calculation.fxml"/>
                     </content>
                 </Tab>
-                <Tab text="%parametric_portrait_tab_label">
-                    <AnchorPane>
-                        <fx:include source="ParametricPortraitTab.fxml"
-                                    AnchorPane.bottomAnchor="0.0"
-                                    AnchorPane.leftAnchor="0.0"
-                                    AnchorPane.rightAnchor="0.0"
-                                    AnchorPane.topAnchor="15.0"
-                        />
-                    </AnchorPane>
-                </Tab>
+
             </tabs>
         </TabPane>
     </children>

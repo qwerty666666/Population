@@ -1,9 +1,6 @@
 package population.model.ParametricPortrait;
 
 import javafx.beans.property.*;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import population.component.ParametricPortrait;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;

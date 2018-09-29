@@ -2,7 +2,6 @@ package population.component;
 
 import population.PopulationApplication;
 import population.model.ParametricPortrait.PortraitProperties;
-import population.model.ParametricPortrait.StateSetting;
 import population.controller.PrimaryController;
 import population.model.StateModel.State;
 import population.model.Task;
@@ -18,7 +17,6 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.image.WritableImage;
@@ -35,7 +33,6 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -87,16 +84,7 @@ public class ParametricPortrait extends GridPane {
         return portraitProperties;
     }
 
-    /**
-     * transitions and states properties which can be chosen as parametric portrait property for certain axe
-     */
-    public enum Property {
-        PROBABILITY,
-        SOURCE_DELAY,
-        STATE_IN,
-        STATE_OUT,
-        COUNT
-    }
+
 
 
     public ParametricPortrait() {
@@ -364,7 +352,7 @@ public class ParametricPortrait extends GridPane {
      * @param property changed property
      * @param val new value
      */
-    private void setPropertyValue(Object instance, Property property, double val) {
+    private void setPropertyValue(Object instance, population.model.ParametricPortrait.ParametricPortrait.Property property, double val) {
         if (instance instanceof State) {
             switch (property) {
                 case COUNT: {
@@ -946,14 +934,14 @@ public class ParametricPortrait extends GridPane {
                     primaryController.mCalculationsTabPane.getSelectionModel().select(
                             primaryController.mResultChartTab);
                     // save portrait properties selections because they losed when set new task to primaryController
-                    Map<ComboBox, Integer> selections = primaryController.mParametricPortraitTabController.getSelectionModel();
+                    //Map<ComboBox, Integer> selections = primaryController.mParametricPortraitTabController.getSelectionModel();
                     // need set task steps - 1 because of steps increase in PrimaryController validation
                     Task task = this.getTask();
                     task.setStepsCount(task.getStepsCount() - 1);
                     primaryController.setTask(this.getTask());
                     task.setStepsCount(task.getStepsCount() + 1);
                     primaryController.calculateTask(task);
-                    primaryController.mParametricPortraitTabController.setSelectionModel(selections);
+                    //primaryController.mParametricPortraitTabController.setSelectionModel(selections);
                 }
             });
         }
