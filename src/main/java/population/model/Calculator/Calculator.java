@@ -184,16 +184,15 @@ public class Calculator {
         switch (transition.getType()) {
             case TransitionType.LINEAR: {
                 intensity = states.stream()
-                        .mapToDouble(stateInTransition -> {
-                            double count = getDelayedStateCount(stateInTransition, step);
-                            double res = count / stateInTransition.getIn();
-                            if (stateInTransition.getMode() == StateMode.INHIBITOR) {
-                                res = count - res;
-                            }
-                            return res;
-                        })
+                        .filter(stateInTransition -> stateInTransition.getMode() != StateMode.INHIBITOR)
+                        .mapToDouble(stateInTransition -> getDelayedStateCount(stateInTransition, step) / stateInTransition.getIn())
                         .min()
                         .orElse(0);
+                intensity -= states.stream()
+                    .filter(stateInTransition -> stateInTransition.getMode() == StateMode.INHIBITOR)
+                    .mapToDouble(stateInTransition -> getDelayedStateCount(stateInTransition, step) / stateInTransition.getIn())
+                    .sum();
+                intensity = Math.max(0, intensity);
                 break;
             }
 

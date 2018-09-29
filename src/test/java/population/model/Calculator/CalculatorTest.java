@@ -91,57 +91,78 @@ public class CalculatorTest {
 
 
     @Test
-    public void getIntensity() {
+    public void getIntensityLinear() {
         Calculator calc = new Calculator(task);
         Transition transition = task.getTransitions().get(1);
         transition.getStates().get(0).setDelay(0);
         transition.getStates().get(1).setDelay(0);
         transition.getStates().get(0).setIn(1);
         transition.getStates().get(1).setIn(4);
-
-        double expected;
-        double actual;
-
-        // LINEAR
-
         transition.setType(TransitionType.LINEAR);
-        expected = 25;
-        actual = calc.getIntensity(transition, 0);
+
+        double expected = 25;
+        double actual = calc.getIntensity(transition, 0);
         Assertions.assertEquals(expected, actual,
-                "getIntensity for LINEAR: expected: " + expected + ", actual: " + actual
+            "getIntensity for LINEAR: expected: " + expected + ", actual: " + actual
         );
+    }
 
-        // LINEAR INHIBITOR
 
+    @Test
+    public void getIntensityLinearInhibitor() {
+        Calculator calc = new Calculator(task);
+        Transition transition = task.getTransitions().get(1);
+        transition.setType(TransitionType.LINEAR);
+        transition.getStates().get(0).setDelay(0);
+        transition.getStates().get(1).setDelay(0);
         transition.getStates().get(0).setIn(2);
         transition.getStates().get(0).setMode(StateMode.INHIBITOR);
         transition.getStates().get(1).setIn(2);
-        expected = 25;
-        actual = calc.getIntensity(transition, 0);
+
+        double expected = 25;
+        double actual = calc.getIntensity(transition, 0);
+
         Assertions.assertEquals(expected, actual,
-                "getIntensity for LINEAR INHIBITOR: expected: " + expected + ", actual: " + actual
+            "getIntensity for LINEAR INHIBITOR: expected: " + expected + ", actual: " + actual
         );
+    }
+
+
+    @Test
+    public void getIntensitySolute() {
+        Calculator calc = new Calculator(task);
+        Transition transition = task.getTransitions().get(1);
+        transition.getStates().get(0).setDelay(0);
+        transition.getStates().get(1).setDelay(0);
         transition.getStates().get(0).setIn(1);
         transition.getStates().get(0).setMode(StateMode.SIMPLE);
         transition.getStates().get(1).setIn(4);
-
-        // SOLUTE
-
         transition.setType(TransitionType.SOLUTE);
-        expected = 0.0027;
-        actual = calc.getIntensity(transition, 0);
+
+        double expected = 0.0027;
+        double actual = calc.getIntensity(transition, 0);
         Assertions.assertTrue(Math.abs(expected - actual) < 0.0001,
             "getIntensity for SOLUTE: expected: " + expected + ", actual: " + actual
         );
+    }
 
-        // SOLUTE INHIBITOR
 
+    @Test
+    public void getIntensitySoluteInhibitor() {
+        Calculator calc = new Calculator(task);
+        Transition transition = task.getTransitions().get(1);
+        transition.getStates().get(0).setDelay(0);
+        transition.getStates().get(1).setDelay(0);
+        transition.getStates().get(0).setIn(1);
+        transition.getStates().get(0).setMode(StateMode.SIMPLE);
+        transition.getStates().get(1).setIn(4);
         transition.setType(TransitionType.SOLUTE);
         transition.getStates().get(0).setMode(StateMode.INHIBITOR);
-        expected = 0.0054;
-        actual = calc.getIntensity(transition, 0);
+
+        double expected = 0.0054;
+        double actual = calc.getIntensity(transition, 0);
         Assertions.assertTrue(Math.abs(expected - actual) < 0.0001,
-                "getIntensity for SOLUTE INHIBITOR: expected: " + expected + ", actual: " + actual
+            "getIntensity for SOLUTE INHIBITOR: expected: " + expected + ", actual: " + actual
         );
     }
 
