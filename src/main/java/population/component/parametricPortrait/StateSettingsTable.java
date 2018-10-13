@@ -30,15 +30,17 @@ public class StateSettingsTable extends TableView<StateSetting> {
     /** Portrait properties which will be changed by this inputs */
     private PortraitProperties portraitProperties;
     /** table model */
-    private ObservableList<StateSetting> stateSettings = FXCollections.observableArrayList();
+    private ObservableList<StateSetting> stateSettings;
 
     private ColorGenerator colorGenerator;
 
 
-    public StateSettingsTable(TaskV4 task) {
+    public StateSettingsTable(TaskV4 task, ObservableList<StateSetting> stateSettings) {
         this.task = task;
         this.setLayout();
         this.setEditable(true);
+
+        this.stateSettings = stateSettings;
         this.initStateSettingList();
     }
 

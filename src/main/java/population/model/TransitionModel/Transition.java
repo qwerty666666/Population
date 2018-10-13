@@ -3,18 +3,17 @@ package population.model.TransitionModel;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import population.model.State;
 import population.model.TransitionType;
+import population.util.ListUtils;
+import population.util.Cloneable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
-public class Transition {
+public class Transition implements Cloneable<Transition> {
     protected int id;
     protected static final AtomicInteger ID_COUNTER = new AtomicInteger();
 
@@ -90,13 +89,17 @@ public class Transition {
         this.block.set(block);
     }
 
-    @Override
-    protected Transition clone() throws CloneNotSupportedException {
-        Transition clone = new Transition();
+    /**
+     * @return Transition transition clone with the same states
+     */
+    public Transition clone() {
+        Transition clone = new Transition(this.getId());
+
         clone.setProbability(this.getProbability());
         clone.setBlock(this.getBlock());
         clone.setType(this.getType());
-        clone.getStates().addAll(this.getStates());
+        clone.states = ListUtils.cloneObservableList(this.getStates());
+
         return clone;
     }
 
@@ -111,7 +114,7 @@ public class Transition {
         clone.type = this.type;
 
         clone.states = FXCollections.observableArrayList();
-        clone.states.addAll(this.getStates());
+        clone.states = ListUtils.cloneObservableList(this.getStates());
 
         return clone;
     }

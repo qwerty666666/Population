@@ -6,6 +6,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import population.model.ParametricPortrait.ParametricPortrait;
 import population.model.ParametricPortrait.PortraitProperties;
+import population.model.ParametricPortrait.SimpleParametricPortraitCalculator;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -18,13 +19,13 @@ import java.util.List;
  * Grid of parametric portrait task cells
  */
 public class TaskCellGrid extends GridPane {
-    /** grid of TaskCell (numeration from upper left corner [row][col]) */
-    private List<List<ParametricPortraitNode.TaskCell>> taskCells = new ArrayList<>();
-    /** highlight rectangle on drag */
+    /** grid of TaskCell (numeration from upper left corner [row][col]) *//*
+    private List<List<TaskCell>> taskCells = new ArrayList<>();
+    *//** highlight rectangle on drag *//*
     private Pane overlay = new Pane();
-    /** start drag cell index */
+    *//** start drag cell index *//*
     private int dragStartX = 0;
-    /** start drag cell index */
+    *//** start drag cell index *//*
     private int dragStartY = 0;
 
     private ParametricPortrait portrait;
@@ -87,7 +88,7 @@ public class TaskCellGrid extends GridPane {
                     if (dragStartX == endX && dragStartY == endY)
                         return;
 
-                    PortraitProperties props = this.portrait.getProperties();
+                    PortraitProperties props = this.portrait.getUniqueTaskProperties();
 
                     List<Double> start = Arrays.asList(
                         getValueOnStep(props.getStartValues().get(0).get(), props.getStepDeltas().get(0).get(), Math.min(dragStartX, endX))
@@ -104,7 +105,7 @@ public class TaskCellGrid extends GridPane {
                             .setScale(5, RoundingMode.HALF_UP).doubleValue()
                     );
                     // TODO
-                    /*List<Integer> steps = getListDeepCopy(stepsCnt);
+                    *//*List<Integer> steps = getListDeepCopy(stepsCnt);
                     for (int i = 0; i < start.size(); i++) {
                         if (start.get(i).equals(end.get(i)))
                             steps.set(i, 1);
@@ -113,31 +114,31 @@ public class TaskCellGrid extends GridPane {
                     ParametricPortraitNode parametricPortrait = new ParametricPortraitNode();
                     parametricPortrait.setParameters(commonTask, instances, properties, start, end, steps, scale);
 
-                    SubareaSelectedCallback.selected(parametricPortrait);*/
+                    SubareaSelectedCallback.selected(parametricPortrait);*//*
                 }
             }
         });
     }
 
 
-    /**
+    *//**
      *
      * @param x coordinate
      * @return column index by x coord. Assuming all columns have the same size.
      * if coord out of bound return nearest column
-     */
+     *//*
     private int getColumnByXCoord(double x) {
         if (x <= 0) return 0;
         return Math.min((int)(x / (this.getWidth() / this.getColumnConstraints().size())),
             this.getColumnConstraints().size() - 1);
     }
 
-    /**
+    *//**
      *
      * @param y coordinate
      * @return row index by y coord. Assuming all rows have the same size.
      * if coord out of bound return nearest row
-     */
+     *//*
     private int getRowByYCoord(double y) {
         if (y <= 0) return 0;
         return Math.min((int)(y / (this.getHeight() / this.getRowConstraints().size())),
@@ -145,19 +146,19 @@ public class TaskCellGrid extends GridPane {
     }
 
 
-    /**
+    *//**
      * make new taskCells List
      * @param cols columns count
      * @param rows rows count
-     */
+     *//*
     void newTaskCellsList(int cols, int rows) {
         taskCells = new ArrayList<>();
         for (int row = 0; row < rows; row++) {
-            List<ParametricPortraitNode.TaskCell> rowCells = new ArrayList<>();
+            List<TaskCell> rowCells = new ArrayList<>();
 
             for (int col = 0; col < cols; col++) {
-                ParametricPortraitNode.TaskCell cell = new ParametricPortraitNode.TaskCell();
-                rowCells.add(cell);
+//                TaskCell cell = new TaskCell();
+//                rowCells.add(cell);
             }
 
             taskCells.add(rowCells);
@@ -165,20 +166,20 @@ public class TaskCellGrid extends GridPane {
     }
 
 
-    /**
+    *//**
      *
      * @return taskCells list
-     */
-    List<List<ParametricPortraitNode.TaskCell>> getTaskCells() {
+     *//*
+    List<List<TaskCell>> getTaskCells() {
         return taskCells;
     }
 
 
-    /**
+    *//**
      * set grid
      * @param cols columns count
      * @param rows rows count
-     */
+     *//*
     void updateGrid(int cols, int rows) {
         this.getChildren().clear();
         this.getColumnConstraints().clear();
@@ -205,17 +206,17 @@ public class TaskCellGrid extends GridPane {
     }
 
 
-    /**
+    *//**
      *
      * @param startValue start value
      * @param delta steps count
      * @param step step number
      * @return calculated value
-     */
+     *//*
     private BigDecimal getValueOnStep(double startValue, double delta, int step) {
         BigDecimal bdStartValue = new BigDecimal(startValue);
         BigDecimal bdSteps = new BigDecimal(Math.max(1, delta - 1));
         BigDecimal bdStep = new BigDecimal(step);
         return bdStartValue.add(new BigDecimal(delta * step), MathContext.DECIMAL64);
     }
-}
+*/}

@@ -2,11 +2,12 @@ package population.model.StateModel;
 
 import population.model.Expression.ExpressionManager;
 import javafx.beans.property.*;
+import population.util.Cloneable;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-public class State {
+public class State implements Cloneable<State> {
     /**
      * used to show empty states in transitions table
      */
@@ -98,12 +99,15 @@ public class State {
         return obj instanceof State && this.id == ((State)obj).id;
     }
 
+
     @Override
-    public Object clone() {
-        State clone = new State(this.id);
+    public State clone() {
+        State clone = new State(this.getId());
+
         clone.setName(this.getName());
         clone.setAlias(this.getAlias());
         clone.setCount(this.getCount());
+
         return clone;
     }
 }

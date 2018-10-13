@@ -23,4 +23,14 @@ public class SimpleParametricPortraitCalculator implements ParametricPortraitCal
     public List<State> getAllowedStates() {
         return allowedStates;
     }
+
+    @Override
+    public void calculate() {
+
+    }
+
+    @Override
+    public Object getCalculationResult() {
+        return null;
+    }
 }

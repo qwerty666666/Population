@@ -112,12 +112,12 @@ public class TaskCell extends GridPane {
     }
 
 
-    void setTask(Task task) {
+    void setTask(TaskV4 task) {
         this.task = task;
     }
 
 
-    Task getTask() {
+    TaskV4 getTask() {
         return this.task;
     }
 
@@ -302,10 +302,10 @@ public class TaskCell extends GridPane {
             return;
         }
 
-        if (aliveStates.size() == 1 && aliveStates.get(0).size() == statesListShownOnParametricPortrait.size()) {
-            // show transparent square if all states has the same value
-            return;
-        }
+//        if (aliveStates.size() == 1 && aliveStates.get(0).size() == statesListShownOnParametricPortrait.size()) {
+//            // show transparent square if all states has the same value
+//            return;
+//        }
 
         int cell = numRows * numCols - 1;
         int size = (aliveStates.size() == 1) ? numRows * numCols : 1;
@@ -339,11 +339,11 @@ public class TaskCell extends GridPane {
      * set background
      */
     void fill() {
-        if (type == ParametricPortraitNode.TaskCellType.STABLE) {
-            fillStable();
-        } else {
-            fillCyclic();
-        }
+//        if (type == ParametricPortraitNode.TaskCellType.STABLE) {
+//            fillStable();
+//        } else {
+//            fillCyclic();
+//        }
     }
 
 

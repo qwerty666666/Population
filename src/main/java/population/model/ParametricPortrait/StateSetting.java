@@ -6,12 +6,13 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.paint.Color;
 import population.model.StateModel.State;
+import population.util.Cloneable;
 
 
 /**
  * parametric portrait state settings: state color and visibility in portrait
  */
-public class StateSetting {
+public class StateSetting implements Cloneable<StateSetting> {
     private ObjectProperty<State> state = new SimpleObjectProperty<>();
     /** should state be shown in portrait */
     private BooleanProperty show = new SimpleBooleanProperty();
@@ -25,6 +26,8 @@ public class StateSetting {
         this.colorGenerator = colorGenerator;
         this.setColor(colorGenerator.getNext());
     }
+
+    protected StateSetting() {}
 
     public ObjectProperty<State> stateProperty() {
         return state;
@@ -60,5 +63,15 @@ public class StateSetting {
 
     public void setColor(Color color) {
         this.color.set(color);
+    }
+
+    @Override
+    public StateSetting clone() {
+        StateSetting clone = new StateSetting();
+        clone.state.set(this.getState());
+        clone.colorGenerator = this.colorGenerator;
+        clone.setColor(this.getColor());
+        clone.setShow(this.getShow());
+        return clone;
     }
 }

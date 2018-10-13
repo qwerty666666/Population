@@ -33,9 +33,9 @@ import java.util.stream.Collectors;
 
 
 public class ParametricPortraitNode extends GridPane {
-    /** needed width of parametric portrait to take nail snapshot*/
+    /** needed width of parametric portrait to take nail snapshot */
     private static final double THUMBNAIL_WIDTH = 230;
-    /** needed height of parametric portrait to take nail snapshot*/
+    /** needed height of parametric portrait to take nail snapshot */
     private static final double THUMBNAIL_HEIGHT = 230;
 
     /** max GridPane width */
@@ -232,17 +232,21 @@ public class ParametricPortraitNode extends GridPane {
     }
 
 
+
+
     /**
      * update parametric portrait depending on task. Set grid, axes, size etc...
      */
+
+/*
     public void updateView() {
         List<IntegerProperty> stepCounts = parametricPortrait.getProperties().getStepCounts();
         cellContainer.updateGrid(stepCounts.get(0).get(), stepCounts.get(1).get());
         
         setAxesUnits();
 
-        List<ObjectProperty> instances = parametricPortrait.getProperties().getInstances();
-        List<ObjectProperty<ParametricPortrait.Property>> properties = parametricPortrait.getProperties().getProperties();
+        List<ObjectProperty> instances = parametricPortrait.getUniqueTaskProperties().getInstances();
+        List<ObjectProperty<ParametricPortrait.Property>> properties = parametricPortrait.getUniqueTaskProperties().getUniqueTaskProperties();
         xLabel.setText(ParametricPortrait.INSTANCE_STRING_CONVERTER.toString(instances.get(0).get()) + " : " + 
             ParametricPortrait.PROPERTY_STRING_CONVERTER.toString(properties.get(0).get())
         );
@@ -253,6 +257,7 @@ public class ParametricPortraitNode extends GridPane {
         updateParametricPortraitFill();
         updateSize();
     }
+*/
 
 
 
@@ -263,10 +268,10 @@ public class ParametricPortraitNode extends GridPane {
      *
      ***************************/
 
-
-    /**
+/*
+    *
      * updateView parametric portrait decoration
-     */
+
     public void updateParametricPortraitFill() {
         if (cellContainer.getTaskCells() == null)
             return;
@@ -288,12 +293,12 @@ public class ParametricPortraitNode extends GridPane {
     }
 
 
-    /**
+    *
      * set new property value to instance
      * @param instance instance (state or transition)
      * @param property changed property
      * @param val new value
-     */
+
     private void setPropertyValue(Object instance, Property property, double val) {
         if (instance instanceof State) {
             switch (property) {
@@ -327,17 +332,17 @@ public class ParametricPortraitNode extends GridPane {
     }
 
 
-    /**
+    *
      *
      * @param instance state or transition with description
      * @return list of instances of instance Class, whose trimmed descriptions equals to instance description
-     */
+
     private List<Object> getInstancesByInstanceDescription(Object instance) {
         List<Object> instancesByDescription = new ArrayList<>();
         instancesByDescription.add(instance);
 
         // TODO do it on id
-        /*if (instance instanceof State) {
+        if (instance instanceof State) {
             String description = ((State)instance).getDescription().trim();
             if (!description.equals("")) {
                 instancesByDescription.addAll(commonTask.getStates().stream()
@@ -352,22 +357,22 @@ public class ParametricPortraitNode extends GridPane {
                         .filter(x -> x.getDescription().trim().equals(description))
                         .collect(Collectors.toList()));
             }
-        }*/
+        }
 
         return instancesByDescription;
     }
 
 
-    /**
+    *
      * get task in the specified cell
      * Clone states and transitions in task
      * @param steps step number for each changed instance property. ({col, row})
      * @return task with properties set for specified task
-     */
+
     private Task getTask(int[] steps) {
         //Task task = new Task(commonTask);
         // TODO
-        /*task.setAllowNegative(false);
+        task.setAllowNegative(false);
 
         // set cloned states and transition to task for modify their fields without impact
         List<Transition> clonedTransitions = getListDeepCopy(transitions);
@@ -395,12 +400,12 @@ public class ParametricPortraitNode extends GridPane {
                 setPropertyValue(selectedInstance, selectedProperty, val);
             }
         }
-*/
+
         return task;
     }
 
 
-    /**
+    *
      * set primary parametric portrait parameters
      * @param commonTask commonTask
      * @param instances instances list
@@ -408,7 +413,7 @@ public class ParametricPortraitNode extends GridPane {
      * @param startValues start values
      * @param endValues end values
      * @param stepsCnt steps count
-     */
+
     private void setParameters(Task commonTask,
                                List<Object> instances,
                                List<String> properties,
@@ -418,7 +423,7 @@ public class ParametricPortraitNode extends GridPane {
                                int scale
     ) {
         // TODO
-        /*List<State> primaryStates = commonTask.getStates();
+        List<State> primaryStates = commonTask.getStates();
         List<Transition> primaryTransitions = commonTask.getTransitions();
 
         // clone task
@@ -445,12 +450,12 @@ public class ParametricPortraitNode extends GridPane {
 
         cellContainer.newTaskCellsList(stepsCnt.get(0), stepsCnt.get(1));
 
-        this.scale = scale;*/
+        this.scale = scale;
     }
 
 
 
-    /**
+    *
      * calculate parametric portrait
      * calculate each task concurrent in multithreading mode
      * @param commonTask common task for whole parametric portrait.
@@ -460,7 +465,7 @@ public class ParametricPortraitNode extends GridPane {
      * @param startValues List of start values of changed properties
      * @param endValues List of end values of changed properties
      * @param stepsCnt List of steps count by which split values
-     */
+
     public void calculate( Task commonTask,
                            List<Object> instances,
                            List<String> properties,
@@ -472,10 +477,10 @@ public class ParametricPortraitNode extends GridPane {
         setParameters(commonTask, instances, properties, startValues, endValues, stepsCnt, scale);
 
         // TODO
-        /*statesListShownOnParametricPortrait = stateSettingsGroup.getStateSettingList().stream()
+        statesListShownOnParametricPortrait = stateSettingsGroup.getStateSettingList().stream()
                 .filter(StateSetting::getShow)
                 .map(StateSetting::getState)
-                .collect(Collectors.toList());*/
+                .collect(Collectors.toList());
 
         if (commonTask.isParallel())
             calculateConcurrent();
@@ -484,9 +489,9 @@ public class ParametricPortraitNode extends GridPane {
     }
 
 
-    /**
+    *
      * calculate each taskCells in portrait sequential
-     */
+
     private void calculateSequential() {
         double taskProgress[] = {0};        // progress of current calculated task
         final int tasksCnt = stepsCnt.get(0) * stepsCnt.get(1);
@@ -514,9 +519,9 @@ public class ParametricPortraitNode extends GridPane {
             }
     }
 
-    /**
+    *
      * calculate each taskCell concurrent
-     */
+
     private void calculateConcurrent() {
         final double[] threadProgress = {0};
         final int tasksCnt = stepsCnt.get(0) * stepsCnt.get(1);
@@ -564,10 +569,10 @@ public class ParametricPortraitNode extends GridPane {
     }
 
 
-    /**
+    *
      * set labels visibility on portrait
      * @param visible should be visible
-     */
+
     private void setLabelsVisibility(boolean visible) {
         double maxSize = visible ? Double.MAX_VALUE : 0;
         xLabel.setVisible(visible);
@@ -577,9 +582,9 @@ public class ParametricPortraitNode extends GridPane {
     }
 
 
-    /**
+    *
      * make snapshot
-     */
+
     public WritableImage takeSnapshot(double width, double height, boolean withLabels) {
         // set size of this to snapshot size to fit all elements right
         double w = availableWidth.doubleValue(),
@@ -614,10 +619,10 @@ public class ParametricPortraitNode extends GridPane {
     }
 
 
-    /**
+    *
      *
      * @return snapshot of parametric portrait
-     */
+
     public WritableImage getThumbnail() {
         return takeSnapshot(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, false);
     }
@@ -655,10 +660,10 @@ public class ParametricPortraitNode extends GridPane {
 
 
     public interface SubareaSelectedCallback {
-        /**
+        *
          * called when area in parametric portrait was selected
          * @param parametricPortrait new parametric portrait with new bounds
-         */
+
         void selected(ParametricPortraitNode parametricPortrait);
     }
 
@@ -668,12 +673,12 @@ public class ParametricPortraitNode extends GridPane {
 
 
 
-    /**
+    *
      *
      * @param list list to clone
      * @param <T> list type
      * @return new List with cloned items
-     */
+
     @SuppressWarnings("unchecked")
     private <T> List<T> getListDeepCopy(List<T> list) {
         return  (List<T>)list.stream()
@@ -688,4 +693,5 @@ public class ParametricPortraitNode extends GridPane {
             })
             .collect(Collectors.toList());
     }
+*/
 }

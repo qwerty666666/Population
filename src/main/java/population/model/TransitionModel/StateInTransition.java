@@ -2,8 +2,9 @@ package population.model.TransitionModel;
 
 import population.model.StateModel.State;
 import javafx.beans.property.*;
+import population.util.Cloneable;
 
-public class StateInTransition {
+public class StateInTransition implements Cloneable<StateInTransition> {
     protected ObjectProperty<State> state = new SimpleObjectProperty<>(null);
     protected DoubleProperty in = new SimpleDoubleProperty(0);
     protected DoubleProperty out = new SimpleDoubleProperty(0);
@@ -80,5 +81,14 @@ public class StateInTransition {
 
     public void setDelay(int delay) {
         this.delay.set(delay);
+    }
+
+    /**
+     * @return clone with the same state
+     */
+    @Override
+    public StateInTransition clone() {
+        StateInTransition clone = new StateInTransition(this.getState(), this.getIn(), this.getOut(), this.getDelay(), this.getMode());
+        return clone;
     }
 }

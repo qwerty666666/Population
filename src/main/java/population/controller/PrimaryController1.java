@@ -156,7 +156,6 @@ public class PrimaryController1 extends AbstractController {
             path += ".pmt";
             file = new File(path);
         }
-        Task task = new Task();
         TaskParser.encodeV4(file, App.getTask());
         taskFile = file;
         getApplication().setWorkDirectory(file.getParent());

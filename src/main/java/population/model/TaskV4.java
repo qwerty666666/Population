@@ -1,9 +1,12 @@
 package population.model;
 
 import population.model.StateModel.State;
+import population.model.TransitionModel.StateInTransition;
 import population.model.TransitionModel.Transition;
 import javafx.beans.property.*;
 import javafx.collections.ObservableList;
+import population.util.ListUtils;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -88,5 +91,32 @@ public class TaskV4 {
 
     public void setStepsCount(int stepsCount) {
         this.stepsCount.set(stepsCount);
+    }
+
+    public TaskV4 clone() {
+        TaskV4 clone = new TaskV4();
+
+        clone.setName(this.getName());
+        clone.setStartPoint(this.getStartPoint());
+        clone.setStepsCount(this.getStepsCount());
+        clone.setIsAllowNegative(this.getIsAllowNegative());
+        clone.states = ListUtils.cloneObservableList(this.getStates());
+        clone.transitions = ListUtils.cloneObservableList(this.getTransitions());
+
+        // replace states in transitions with new cloned states
+        for (Transition transition: clone.getTransitions()) {
+            for (StateInTransition stateInTransition: transition.getStates()) {
+                State oldState = stateInTransition.getState();
+                if (oldState != null && !oldState.isEmptyState()) {
+                    State newState = clone.getStates().stream()
+                        .filter(state -> state.getId() == stateInTransition.getState().getId())
+                        .findFirst()
+                        .get();
+                    stateInTransition.setState(newState);
+                }
+            }
+        }
+
+        return clone;
     }
 }

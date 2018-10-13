@@ -1,13 +1,16 @@
 package population.controller;
 
 import javafx.application.Platform;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import population.App;
 import population.component.Calculator;
-import population.component.ParametricPortrait;
+import population.model.ParametricPortrait.ParametricPortrait;
 import population.component.UIComponents.ColorTableCell;
 import population.component.UIComponents.DraggableVerticalScrollPane;
 import population.component.UIComponents.IconButton;
+import population.component.parametricPortrait.ParametricPortraitNode;
 import population.component.parametricPortrait.ParametricPortraitPropertiesNode;
 import population.component.parametricPortrait.StateSettingsTable;
 import population.model.ParametricPortrait.PortraitProperties;
@@ -17,6 +20,7 @@ import population.controller.base.AbstractController;
 import population.model.StateModel.State;
 import population.model.TaskV4;
 import population.model.TransitionModel.Transition;
+import population.util.ListUtils;
 import population.util.Utils;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
@@ -66,19 +70,9 @@ public class ParametricPortraitTabController extends AbstractController {
     private StackPane stateSettingsContainer;
     @FXML
     private ScrollPane parametricPortraitSectionContainer;
-    @FXML
-    private TextField tfPrecision;
 
-    /** calculation precision used in task (digits after commma) */
+    /** calculation precision used in task (digits after comma) */
     private int taskScale;
-
-    /** List of states and transitions which user can select in instance ComboBoxes */
-    private ObservableList<Object> instancesList;
-
-    /** initial task for which parametric portrait properties will be shown */
-    private TaskV4 task;
-    /** max steps count for task calculating */
-    private int calculateStepsCount;
 
     private PrimaryController primaryController;
 
@@ -86,18 +80,12 @@ public class ParametricPortraitTabController extends AbstractController {
 
 
     /** ParametricPortrait shown on scene */
-    private ParametricPortrait shownParametricPortrait;
+    private ParametricPortraitNode shownParametricPortrait;
 
     /** parametric portraits history */
     private History history = new History();
 
-
-    /**
-     * bind to task mutations
-     */
-    private void initTask() {
-        task = App.getTask();
-    }
+    private PortraitProperties portraitProperties;
 
 
     /*********************************
@@ -110,44 +98,13 @@ public class ParametricPortraitTabController extends AbstractController {
      * initialize property section
      */
     private void initPropertiesSection() {
-        ParametricPortrait parametricPortrait = new ParametricPortrait();
-        PortraitProperties portraitProperties = parametricPortrait.getPortraitProperties();
-        ParametricPortraitPropertiesNode propNode = new ParametricPortraitPropertiesNode(App.getTask(), portraitProperties.getDimensions());
-        propNode.setPortraitProperties(portraitProperties);
+        this.portraitProperties = new PortraitProperties();
+
+        ParametricPortraitPropertiesNode propNode = new ParametricPortraitPropertiesNode(App.getTask(), this.portraitProperties.getDimensions());
+        propNode.setPortraitProperties(this.portraitProperties);
         portraitPropertiesContainer.getChildren().add(propNode);
 
         initStateSettingsTable();
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-    @Override
-    public void initialize() {
-        initTask();
-        initPropertiesSection();
-        initParametricPortraitSection();
-//        initHistory();
-//
-        Platform.runLater(() ->
-                rootSplitPane.setDividerPositions(
-                        history.getMinWidth() / rootSplitPane.getWidth(),
-                        1 - propertiesSection.getMinWidth() / rootSplitPane.getWidth())
-        );
-//
-//
-//        if (getApplication().IS_DEVELOP) {
-//            test();
-//        }
     }
 
 
@@ -155,10 +112,17 @@ public class ParametricPortraitTabController extends AbstractController {
      * initialize state settings table
      */
     private void initStateSettingsTable() {
-        StateSettingsTable table = new StateSettingsTable(App.getTask());
+        StateSettingsTable table = new StateSettingsTable(App.getTask(), this.portraitProperties.stateSettingProperty());
         table.setColorGenerator(new SimpleColorGenerator());
         stateSettingsContainer.getChildren().add(table);
     }
+
+
+    /*********************************
+     *
+     *      PORTRAIT SECTION
+     *
+     *********************************/
 
 
     /**
@@ -187,6 +151,32 @@ public class ParametricPortraitTabController extends AbstractController {
             );
         }
     }
+
+
+
+
+
+
+    @Override
+    public void initialize() {
+        initPropertiesSection();
+        initParametricPortraitSection();
+//        initHistory();
+//
+        Platform.runLater(() ->
+                rootSplitPane.setDividerPositions(
+                        history.getMinWidth() / rootSplitPane.getWidth(),
+                        1 - propertiesSection.getMinWidth() / rootSplitPane.getWidth())
+        );
+//
+//
+//        if (getApplication().IS_DEVELOP) {
+//            test();
+//        }
+    }
+
+
+
 
 
     /**
@@ -554,9 +544,7 @@ public class ParametricPortraitTabController extends AbstractController {
      * @return created ParametricPortrait instance
      */
     private ParametricPortrait getNewParametricPortraitInstance() {
-        ParametricPortrait parametricPortrait = new ParametricPortrait();
-        parametricPortrait.setSubareaSelectedCallback(parametricPortraitAreaSelectedCallback);
-        return parametricPortrait;
+        return new ParametricPortrait(App.getTask(), this.portraitProperties.clone());
     }
 
 
@@ -569,14 +557,14 @@ public class ParametricPortraitTabController extends AbstractController {
             return;
 
         // disable controls
-        primaryController.setCalculating(true);
-        primaryController.mCalculationProgressBar.setProgress(0);
-        setControlsDisable(true);
-
+//        primaryController.setCalculating(true);
+//        primaryController.mCalculationProgressBar.setProgress(0);
+//        setControlsDisable(true);
+//
         // create new parametric portrait
         parametricPortraitSection.getChildren().remove(shownParametricPortrait);
-
-        shownParametricPortrait = getNewParametricPortraitInstance();
+        shownParametricPortrait = new ParametricPortraitNode(getNewParametricPortraitInstance());
+        parametricPortraitSection.getChildren().add(shownParametricPortrait);
 
 
         // TODO
