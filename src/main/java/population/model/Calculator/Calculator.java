@@ -128,7 +128,7 @@ public class Calculator {
         // sum of all residual states
         double residualSum = transition.getActualStates().stream()
                 .filter(state -> state.getMode() == StateMode.RESIDUAL)
-                .mapToDouble(state -> this.statesCount[step][this.getStateIndex(state.getState())] - intensity)
+                .mapToDouble(state -> this.statesCount[step - 1][this.getStateIndex(state.getState())] - intensity)
                 .sum();
 
         // subtract count from residual states
@@ -138,7 +138,7 @@ public class Calculator {
 //                    double coef = this.getStateInTransitionCoefficient(state);
 //                    double count = coef * (this.statesCount[step][this.getStateIndex(state.getState())] - intensity);
                     this.statesCount[step][this.getStateIndex(state.getState())] -=
-                            this.statesCount[step][this.getStateIndex(state.getState())] - intensity;
+                            this.statesCount[step - 1][this.getStateIndex(state.getState())] - intensity;
                 });
 
         // and add count to all states which Out > 0
