@@ -29,11 +29,7 @@ public class Transition {
     }
 
     protected Transition(Integer id) {
-        if (id == null) {
-            this.id = ID_COUNTER.incrementAndGet();
-        } else {
-            this.id = id;
-        }
+        this.id = id;
     }
 
     public int getId() {
@@ -62,7 +58,7 @@ public class Transition {
 
     public List<StateInTransition> getActualStates() {
         return this.states.stream()
-                .filter(state -> state != null && state.getState() != null)
+                .filter(state -> state != null && state.getState() != null && !state.getState().isEmptyState())
                 .collect(Collectors.toList());
     }
 
@@ -105,15 +101,18 @@ public class Transition {
     }
 
     /**
-     *
-     * @return Transition transition clone with the same id and properties linked to this properties
+     * @return Transition transition clone with the same id and properties linked to this properties,
+     * but with new states list (lists will be differ, but states the same)
      */
     public Transition cloneWithPreserveProperties() {
         Transition clone = new Transition(this.id);
         clone.probability = this.probability;
         clone.block = this.block;
         clone.type = this.type;
-        clone.states = this.states;
+
+        clone.states = FXCollections.observableArrayList();
+        clone.states.addAll(this.getStates());
+
         return clone;
     }
 

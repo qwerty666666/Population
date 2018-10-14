@@ -10,6 +10,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import population.util.Resources.AppResource;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -29,6 +30,16 @@ public class App {
         initTask();
     }
 
+
+    public static boolean isDev() {
+        return AppResource.getString("buildType").equals("dev");
+    }
+
+    public static String getVersion() {
+        return AppResource.getString("version");
+    }
+
+
     /************************************************
      *
      *               App Controllers
@@ -42,27 +53,6 @@ public class App {
 
     static void setController(Class classType, Object controller) {
         controllers.put(classType, controller);
-    }
-
-
-    /************************************************
-     *
-     *              Resource Bundle
-     *
-     ***********************************************/
-
-    private static ResourceBundle resources;
-
-    static void setResources(ResourceBundle resources) {
-        App.resources = resources;
-    }
-
-    public static ResourceBundle getResources() {
-        return resources;
-    }
-
-    public static String getString(String key) {
-        return resources.getString(key);
     }
 
 

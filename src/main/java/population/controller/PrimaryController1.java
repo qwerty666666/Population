@@ -17,62 +17,32 @@
  */
 package population.controller;
 
+import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import population.App;
 import population.PopulationApplication;
-import population.component.Calculator;
-import population.component.ChartSeries;
-import population.component.TickLabelFormatter;
 import population.controller.base.AbstractController;
 import population.model.*;
+import population.util.Resources.StringResource;
 import population.util.TaskParser;
-import population.util.Utils;
-import javafx.application.Platform;
-import javafx.beans.Observable;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.Point2D;
-import javafx.scene.Node;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.cell.ChoiceBoxTableCell;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
-import javafx.util.Callback;
-import javafx.util.StringConverter;
 
 import java.io.File;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 
 public class PrimaryController1 extends AbstractController {
-    // TODO remove in view
-    public TabPane mMainTabPane;
+    @FXML
+    protected HBox debugPanel;
     protected File taskFile = null;
 
     private FileChooser getTaskFileChooser(String title) {
         FileChooser fileChooser = getFileChooser(title);
         fileChooser.getExtensionFilters()
-                .add(new FileChooser.ExtensionFilter(getString("task"), "*.pmt"));
+                .add(new FileChooser.ExtensionFilter(getString("TopMenu.Task"), "*.pmt"));
         return fileChooser;
     }
 
@@ -89,34 +59,59 @@ public class PrimaryController1 extends AbstractController {
         return fileChooser;
     }
 
-    private void setTitle(File file) {
-        String applicationName = getString("application_name");
-        getStage().setTitle(
-                file == null ? applicationName : file.getName() + " - " + applicationName);
+
+    /**
+     * set title for main window
+     * @param title title
+     */
+    private void setTitle(String title) {
+        getStage().setTitle(title == null || title.isEmpty() ? this.getDefaultTitle() : title);
     }
 
-    private void setTitle() {
-        setTitle(null);
+
+    /**
+     * @return task name from file or empty string if file is null
+     */
+    private String getTaskNameFromFile(File file) {
+        if (file == null) {
+            return "";
+        }
+        return file.getName();
     }
+
+
+    /**
+     * @return title displayed by default
+     */
+    private String getDefaultTitle() {
+        return StringResource.getString("App.WindowTitle");
+    }
+
 
     @FXML
     public void debug() {
         int a = 0;
     }
 
+
     @Override
     public void initialize() {
+        debugPanel.setVisible(App.isDev());
+        debugPanel.setManaged(App.isDev());
+
+        this.setTitle(this.getDefaultTitle());
 //        mMainTabPane.getSelectionModel().select(2);
 //        File file = new File("C:\\Users\\user\\Desktop\\test.pmt");
 //        openTaskFromFile(file);
     }
 
-    public void openTask() {
-        File file = getTaskFileChooser(getString("open_task"))
-                .showOpenDialog(mMainTabPane.getScene().getWindow());
 
+    public void openTask() {
+        File file = getTaskFileChooser(getString("App.OpenTaskDialogTitle"))
+                .showOpenDialog(this.getStage().getScene().getWindow());
         openTaskFromFile(file);
     }
+
 
     public void openTaskFromFile(File file) {
         if (file == null) {
@@ -132,17 +127,21 @@ public class PrimaryController1 extends AbstractController {
 
         getApplication().setWorkDirectory(file.getParent());
 
+        this.setTitle(this.getTaskNameFromFile(file));
+
         App.setTask(task);
     }
+
 
     public void clearTask() {
         taskFile = null;
         App.clearTask();
-        setTitle();
+        setTitle(null);
     }
 
+
     public void saveTaskAs() {
-        File file = getTaskFileChooser(getString("save_task"))
+        File file = getTaskFileChooser(getString("App.SaveTaskDialogTitle"))
                 .showSaveDialog(this.getStage().getScene().getWindow());
         if (file == null) {
             return;
@@ -157,8 +156,9 @@ public class PrimaryController1 extends AbstractController {
         TaskParser.encodeV4(file, App.getTask());
         taskFile = file;
         getApplication().setWorkDirectory(file.getParent());
-        setTitle(file);
+        setTitle(this.getTaskNameFromFile(file));
     }
+
 
     public void saveTask() {
         if (taskFile == null) {
@@ -168,28 +168,34 @@ public class PrimaryController1 extends AbstractController {
         }
     }
 
+
     public void about() {
-        getApplication().showAboutDialog();
+//        getApplication().showAboutDialog();
     }
 
+
     public void quit() {
-        Platform.exit();
+        Stage stage = this.getApplication().getPrimaryStage();
+        stage.fireEvent(new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
+
 
     public void selectLangRussian() {
         selectLanguage("ru");
     }
 
+
     public void selectLangEnglish() {
         selectLanguage("en");
     }
+
 
     private void selectLanguage(String langTag) {
         PopulationApplication application = getApplication();
         if (application.selectLanguage(langTag)) {
             ResourceBundle resources = getResources();
-            application.showAlert(resources.getString("lang"), null,
-                    resources.getString("lang_change"), Alert.AlertType.INFORMATION);
+            application.showAlert(resources.getString("TopMenu.Lang"), null,
+                    resources.getString("App.ChangeLang.Info"), Alert.AlertType.INFORMATION);
         }
     }
 }

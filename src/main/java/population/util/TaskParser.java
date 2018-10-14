@@ -32,6 +32,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class TaskParser {
     private static final String FORMAT_NAME = "PopulationModelingTask";
@@ -291,7 +293,12 @@ public final class TaskParser {
 //                } else {
 //                    transition.getStates().addAll(source, operand, result);
 //                }
-                transition.getStates().addAll(source, operand, result);
+
+                // remove external state
+                transition.getStates().addAll(Stream.of(source, operand, result)
+                    .filter(stateInTransition -> stateInTransition.getState() != null && stateInTransition.getState().getId() != -1)
+                    .collect(Collectors.toList())
+                );
                 transition.normalizeStates();
 
                 transitions.add(transition);

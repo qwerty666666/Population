@@ -5,7 +5,7 @@ import javafx.beans.property.*;
 
 public class StateInTransition {
     protected ObjectProperty<State> state = new SimpleObjectProperty<>(null);
-    protected DoubleProperty in = new SimpleDoubleProperty(1);
+    protected DoubleProperty in = new SimpleDoubleProperty(0);
     protected DoubleProperty out = new SimpleDoubleProperty(0);
     protected IntegerProperty delay = new SimpleIntegerProperty(0);
     protected IntegerProperty mode = new SimpleIntegerProperty(StateMode.SIMPLE);
@@ -34,7 +34,7 @@ public class StateInTransition {
         this.mode.set(mode);
     }
 
-    public ObjectProperty stateProperty() {
+    public ObjectProperty<State> stateProperty() {
         return this.state;
     }
 

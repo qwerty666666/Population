@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import population.model.StateModel.State;
 import population.model.TaskV4;
+import population.model.TransitionMode;
 import population.model.TransitionModel.StateInTransition;
 import population.model.TransitionModel.StateMode;
 import population.model.TransitionModel.Transition;
@@ -46,7 +47,7 @@ public class CalculatorTest {
 
         transitions.get(0).getStates().addAll(
                 new StateInTransition(state1, 1, 1, 1, StateMode.SIMPLE),
-                new StateInTransition(state1, 0, 1, 0, StateMode.SIMPLE)
+                new StateInTransition(state2, 0, 1, 0, StateMode.SIMPLE)
         );
         transitions.get(1).getStates().addAll(
                 new StateInTransition(state1, 1, 1, 2, StateMode.SIMPLE),
@@ -81,100 +82,48 @@ public class CalculatorTest {
         Assertions.assertEquals(expected, calc.getTotalCount(task.getTransitions().get(0), 0));
 
         task.getTransitions().get(0).setType(TransitionType.SOLUTE);
-        expected = task.getStates().stream()
-                .mapToDouble(State::getCount)
-                .sum();
+        expected = 150;
         Assertions.assertEquals(expected, calc.getTotalCount(task.getTransitions().get(0), 0));
 
         task.getTransitions().get(0).setType(TransitionType.BLEND);
-        expected = task.getStates().get(0).getCount();
+        expected = 150;
         Assertions.assertEquals(expected, calc.getTotalCount(task.getTransitions().get(0), 0));
     }
 
 
     @Test
-    public void getIntensity() {
+    public void getIntensityLinear() {
         Calculator calc = new Calculator(task);
         Transition transition = task.getTransitions().get(1);
         transition.getStates().get(0).setDelay(0);
         transition.getStates().get(1).setDelay(0);
         transition.getStates().get(0).setIn(1);
         transition.getStates().get(1).setIn(4);
-
-        double expected;
-        double actual;
-
-        // LINEAR
-
         transition.setType(TransitionType.LINEAR);
-        expected = 25;
-        actual = calc.getIntensity(transition, 0);
+
+        double expected = 25;
+        double actual = calc.getIntensity(transition, 0);
         Assertions.assertEquals(expected, actual,
-                "getIntensity for LINEAR: expected: " + expected + ", actual: " + actual
-        );
-
-        // LINEAR INHIBITOR
-
-        transition.getStates().get(0).setIn(2);
-        transition.getStates().get(0).setMode(StateMode.INHIBITOR);
-        transition.getStates().get(1).setIn(2);
-        expected = 25;
-        actual = calc.getIntensity(transition, 0);
-        Assertions.assertEquals(expected, actual,
-                "getIntensity for LINEAR INHIBITOR: expected: " + expected + ", actual: " + actual
-        );
-        transition.getStates().get(0).setIn(1);
-        transition.getStates().get(0).setMode(StateMode.SIMPLE);
-        transition.getStates().get(1).setIn(4);
-
-        // SOLUTE
-
-        transition.setType(TransitionType.SOLUTE);
-        expected = 0.0027;
-        actual = calc.getIntensity(transition, 0);
-        Assertions.assertTrue(Math.abs(expected - actual) < 0.0001,
-            "getIntensity for SOLUTE: expected: " + expected + ", actual: " + actual
-        );
-
-        // SOLUTE INHIBITOR
-
-        transition.setType(TransitionType.SOLUTE);
-        transition.getStates().get(0).setMode(StateMode.INHIBITOR);
-        expected = 0.0054;
-        actual = calc.getIntensity(transition, 0);
-        Assertions.assertTrue(Math.abs(expected - actual) < 0.0001,
-                "getIntensity for SOLUTE INHIBITOR: expected: " + expected + ", actual: " + actual
+            "getIntensity for LINEAR: expected: " + expected + ", actual: " + actual
         );
     }
 
 
     @Test
-    public void applyResidualTransition() {
+    public void getIntensitySolute() {
         Calculator calc = new Calculator(task);
         Transition transition = task.getTransitions().get(1);
-        transition.setType(TransitionType.SOLUTE);
-        transition.setProbability(0.1);
-
         transition.getStates().get(0).setDelay(0);
-        transition.getStates().get(0).setIn(1);
-        transition.getStates().get(0).setOut(0);
-        transition.getStates().get(0).setMode(StateMode.RESIDUAL);
-
         transition.getStates().get(1).setDelay(0);
-        transition.getStates().get(1).setIn(0);
-        transition.getStates().get(1).setOut(1);
+        transition.getStates().get(0).setIn(1);
+        transition.getStates().get(0).setMode(StateMode.SIMPLE);
+        transition.getStates().get(1).setIn(4);
+        transition.setType(TransitionType.SOLUTE);
 
-        calc.copyStep(0);
-        calc.applyResidualTransition(transition, 1);
-        double expected1 = 5;
-        double expected2 = 145;
-        Assertions.assertAll(
-                () -> Assertions.assertTrue(Math.abs(calc.statesCount[1][0] - expected1) < 0.001,
-                        "expected: " + expected1 + ", given: " + calc.statesCount[1][0]
-                ),
-                () -> Assertions.assertTrue(Math.abs(calc.statesCount[1][1] - expected2) < 0.001,
-                        "expected: " + expected2 + ", given: " + calc.statesCount[1][1]
-                )
+        double expected = 0.0027;
+        double actual = calc.getIntensity(transition, 0);
+        Assertions.assertTrue(Math.abs(expected - actual) < 0.0001,
+            "getIntensity for SOLUTE: expected: " + expected + ", actual: " + actual
         );
     }
 }

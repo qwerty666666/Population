@@ -163,7 +163,7 @@ public class ResultTableController extends AbstractController {
 
 
     protected TableColumn<ResultTableRow, Integer> getStepColumn() {
-        TableColumn<ResultTableRow, Integer> column = new TableColumn<>(getString("step"));
+        TableColumn<ResultTableRow, Integer> column = new TableColumn<>(getString("Transitions.Settings.Step"));
         column.setMinWidth(30);
         column.setSortable(false);
         column.setEditable(false);

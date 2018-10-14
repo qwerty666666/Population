@@ -17,13 +17,15 @@
  */
 package population;
 
+import javafx.event.EventHandler;
+import javafx.scene.control.Button;
+import javafx.stage.WindowEvent;
 import population.controller.PrimaryController;
 import population.controller.base.AbstractAboutController;
 import population.controller.base.AbstractController;
-import population.controller.base.AbstractExportController;
-import population.model.Result;
 import population.util.CsvParser;
 import population.util.PopulationThreadFactory;
+import population.util.Resources.StringResource;
 import population.util.StringRow;
 import population.util.StringTable;
 import population.util.Utils;
@@ -33,18 +35,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.concurrent.ThreadFactory;
 
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
@@ -68,10 +64,10 @@ public final class PopulationApplication extends Application {
     private final Thread.UncaughtExceptionHandler mUncaughtExceptionHandler =
             (thread, throwable) -> {
                 throwable.printStackTrace();
-                ResourceBundle resources = getResources();
-                showAlert(resources.getString("alert_error"),
-                        resources.getString("alert_unexpected_error"),
-                        Utils.buildErrorText(throwable, 10, resources.getString("stack_trace")),
+                ResourceBundle resources = StringResource.getBundle();
+                showAlert(resources.getString("App.ErrorAlert.Title"),
+                        resources.getString("App.ErrorAlert.Header"),
+                        Utils.buildErrorText(throwable, 10, resources.getString("App.ErrorAlert.StackTrace")),
                         Alert.AlertType.ERROR);
             };
 
@@ -151,22 +147,47 @@ public final class PopulationApplication extends Application {
     }
 
     private void initializeResources() {
-        mResources = ResourceBundle.getBundle("population/resource/strings",
-                Locale.forLanguageTag(mSettings.get(Settings.LOCALE)));
-
-        App.setResources(mResources);
+        Locale.setDefault(Locale.forLanguageTag(mSettings.get(Settings.LOCALE)));
     }
+
+
+    /**
+     * exit confirmation dialog
+     */
+    protected EventHandler<WindowEvent> confirmCloseEventHandler = event -> {
+        Alert closeConfirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        closeConfirmation.setTitle(StringResource.getString("ExitConfirmation.Title"));
+        closeConfirmation.setHeaderText(StringResource.getString("ExitConfirmation.ConfirmationText"));
+        closeConfirmation.initModality(Modality.APPLICATION_MODAL);
+        closeConfirmation.initOwner(mPrimaryStage);
+
+        closeConfirmation.getDialogPane().setPrefWidth(400);
+
+        ((Button)closeConfirmation.getDialogPane()
+            .lookupButton(ButtonType.OK))
+            .setText(StringResource.getString("ExitConfirmation.OkButton"));
+
+        ((Button)closeConfirmation.getDialogPane()
+            .lookupButton(ButtonType.CANCEL))
+            .setText(StringResource.getString("ExitConfirmation.CancelButton"));
+
+        Optional<ButtonType> closeResponse = closeConfirmation.showAndWait();
+        if (!ButtonType.OK.equals(closeResponse.orElse(null))) {
+            event.consume();
+        }
+    };
+
 
     private void showPrimaryStage(Stage primaryStage) {
         mPrimaryStage = primaryStage;
-        mPrimaryStage.setTitle(mResources.getString("application_name"));
+        mPrimaryStage.setTitle(StringResource.getString("application_name"));
         mPrimaryStage.setMinWidth(PRIMARY_STAGE_MIN_WIDTH);
         mPrimaryStage.setMinHeight(PRIMARY_STAGE_MIN_HEIGHT);
         mPrimaryStage.getIcons()
                 .add(new Image(getClass().getResourceAsStream("resource/images/icon.png")));
         FXMLLoader sceneLoader =
                 new FXMLLoader(getClass().getResource("resource/view/PrimaryView.fxml"),
-                        mResources);
+                        StringResource.getBundle());
         sceneLoader.setControllerFactory(controllerClass -> {
             try {
                 Object controller = controllerClass.newInstance();
@@ -218,12 +239,14 @@ public final class PopulationApplication extends Application {
         }
         try {
             Scene primaryScene = new Scene(sceneLoader.load(), 1, 1);
-            primaryScene.getStylesheets().add("com//population/resource/style/primary.css");
             mPrimaryStage.setScene(primaryScene);
             mPrimaryStage.show();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+
+        this.getPrimaryStage().setOnCloseRequest(this.confirmCloseEventHandler);
     }
 
     @Override
@@ -241,54 +264,16 @@ public final class PopulationApplication extends Application {
         saveSettings();
     }
 
-    public void showExportDialog(ArrayList<Result> results, HashMap<String, String> taskSettings) {
-        Stage exportStage = new Stage(StageStyle.UTILITY);
-        exportStage.initModality(Modality.APPLICATION_MODAL);
-        Stage primaryStage = mPrimaryStage;
-        exportStage.initOwner(primaryStage.getOwner());
-        exportStage.setResizable(false);
-        exportStage.setTitle(mResources.getString("export"));
-        FXMLLoader sceneLoader =
-                new FXMLLoader(getClass().getResource("resource/view/ExportView.fxml"));
-        sceneLoader.setResources(mResources);
-        sceneLoader.setControllerFactory(controllerClass -> {
-            try {
-                Object controller = controllerClass.newInstance();
-                if (controller instanceof AbstractExportController) {
-                    AbstractExportController exportController =
-                            (AbstractExportController) controller;
-                    exportController.setApplication(PopulationApplication.this);
-                    exportController.setStage(exportStage);
-                    exportController.setResults(results);
-                    exportController.setTaskSettings(taskSettings);
-                }
-                return controller;
-            } catch (InstantiationException | IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        try {
-            Scene exportScene = new Scene(sceneLoader.load(), -1, -1);
-            exportScene.getStylesheets().add("com//population/resource/style/export.css");
-            exportStage.setScene(exportScene);
-            exportStage.setX(primaryStage.getX() + WINDOW_OFFSET);
-            exportStage.setY(primaryStage.getY() + WINDOW_OFFSET);
-            exportStage.show();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public void showAboutDialog() {
         Stage aboutStage = new Stage(StageStyle.UTILITY);
         aboutStage.initModality(Modality.APPLICATION_MODAL);
         Stage primaryStage = mPrimaryStage;
         aboutStage.initOwner(primaryStage.getOwner());
         aboutStage.setResizable(false);
-        aboutStage.setTitle(mResources.getString("about"));
+        aboutStage.setTitle(StringResource.getString("TopMenu.Help.About"));
         FXMLLoader sceneLoader =
                 new FXMLLoader(getClass().getResource("resource/view/AboutView.fxml"));
-        sceneLoader.setResources(mResources);
+        sceneLoader.setResources(StringResource.getBundle());
         sceneLoader.setControllerFactory(controllerClass -> {
             try {
                 Object controller = controllerClass.newInstance();
@@ -328,10 +313,6 @@ public final class PopulationApplication extends Application {
         return mPrimaryStage;
     }
 
-    public ResourceBundle getResources() {
-        return mResources;
-    }
-
     public ThreadFactory getThreadFactory() {
         return mThreadFactory;
     }
@@ -349,7 +330,7 @@ public final class PopulationApplication extends Application {
             alert.setHeaderText(header);
             alert.setContentText(content);
             alert.getButtonTypes().clear();
-            alert.getButtonTypes().add(new ButtonType(getResources().getString("alert_close"),
+            alert.getButtonTypes().add(new ButtonType(StringResource.getString("App.ErrorAlert.Close"),
                     ButtonBar.ButtonData.OK_DONE));
             alert.showAndWait();
         });

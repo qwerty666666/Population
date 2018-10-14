@@ -15,17 +15,17 @@
     <children>
         <TableView fx:id="statesTable" editable="true" layoutX="14.0" layoutY="49.0" AnchorPane.bottomAnchor="49.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
             <columns>
-                <TableColumn fx:id="nameColumn" prefWidth="150.0" sortable="false" text="%state_name">
+                <TableColumn fx:id="nameColumn" prefWidth="150.0" sortable="false" text="%States.Name">
                     <cellValueFactory>
                         <PropertyValueFactory property="name" />
                     </cellValueFactory>
                 </TableColumn>
-                <TableColumn fx:id="aliasColumn" prefWidth="150.0" sortable="false" text="%state_alias">
+                <TableColumn fx:id="aliasColumn" prefWidth="150.0" sortable="false" text="%States.Alias">
                     <cellValueFactory>
                         <PropertyValueFactory property="alias" />
                     </cellValueFactory>
                 </TableColumn>
-                <TableColumn fx:id="countColumn" prefWidth="150.0" sortable="false" text="%state_count">
+                <TableColumn fx:id="countColumn" prefWidth="150.0" sortable="false" text="%States.Count">
                     <cellValueFactory>
                         <PropertyValueFactory property="count" />
                     </cellValueFactory>
@@ -49,14 +49,14 @@
         </TableView>
         <HBox layoutX="14.0" layoutY="14.0" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0">
             <children>
-                <Button fx:id="addButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#addState" text="%add" />
-                <Button fx:id="removeButton" layoutX="75.0" layoutY="14.0" mnemonicParsing="false" onAction="#removeState" text="%remove" />
+                <Button fx:id="addButton" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#addState" text="%States.AddButton" />
+                <Button fx:id="removeButton" layoutX="75.0" layoutY="14.0" mnemonicParsing="false" onAction="#removeState" text="%States.RemoveButton" />
             </children>
         </HBox>
         <HBox layoutX="523.0" layoutY="14.0" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="14.0">
             <children>
-                <Button fx:id="moveUpButton" layoutX="523.0" layoutY="14.0" mnemonicParsing="false" onAction="#moveStateUp" text="%move_up" />
-                <Button fx:id="moveDownButton" layoutX="585.0" layoutY="14.0" mnemonicParsing="false" onAction="#moveStateDown" text="%move_down" />
+                <Button fx:id="moveUpButton" layoutX="523.0" layoutY="14.0" mnemonicParsing="false" onAction="#moveStateUp" text="%States.MoveUpButton" />
+                <Button fx:id="moveDownButton" layoutX="585.0" layoutY="14.0" mnemonicParsing="false" onAction="#moveStateDown" text="%States.MoveDownButton" />
             </children>
         </HBox>
     </children>

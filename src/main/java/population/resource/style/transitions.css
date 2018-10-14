@@ -1,8 +1,0 @@
-.transition-state-in,
-.transition-state-out,
-.transition-state-delay {
-    -fx-pref-width: 40px;
-}
-.table-view .column-header {
-    -fx-font-weight: normal;
-}

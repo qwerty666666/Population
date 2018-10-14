@@ -128,7 +128,7 @@ public class Calculator {
         // sum of all residual states
         double residualSum = transition.getActualStates().stream()
                 .filter(state -> state.getMode() == StateMode.RESIDUAL)
-                .mapToDouble(state -> this.statesCount[step][this.getStateIndex(state.getState())] - intensity)
+                .mapToDouble(state -> this.statesCount[step - 1][this.getStateIndex(state.getState())] - intensity)
                 .sum();
 
         // subtract count from residual states
@@ -138,7 +138,7 @@ public class Calculator {
 //                    double coef = this.getStateInTransitionCoefficient(state);
 //                    double count = coef * (this.statesCount[step][this.getStateIndex(state.getState())] - intensity);
                     this.statesCount[step][this.getStateIndex(state.getState())] -=
-                            this.statesCount[step][this.getStateIndex(state.getState())] - intensity;
+                            this.statesCount[step - 1][this.getStateIndex(state.getState())] - intensity;
                 });
 
         // and add count to all states which Out > 0
@@ -184,23 +184,23 @@ public class Calculator {
         switch (transition.getType()) {
             case TransitionType.LINEAR: {
                 intensity = states.stream()
-                        .mapToDouble(stateInTransition -> {
-                            double count = getDelayedStateCount(stateInTransition, step);
-                            double res = count / stateInTransition.getIn();
-                            if (stateInTransition.getMode() == StateMode.INHIBITOR) {
-                                res = count - res;
-                            }
-                            return res;
-                        })
+                        .filter(stateInTransition -> stateInTransition.getMode() != StateMode.INHIBITOR)
+                        .mapToDouble(stateInTransition -> getDelayedStateCount(stateInTransition, step) / stateInTransition.getIn())
                         .min()
                         .orElse(0);
+                intensity -= states.stream()
+                    .filter(stateInTransition -> stateInTransition.getMode() == StateMode.INHIBITOR)
+                    .mapToDouble(stateInTransition -> getDelayedStateCount(stateInTransition, step) / stateInTransition.getIn())
+                    .sum();
+                intensity = Math.max(0, intensity);
                 break;
             }
 
             case TransitionType.SOLUTE:
             case TransitionType.BLEND: {
                 final double totalCount = this.getTotalCount(transition, step);
-                intensity = states.stream()
+                if (totalCount != 0) {
+                    intensity = states.stream()
                         .mapToDouble(stateInTransition -> {
                             double cur = getDelayedStateCount(stateInTransition, step);
                             double in = stateInTransition.getIn();
@@ -211,6 +211,7 @@ public class Calculator {
                             return res;
                         })
                         .reduce(1, (a, b) -> a * b);
+                }
 
                 break;
             }
@@ -298,7 +299,7 @@ public class Calculator {
 
             case TransitionType.BLEND: {
                 return transition.getActualStates().stream()
-                        .filter(stateInTransition -> stateInTransition.getIn() > 0)
+                        //.filter(stateInTransition -> stateInTransition.getIn() > 0)
                         // remain only distinct states
                         .filter(new Predicate<StateInTransition>() {
                             Set<State> set = new HashSet<>();

@@ -140,7 +140,7 @@ public final class Utils {
         formatter.getDecimalFormatSymbols().setDecimalSeparator(decimalSeparator);
         try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(file), encoding))) {
-            writer.append(QUOTE).append(resources.getString("step")).append(QUOTE)
+            writer.append(QUOTE).append(resources.getString("Transitions.Settings.Step")).append(QUOTE)
                     .append(columnSeparator);
             for (int i = 0; i < results.size(); i++) {
                 ArrayList<String> headers = results.get(i).getDataNames();

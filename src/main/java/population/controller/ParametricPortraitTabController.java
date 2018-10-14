@@ -430,7 +430,7 @@ public class ParametricPortraitTabController extends AbstractController {
      * transition property items shown in Properties ComboBoxes
      */
     public static class TransitionPropertyChooseList {
-        public final static String PROBABILITY = "transition_probability";
+        public final static String PROBABILITY = "Transitions.ProbabilityColumnHeader";
         public final static String SOURCE_DELAY = "transition_source_delay";
         public final static String OPERAND_DELAY = "transition_operand_delay";
         public final static String SOURCE_COEFF = "transition_source_coefficient";
@@ -442,7 +442,7 @@ public class ParametricPortraitTabController extends AbstractController {
      * state property items shown in Properties ComboBoxes
      */
     public static class StatePropertyChooseList {
-        public final static String COUNT = "state_count";
+        public final static String COUNT = "States.Count";
     }
 
 
@@ -640,7 +640,7 @@ public class ParametricPortraitTabController extends AbstractController {
 
     private boolean validateStatesInput() {
         if (states.size() == 0) {
-            getApplication().showAlert(getString("alert_error"),
+            getApplication().showAlert(getString("App.ErrorAlert.Title"),
                     null, getString("states_missing"), Alert.AlertType.WARNING);
             return false;
         }
@@ -649,7 +649,7 @@ public class ParametricPortraitTabController extends AbstractController {
 
     private boolean validateTransitionsInput() {
         if (transitions.size() == 0) {
-            getApplication().showAlert(getString("alert_error"),
+            getApplication().showAlert(getString("App.ErrorAlert.Title"),
                     null, getString("transitions_missing"), Alert.AlertType.WARNING);
             return false;
         }
@@ -658,7 +658,7 @@ public class ParametricPortraitTabController extends AbstractController {
             if (transition.getSourceState() == State.UNDEFINED ||
                     transition.getOperandState() == State.UNDEFINED ||
                     transition.getResultState() == State.UNDEFINED) {
-                getApplication().showAlert(getString("alert_error"), null,
+                getApplication().showAlert(getString("App.ErrorAlert.Title"), null,
                         getString("transitions_incorrect"), Alert.AlertType.WARNING);
                 return false;
             }
@@ -676,7 +676,7 @@ public class ParametricPortraitTabController extends AbstractController {
             }
         } catch (NumberFormatException e) {
             getApplication()
-                    .showAlert(getString("alert_error"), null, getString("steps_count_invalid"),
+                    .showAlert(getString("App.ErrorAlert.Title"), null, getString("steps_count_invalid"),
                             Alert.AlertType.WARNING);
             return false;
         }
@@ -693,7 +693,7 @@ public class ParametricPortraitTabController extends AbstractController {
             }
         } catch (Exception e) {
             getApplication()
-                    .showAlert(getString("alert_error"), null,
+                    .showAlert(getString("App.ErrorAlert.Title"), null,
                             getString("parametric_portrait_invalid_instance"),
                             Alert.AlertType.WARNING);
             return false;
@@ -711,7 +711,7 @@ public class ParametricPortraitTabController extends AbstractController {
             }
         } catch (Exception e) {
             getApplication()
-                    .showAlert(getString("alert_error"), null,
+                    .showAlert(getString("App.ErrorAlert.Title"), null,
                             getString("parametric_portrait_invalid_property"),
                             Alert.AlertType.WARNING);
             return false;
@@ -739,14 +739,14 @@ public class ParametricPortraitTabController extends AbstractController {
         }
         catch (NumberFormatException e) {
             getApplication()
-                    .showAlert(getString("alert_error"), null,
+                    .showAlert(getString("App.ErrorAlert.Title"), null,
                             getString("parametric_portrait_invalid_start_value") + ": " + e.getMessage(),
                             Alert.AlertType.WARNING);
             return false;
         }
         catch (IllegalArgumentException e) {
             getApplication()
-                    .showAlert(getString("alert_error"), null,
+                    .showAlert(getString("App.ErrorAlert.Title"), null,
                             getString("parametric_portrait_illegal_start_value"),
                             Alert.AlertType.WARNING);
             return false;
@@ -784,14 +784,14 @@ public class ParametricPortraitTabController extends AbstractController {
         }
         catch (NumberFormatException e) {
             getApplication()
-                    .showAlert(getString("alert_error"), null,
+                    .showAlert(getString("App.ErrorAlert.Title"), null,
                             getString("parametric_portrait_invalid_end_value") + ": " + e.getMessage(),
                             Alert.AlertType.WARNING);
             return false;
         }
         catch (IllegalArgumentException e) {
             getApplication()
-                    .showAlert(getString("alert_error"), null, getString(e.getMessage()),
+                    .showAlert(getString("App.ErrorAlert.Title"), null, getString(e.getMessage()),
                             Alert.AlertType.WARNING);
             return false;
         }
@@ -816,14 +816,14 @@ public class ParametricPortraitTabController extends AbstractController {
         }
         catch (NumberFormatException e) {
             getApplication()
-                    .showAlert(getString("alert_error"), null,
+                    .showAlert(getString("App.ErrorAlert.Title"), null,
                             getString("parametric_portrait_invalid_steps_count") + ": " + e.getMessage(),
                             Alert.AlertType.WARNING);
             return false;
         }
         catch (IllegalArgumentException e) {
             getApplication()
-                    .showAlert(getString("alert_error"), null, getString(e.getMessage()),
+                    .showAlert(getString("App.ErrorAlert.Title"), null, getString(e.getMessage()),
                             Alert.AlertType.WARNING);
             return false;
         }
@@ -846,14 +846,14 @@ public class ParametricPortraitTabController extends AbstractController {
         }
         catch (NumberFormatException e) {
             getApplication()
-                    .showAlert(getString("alert_error"), null,
+                    .showAlert(getString("App.ErrorAlert.Title"), null,
                             getString("parametric_portrait_illegal_precision") + ": " + e.getMessage(),
                             Alert.AlertType.WARNING);
             return false;
         }
         catch (IllegalArgumentException e) {
             getApplication()
-                    .showAlert(getString("alert_error"), null,
+                    .showAlert(getString("App.ErrorAlert.Title"), null,
                             getString("parametric_portrait_illegal_precision") + ": " + e.getMessage(),
                             Alert.AlertType.WARNING);
             return false;

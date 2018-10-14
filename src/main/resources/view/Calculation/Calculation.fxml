@@ -35,11 +35,11 @@
             <children>
                 <HBox alignment="CENTER_LEFT" spacing="10.0">
                     <children>
-                        <Label text="%start_point" />
+                        <Label text="%Calculations.StartPoint" />
                         <TextField fx:id="startPointTextField" />
-                        <Label text="%steps_count" />
+                        <Label text="%Calculations.StepCount" />
                         <TextField fx:id="stepsCountTextField" />
-                        <Button fx:id="calculationButton" mnemonicParsing="false" onAction="#calculate" text="%calculate" textOverrun="CLIP" />
+                        <Button fx:id="calculationButton" mnemonicParsing="false" onAction="#calculate" text="%Calculations.CalculateButton" textOverrun="CLIP" />
                         <ProgressBar fx:id="calculationProgressBar" maxWidth="+Infinity" prefWidth="25.0" progress="0.0" HBox.hgrow="ALWAYS" visible="false"/>
                     </children>
                 </HBox>
@@ -49,7 +49,7 @@
                         <!--<CheckBox id="mParallel" mnemonicParsing="false" text="%parallel" />-->
                         <!--<CheckBox id="mHigherAccuracy" mnemonicParsing="false" text="%higher_accuracy" />-->
                         <!-- TODO -->
-                        <CheckBox fx:id="allowNegativeNumbers" mnemonicParsing="false" text="%allow_negative_values" />
+                        <CheckBox fx:id="allowNegativeNumbers" mnemonicParsing="false" text="%Calculations.AllowNegativeValues" />
                         <!--<CheckBox id="mResultsOnChart" mnemonicParsing="false" selected="true" text="%results_on_chart" />-->
                         <!--<CheckBox id="mResultsInTable" mnemonicParsing="false" selected="true" text="%results_in_table" />-->
                     </children>
