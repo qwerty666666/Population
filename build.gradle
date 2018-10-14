@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'Population'
-version '1.0-SNAPSHOT'
+version '4.0.0'
 sourceCompatibility = 1.8
 
 
