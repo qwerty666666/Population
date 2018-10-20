@@ -1,22 +1,30 @@
 package population.model.ParametricPortrait;
 
+import javafx.beans.Observable;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.scene.paint.Color;
 import population.model.StateModel.State;
 import population.util.ListUtils;
 import population.util.Cloneable;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
+/**
+ * Portrait properties describes parameters for building axes in PP (steps count
+ */
 public class PortraitProperties implements Cloneable<PortraitProperties> {
     private int dimensions = 2;
 
     private static final double START_VALUE_DEFAULT = 0.1;
     private static final double STEP_DELTA_DEFAULT = 0.1;
-    private static final int STEP_COUNT_DEFAULT = 10;
+    private static final int STEP_COUNT_DEFAULT = 9;
 
     private List<DoubleProperty> startValues = ListUtils.generateListValues(() -> new SimpleDoubleProperty(START_VALUE_DEFAULT), dimensions);
     private List<DoubleProperty> stepDeltas = ListUtils.generateListValues(() -> new SimpleDoubleProperty(STEP_DELTA_DEFAULT), dimensions);
@@ -24,7 +32,13 @@ public class PortraitProperties implements Cloneable<PortraitProperties> {
     private List<ObjectProperty> instances = ListUtils.generateListValues(() -> new SimpleObjectProperty<>(null), dimensions);
     private List<ObjectProperty<ParametricPortrait.Property>> properties = ListUtils.generateListValues(() -> new SimpleObjectProperty<>(null), dimensions);
 
-    private ObservableList<StateSetting> stateSettings = FXCollections.observableArrayList();
+    private ObservableList<StateSetting> stateSettings = FXCollections.observableList(new ArrayList<>(),
+        // trigger change event when this properties changed
+        stateSetting -> new Observable[] {
+            stateSetting.colorProperty(),
+            stateSetting.showProperty()
+        }
+    );
 
 
     public PortraitProperties() { }
@@ -54,6 +68,13 @@ public class PortraitProperties implements Cloneable<PortraitProperties> {
         return dimensions;
     }
 
+    public ObservableList<StateSetting> stateSettingProperty() {
+        return this.stateSettings;
+    }
+
+    /**
+     * @return states which can be shown in portrait
+     */
     public List<State> getShownStateList() {
         return this.stateSettings.stream()
             .filter(StateSetting::getShow)
@@ -61,8 +82,16 @@ public class PortraitProperties implements Cloneable<PortraitProperties> {
             .collect(Collectors.toList());
     }
 
-    public ObservableList<StateSetting> stateSettingProperty() {
-        return this.stateSettings;
+
+    /**
+     * @return color for state
+     */
+    public Color getColor(State state) {
+        return this.stateSettings.stream()
+            .filter(stateSetting -> stateSetting.getState().equals(state))
+            .map(StateSetting::getColor)
+            .findFirst()
+            .orElse(null);
     }
 
 

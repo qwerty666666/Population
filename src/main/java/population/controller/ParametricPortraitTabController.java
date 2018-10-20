@@ -1,53 +1,22 @@
 package population.controller;
 
 import javafx.application.Platform;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import population.App;
-import population.component.Calculator;
 import population.model.ParametricPortrait.ParametricPortrait;
-import population.component.UIComponents.ColorTableCell;
-import population.component.UIComponents.DraggableVerticalScrollPane;
-import population.component.UIComponents.IconButton;
 import population.component.parametricPortrait.ParametricPortraitNode;
 import population.component.parametricPortrait.ParametricPortraitPropertiesNode;
 import population.component.parametricPortrait.StateSettingsTable;
 import population.model.ParametricPortrait.PortraitProperties;
-import population.model.ParametricPortrait.SimpleColorGenerator;
-import population.model.ParametricPortrait.StateSetting;
+import population.model.ColorGenerator.SimpleColorGenerator;
 import population.controller.base.AbstractController;
-import population.model.StateModel.State;
-import population.model.TaskV4;
-import population.model.TransitionModel.Transition;
-import population.util.ListUtils;
-import population.util.Utils;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
-import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.stage.FileChooser;
-
-import javax.imageio.ImageIO;
-import java.awt.image.RenderedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
+import population.model.ParametricPortrait.StateSetting;
 
 
 public class ParametricPortraitTabController extends AbstractController {
@@ -76,14 +45,9 @@ public class ParametricPortraitTabController extends AbstractController {
 
     private PrimaryController primaryController;
 
-    private ParametricPortraitAreaSelectedCallback parametricPortraitAreaSelectedCallback = new ParametricPortraitAreaSelectedCallback();
-
-
     /** ParametricPortrait shown on scene */
     private ParametricPortraitNode shownParametricPortrait;
 
-    /** parametric portraits history */
-    private History history = new History();
 
     private PortraitProperties portraitProperties;
 
@@ -114,6 +78,14 @@ public class ParametricPortraitTabController extends AbstractController {
     private void initStateSettingsTable() {
         StateSettingsTable table = new StateSettingsTable(App.getTask(), this.portraitProperties.stateSettingProperty());
         table.setColorGenerator(new SimpleColorGenerator());
+
+        // TODO bind color property to shown PP
+//        table.getItems().addListener((ListChangeListener<? super StateSetting>) c -> {
+//            if (this.shownParametricPortrait != null) {
+//                this.shownParametricPortrait.redrawCells();
+//            }
+//        });
+
         stateSettingsContainer.getChildren().add(table);
     }
 
@@ -163,33 +135,17 @@ public class ParametricPortraitTabController extends AbstractController {
         initParametricPortraitSection();
 //        initHistory();
 //
-        Platform.runLater(() ->
+        /*Platform.runLater(() ->
                 rootSplitPane.setDividerPositions(
                         history.getMinWidth() / rootSplitPane.getWidth(),
                         1 - propertiesSection.getMinWidth() / rootSplitPane.getWidth())
-        );
+        );*/
 //
 //
-//        if (getApplication().IS_DEVELOP) {
-//            test();
-//        }
+        if (getApplication().IS_DEVELOP) {
+
+        }
     }
-
-
-
-
-
-    /**
-     * initialize history section
-     */
-    private void initHistory() {
-        history = new History();
-        historySection.getChildren().add(history);
-        history.setFitToWidth(true);
-        history.setFitToHeight(true);
-        history.setPadding(new Insets(20));
-    }
-
 
     private boolean validateStatesInput() {
         /*if (this.task.getStates().size() == 0) {
@@ -468,7 +424,7 @@ public class ParametricPortraitTabController extends AbstractController {
      */
     @FXML
     private void save() {
-        if (shownParametricPortrait == null)
+        /*if (shownParametricPortrait == null)
             return;
 
         FileChooser fileChooser = new FileChooser();
@@ -496,7 +452,7 @@ public class ParametricPortraitTabController extends AbstractController {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
 
@@ -533,8 +489,8 @@ public class ParametricPortraitTabController extends AbstractController {
      */
     private void showParametricPortraitOnScene(ParametricPortrait parametricPortrait) {
         parametricPortraitSection.getChildren().remove(shownParametricPortrait);
-        parametricPortraitSection.getChildren().add(parametricPortrait);
-        shownParametricPortrait = parametricPortrait;
+//        parametricPortraitSection.getChildren().add(parametricPortrait);
+//        shownParametricPortrait = parametricPortrait;
         updateShownParametricPortraitSize();
     }
 
@@ -544,7 +500,7 @@ public class ParametricPortraitTabController extends AbstractController {
      * @return created ParametricPortrait instance
      */
     private ParametricPortrait getNewParametricPortraitInstance() {
-        return new ParametricPortrait(App.getTask(), this.portraitProperties.clone());
+        return new ParametricPortrait(App.getTask().clone(), this.portraitProperties.clone());
     }
 
 
@@ -553,8 +509,9 @@ public class ParametricPortraitTabController extends AbstractController {
      */
     @FXML
     private void calculate() {
-        if (!validateUserInput())
+        if (!validateUserInput()) {
             return;
+        }
 
         // disable controls
 //        primaryController.setCalculating(true);
@@ -563,8 +520,14 @@ public class ParametricPortraitTabController extends AbstractController {
 //
         // create new parametric portrait
         parametricPortraitSection.getChildren().remove(shownParametricPortrait);
-        shownParametricPortrait = new ParametricPortraitNode(getNewParametricPortraitInstance());
+        this.shownParametricPortrait = null;
+
+        ParametricPortrait portrait = getNewParametricPortraitInstance();
+        portrait.calculate();
+
+        shownParametricPortrait = new ParametricPortraitNode(portrait);
         parametricPortraitSection.getChildren().add(shownParametricPortrait);
+        this.updateShownParametricPortraitSize();
 
 
         // TODO
@@ -608,202 +571,5 @@ public class ParametricPortraitTabController extends AbstractController {
 
         new Thread(calculationTask).start();
 */
-    }
-
-
-    /**
-     * clear history
-     */
-    @FXML
-    private void clearHistory() {
-        history.clear();
-    }
-
-
-
-    /**
-     * history block view
-     */
-    private class History extends DraggableVerticalScrollPane {
-        /** selected item in history */
-        private HistoryItem selectedItem = null;
-
-
-        History() {
-            super();
-            content.setSpacing(10);
-            this.setMinWidth(240);
-        }
-
-
-        /**
-         * set selected item
-         * @param item selected item
-         */
-        void select(HistoryItem item) {
-            if (selectedItem != null)
-                selectedItem.thumbnail.getStyleClass().remove("active");
-
-            item.thumbnail.getStyleClass().add("active");
-            selectedItem = item;
-        }
-
-        void select(int ind) {
-            if (ind >= 0 && ind < content.getChildren().size())
-                select((HistoryItem)content.getChildren().filtered(x -> x instanceof HistoryItem).get(ind));
-        }
-
-
-        /**
-         * add parametric portrait to history
-         * @param parametricPortrait parametric portrait to add
-         */
-        void add(ParametricPortrait parametricPortrait) {
-            HistoryItem item = new HistoryItem(parametricPortrait);
-            addItem(0, item);
-
-            // apply drag ability to item thumbnail
-            item.thumbnail.setOnDragDetected(item.getOnDragDetected());
-        }
-
-
-        /**
-         * remove historyItem from history
-         * @param item historyItem to remove
-         */
-        void remove(HistoryItem item) {
-            content.getChildren().remove(item);
-        }
-
-
-        /**
-         * remove all items from history
-         */
-        void clear() {
-            content.getChildren().clear();
-        }
-
-
-        /**
-         * update parametric portraits in history in stateSettingsGroup group
-         */
-        void update() {
-            // TODO
-            /*content.getChildren().stream()
-                    .filter(x -> x instanceof HistoryItem)
-                    .map(HistoryItem.class::cast)
-                    .filter(item -> item.getParametricPortrait().getStateSettingsGroup() == stateSettingsGroup)
-                    .forEach(HistoryItem::updateNailImage);*/
-        }
-
-
-
-
-        /**
-         * represents item in history
-         */
-        private class HistoryItem extends StackPane {
-            /** snapshot thumbnail width */
-            private static final double THUMBNAIL_WIDTH = 110;
-            /** snapshot thumbnail height */
-            private static final double THUMBNAIL_HEIGHT = 110;
-            private ParametricPortrait parametricPortrait;
-            /** button for ParametricPortrait thumbnail */
-            private IconButton thumbnail;
-
-
-            HistoryItem(ParametricPortrait parametricPortrait) {
-                this.parametricPortrait = parametricPortrait;
-                setNail();
-                setDeleteButton();
-            }
-
-            /**
-             * add delete button to item
-             */
-            private void setDeleteButton() {
-                ImageView iv = new ImageView(new Image(ParametricPortraitTabController.class
-                        .getResourceAsStream("/com//population/resource/images/remove-icon.png")));
-                iv.setFitHeight(17);
-                iv.setFitWidth(17);
-                IconButton deleteButton = new IconButton(iv);
-                deleteButton.setPadding(new Insets(3));
-                deleteButton.setOnMouseClicked(event -> remove(this));
-
-                // set button position to right side of parametricPortrait thumbnail
-                setAlignment(deleteButton, Pos.TOP_LEFT);
-                ChangeListener<? super Number> listener = (observable, oldValue, newValue) ->
-                    setMargin(deleteButton, new Insets(
-                            (getHeight() - thumbnail.getHeight()) / 2 + 5,
-                            0, 0,
-                            (getWidth()  + thumbnail.getWidth()) / 2 + 5)
-                    );
-                this.widthProperty().addListener(listener);
-                this.heightProperty().addListener(listener);
-                thumbnail.widthProperty().addListener(listener);
-                thumbnail.heightProperty().addListener(listener);
-
-                this.getChildren().add(deleteButton);
-            }
-
-            /**
-             * add thumbnail button to item
-             */
-            private void setNail() {
-                ImageView iv = new ImageView(parametricPortrait.getThumbnail());
-                iv.setFitWidth(THUMBNAIL_WIDTH);
-                iv.setFitHeight(THUMBNAIL_HEIGHT);
-                thumbnail = new IconButton(iv);
-
-                // put thumbnail to container to apply rounded border to the thumbnail
-                BorderPane container = new BorderPane(iv);
-                Rectangle clip = new Rectangle(iv.getFitWidth(), iv.getFitHeight());
-                clip.setArcWidth(4);
-                clip.setArcHeight(4);
-                iv.setClip(clip);
-                container.setBorder(new Border(new BorderStroke(Color.valueOf("#ccc"),
-                        BorderStrokeStyle.SOLID, new CornerRadii(3), BorderWidths.DEFAULT)));
-                thumbnail.setGraphic(container);
-
-                // on click show parametric portrait on scene
-                thumbnail.setOnMouseClicked(event -> {
-                    history.select(this);
-                    setEnvironmentByParametricPortrait(parametricPortrait);
-                    showParametricPortraitOnScene(parametricPortrait);
-                    event.consume();
-                });
-
-                this.getChildren().add(thumbnail);
-            }
-
-            /**
-             * update thumbnail view
-             */
-            void updateNailImage() {
-                thumbnail.getImageView().setImage(parametricPortrait.getThumbnail());
-            }
-
-            /**
-             *
-             * @return parametric portrait associated with item
-             */
-            ParametricPortrait getParametricPortrait() {
-                return parametricPortrait;
-            }
-        }
-    }
-
-
-
-    /**
-     * on area selected show parametric portrait on scene and update user inputs and task tables
-     */
-    private class ParametricPortraitAreaSelectedCallback implements ParametricPortrait.SubareaSelectedCallback {
-        @Override
-        public void selected(ParametricPortrait parametricPortrait) {
-            // show parametric portrait
-            setEnvironmentByParametricPortrait(parametricPortrait);
-            calculate();
-        }
     }
 }

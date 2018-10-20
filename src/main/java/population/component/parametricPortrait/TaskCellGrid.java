@@ -1,31 +1,24 @@
 package population.component.parametricPortrait;
 
-import javafx.geometry.Insets;
-import javafx.scene.input.MouseButton;
+import javafx.collections.ListChangeListener;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import population.model.ParametricPortrait.ParametricPortrait;
-import population.model.ParametricPortrait.PortraitProperties;
-import population.model.ParametricPortrait.SimpleParametricPortraitCalculator;
+import population.model.ParametricPortrait.StateSetting;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
  * Grid of parametric portrait task cells
  */
 public class TaskCellGrid extends GridPane {
-    /** grid of TaskCell (numeration from upper left corner [row][col]) *//*
+    /** grid of TaskCell (numeration from upper left corner [row][col]) */
     private List<List<TaskCell>> taskCells = new ArrayList<>();
-    *//** highlight rectangle on drag *//*
+    /** highlight rectangle on drag */
     private Pane overlay = new Pane();
-    *//** start drag cell index *//*
+    /** start drag cell index */
     private int dragStartX = 0;
-    *//** start drag cell index *//*
+    /** start drag cell index */
     private int dragStartY = 0;
 
     private ParametricPortrait portrait;
@@ -36,11 +29,15 @@ public class TaskCellGrid extends GridPane {
     TaskCellGrid(ParametricPortrait portrait) {
         this.portrait = portrait;
         this.initOverlay();
+
+        this.initTaskCellsList();
+
+        this.updateGrid();
     }
 
 
     private void initOverlay() {
-        overlay.setBackground(new Background(new BackgroundFill(new Color(177./255, 208./255, 255./255, 0.5),
+        /*overlay.setBackground(new Background(new BackgroundFill(new Color(177./255, 208./255, 255./255, 0.5),
             CornerRadii.EMPTY, Insets.EMPTY)));
         overlay.setBorder(new Border(new BorderStroke(new Color(0./255, 100./255, 255./255, 0.2),
             BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
@@ -105,7 +102,7 @@ public class TaskCellGrid extends GridPane {
                             .setScale(5, RoundingMode.HALF_UP).doubleValue()
                     );
                     // TODO
-                    *//*List<Integer> steps = getListDeepCopy(stepsCnt);
+                    /*List<Integer> steps = getListDeepCopy(stepsCnt);
                     for (int i = 0; i < start.size(); i++) {
                         if (start.get(i).equals(end.get(i)))
                             steps.set(i, 1);
@@ -114,31 +111,31 @@ public class TaskCellGrid extends GridPane {
                     ParametricPortraitNode parametricPortrait = new ParametricPortraitNode();
                     parametricPortrait.setParameters(commonTask, instances, properties, start, end, steps, scale);
 
-                    SubareaSelectedCallback.selected(parametricPortrait);*//*
-                }
+                    SubareaSelectedCallback.selected(parametricPortrait);*/
+                /*}
             }
-        });
+        });*/
     }
 
 
-    *//**
+    /**
      *
      * @param x coordinate
      * @return column index by x coord. Assuming all columns have the same size.
      * if coord out of bound return nearest column
-     *//*
+     */
     private int getColumnByXCoord(double x) {
         if (x <= 0) return 0;
         return Math.min((int)(x / (this.getWidth() / this.getColumnConstraints().size())),
             this.getColumnConstraints().size() - 1);
     }
 
-    *//**
+    /**
      *
      * @param y coordinate
      * @return row index by y coord. Assuming all rows have the same size.
      * if coord out of bound return nearest row
-     *//*
+     */
     private int getRowByYCoord(double y) {
         if (y <= 0) return 0;
         return Math.min((int)(y / (this.getHeight() / this.getRowConstraints().size())),
@@ -146,19 +143,20 @@ public class TaskCellGrid extends GridPane {
     }
 
 
-    *//**
-     * make new taskCells List
-     * @param cols columns count
-     * @param rows rows count
-     *//*
-    void newTaskCellsList(int cols, int rows) {
+    /**
+     * Make new taskCells List
+     */
+    void initTaskCellsList() {
         taskCells = new ArrayList<>();
+        int rows = this.portrait.getRowCount();
+        int cols = this.portrait.getColCount();
+
         for (int row = 0; row < rows; row++) {
             List<TaskCell> rowCells = new ArrayList<>();
 
             for (int col = 0; col < cols; col++) {
-//                TaskCell cell = new TaskCell();
-//                rowCells.add(cell);
+                TaskCell cell = new TaskCell(this.portrait, this.portrait.getRowCount() - row - 1, col);
+                rowCells.add(cell);
             }
 
             taskCells.add(rowCells);
@@ -166,21 +164,22 @@ public class TaskCellGrid extends GridPane {
     }
 
 
-    *//**
+    /**
      *
      * @return taskCells list
-     *//*
+     */
     List<List<TaskCell>> getTaskCells() {
         return taskCells;
     }
 
 
-    *//**
-     * set grid
-     * @param cols columns count
-     * @param rows rows count
-     *//*
-    void updateGrid(int cols, int rows) {
+    /**
+     * Set own grid
+     */
+    public void updateGrid() {
+        int cols = this.portrait.getColCount();
+        int rows = this.portrait.getRowCount();
+
         this.getChildren().clear();
         this.getColumnConstraints().clear();
         for (int col = 0; col < cols; col++) {
@@ -203,20 +202,17 @@ public class TaskCellGrid extends GridPane {
                 this.add(taskCells.get(row).get(col), col, row);
             }
         }
+
+        this.redrawCells();
     }
 
 
-    *//**
-     *
-     * @param startValue start value
-     * @param delta steps count
-     * @param step step number
-     * @return calculated value
-     *//*
-    private BigDecimal getValueOnStep(double startValue, double delta, int step) {
-        BigDecimal bdStartValue = new BigDecimal(startValue);
-        BigDecimal bdSteps = new BigDecimal(Math.max(1, delta - 1));
-        BigDecimal bdStep = new BigDecimal(step);
-        return bdStartValue.add(new BigDecimal(delta * step), MathContext.DECIMAL64);
+    /**
+     * Redraw all inner portrait cells
+     */
+    public void redrawCells() {
+        this.taskCells.forEach(list -> {
+            list.forEach(TaskCell::fill);
+        });
     }
-*/}
+}

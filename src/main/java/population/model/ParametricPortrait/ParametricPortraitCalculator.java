@@ -12,16 +12,6 @@ import java.util.List;
  */
 public interface ParametricPortraitCalculator<T> {
     /**
-     * @return task which will be calculated
-     */
-    TaskV4 getTask();
-
-    /**
-     * @return states list which will be returned in the result list
-     */
-    List<State> getAllowedStates();
-
-    /**
      * do task calculation
      */
     void calculate();

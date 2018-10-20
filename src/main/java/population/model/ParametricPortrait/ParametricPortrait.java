@@ -15,12 +15,13 @@ public class ParametricPortrait {
     private PortraitProperties properties;
     /** common task for all cells */
     private TaskV4 task;
-    /** grid of portrait cells */
-    private List<List<PortraitCell<List<List<State>>>>> cells = new ArrayList<>();
+    /** grid of portrait cells [row][col] */
+    private List<List<List<List<State>>>> calculationResult = new ArrayList<>();
 
 
     /**
-     * transition and state properties which can be chosen as parametric portrait property for certain axe
+     * Transition and state properties which can be chosen as parametric
+     * portrait property for certain axe
      */
     public enum Property {
         PROBABILITY,
@@ -32,7 +33,7 @@ public class ParametricPortrait {
 
 
     /**
-     * convert instance to string
+     * Convert instance to string
      */
     public static StringConverter<Object> INSTANCE_STRING_CONVERTER = new StringConverter<Object>() {
         @Override
@@ -90,61 +91,96 @@ public class ParametricPortrait {
     }
 
 
+    /**
+     * @return portrait properties
+     */
     public PortraitProperties getProperties() {
         return this.properties;
     }
 
+
+    /**
+     * @return rows count in portrait
+     */
+    public int getRowCount() {
+        return this.properties.getStepCounts().get(1).get();
+    }
+
+    /**
+     * @return column count in portrait
+     */
+    public int getColCount() {
+        return this.properties.getStepCounts().get(0).get();
+    }
+
+
+    /**
+     * @return common task for portrait
+     */
     public TaskV4 getTask() {
         return this.task;
     }
 
 
     /**
-     * calculate all inner cells
+     * Сalculate all inner cells
      */
     public void calculate() {
-        this.buildCellGrid();
+        this.calculationResult = new ArrayList<>();
 
-        this.cells.forEach(list -> {
-            list.forEach(PortraitCell::calculate);
-        });
+        for (int row = 0; row < this.getRowCount(); row++) {
+            List<List<List<State>>> rowResults = new ArrayList<>();
+            this.calculationResult.add(rowResults);
+
+            for (int col = 0; col < this.getColCount(); col++) {
+                ParametricPortraitCalculator calculator = new SimpleParametricPortraitCalculator(
+                    this.getTask(row, col), this.properties.getShownStateList()
+                );
+                calculator.calculate();
+                rowResults.add(((SimpleParametricPortraitCalculator) calculator).getCalculationResult());
+            }
+        }
     }
 
 
     /**
-     * build cells grid depended on portrait properties
+     * @return calculation cell result
      */
-    protected void buildCellGrid() {
-        for (int i = 0; i < this.properties.getStepCounts().get(0).get(); i++) {
-            List<PortraitCell<List<List<State>>>> list = new ArrayList<>();
-            this.cells.add(list);
+    public List<List<State>> getCalculationResult(int row, int col) {
+        return this.calculationResult.get(row).get(col);
+    }
 
-            for (int j = 0; j < this.properties.getStepCounts().get(1).get(); j++) {
-                TaskV4 clone = this.task.clone();
-                PortraitCell<List<List<State>>> cell = new PortraitCell<List<List<State>>>(new SimpleParametricPortraitCalculator(clone, properties.getShownStateList()));
-                list.add(cell);
 
-                for (int ind = 0; ind < 2; ind++) {
-                    double propertyValue = this.getPropertyValueOnStep(ind, ind == 0 ? i : j);
-                    cell.addUniqueTaskProperty(propertyValue);
+    /**
+     * Change common task properties according to certain cell and return that task
+     *
+     * @return common task with changed properties
+     */
+    public TaskV4 getTask(int row, int col) {
+        TaskV4 result = this.task;
 
-                    Property property = this.properties.getProperties().get(ind).get();
-                    switch (property) {
-                        case PROBABILITY: {
-                            ((Transition)this.properties.getInstances().get(ind).get()).setProbability(propertyValue);
-                            break;
-                        }
-                        case COUNT: {
-                            ((State)this.properties.getInstances().get(ind).get()).setCount(propertyValue);
-                            break;
-                        }
-                        default: {
-                            throw new UnsupportedParametricPortraitProperty("PP property '" + property + "' is unsupported");
-                        }
-                    }
+        for (int ind = 0; ind < 2; ind++) {
+            double propertyValue = this.getPropertyValueOnStep(ind, ind == 0 ? col : row);
+
+            Property property = this.properties.getProperties().get(ind).get();
+            switch (property) {
+                case PROBABILITY: {
+                    Transition transition = (Transition) this.properties.getInstances().get(ind).get();
+                    task.getTransitionById(transition.getId()).setProbability(propertyValue);
+                    break;
+                }
+                case COUNT: {
+                    State state = (State) this.properties.getInstances().get(ind).get();
+                    task.getStateById(state.getId()).setCount(propertyValue);
+                    break;
+                }
+                default: {
+                    throw new UnsupportedParametricPortraitProperty("PP property '" + property + "' is unsupported");
                 }
             }
         }
+
+        return result;
     }
 
 

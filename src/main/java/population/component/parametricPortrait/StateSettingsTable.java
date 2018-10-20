@@ -1,7 +1,6 @@
 package population.component.parametricPortrait;
 
 
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
@@ -10,7 +9,7 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.paint.Color;
 import population.component.UIComponents.ColorTableCell;
-import population.model.ParametricPortrait.ColorGenerator;
+import population.model.ColorGenerator.ColorGenerator;
 import population.model.ParametricPortrait.PortraitProperties;
 import population.model.ParametricPortrait.StateSetting;
 import population.model.StateModel.State;
@@ -21,6 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Represents
+ */
 public class StateSettingsTable extends TableView<StateSetting> {
     /**
      * Task which states should be observed for table model.
@@ -107,10 +109,6 @@ public class StateSettingsTable extends TableView<StateSetting> {
         });
     }
 
-
-    public void setPortraitProperties(PortraitProperties portraitProperties) {
-        this.portraitProperties = portraitProperties;
-    }
 
     public void setColorGenerator(ColorGenerator colorGenerator) {
         this.colorGenerator = colorGenerator;

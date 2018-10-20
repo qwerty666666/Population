@@ -22,7 +22,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import population.component.parametricPortrait.ParametricPortraitPropertiesNode?>
 
-<?import population.controller.ParametricPortraitTabController.History.HistoryItem?>
+<!--<?import population.controller.ParametricPortraitTabController.History.HistoryItem?>-->
 <?import population.component.parametricPortrait.StateSettingsTable?>
 <SplitPane fx:id="rootSplitPane"
            dividerPositions="0.5, 0.5"
@@ -50,9 +50,9 @@
             </center>
             <bottom>
                 <HBox styleClass="panel" alignment="CENTER_RIGHT" minHeight="70">
-                    <Button text="%parametric_portrait_clear_history" onAction="#clearHistory" HBox.hgrow="NEVER">
+                    <!--<Button text="%parametric_portrait_clear_history" onAction="#clearHistory" HBox.hgrow="NEVER">
                         <HBox.margin><Insets right="15" /></HBox.margin>
-                    </Button>
+                    </Button>-->
                 </HBox>
             </bottom>
         </BorderPane>

@@ -104,8 +104,9 @@ public class PrimaryController1 extends AbstractController {
 
         this.setTitle(this.getDefaultTitle());
 
-        mainTabPane.getSelectionModel().select(3);
-        File file = new File("C:\\Users\\user\\Desktop\\3.pmt");
+        mainTabPane.getSelectionModel().select(2);
+        //((TabPane)this.getStage().getScene().lookup("#resultsChartTabs")).getSelectionModel().select(3);
+        File file = new File("C:\\Users\\user\\Desktop\\test.pmt");
         openTaskFromFile(file);
     }
 

@@ -93,6 +93,7 @@ public class TaskV4 {
         this.stepsCount.set(stepsCount);
     }
 
+
     public TaskV4 clone() {
         TaskV4 clone = new TaskV4();
 
@@ -118,5 +119,21 @@ public class TaskV4 {
         }
 
         return clone;
+    }
+
+
+    public Transition getTransitionById(int id) {
+        return this.transitions.stream()
+            .filter(transition -> transition.getId() == id)
+            .findFirst()
+            .orElse(null);
+    }
+
+
+    public State getStateById(int id) {
+        return this.states.stream()
+            .filter(state -> state.getId() == id)
+            .findFirst()
+            .orElse(null);
     }
 }

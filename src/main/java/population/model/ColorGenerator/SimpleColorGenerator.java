@@ -1,15 +1,9 @@
-package population.model.ParametricPortrait;
+package population.model.ColorGenerator;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
-import population.component.ParametricPortrait;
-import population.model.StateModel.State;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**

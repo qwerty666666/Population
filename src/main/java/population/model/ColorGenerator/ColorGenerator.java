@@ -1,4 +1,4 @@
-package population.model.ParametricPortrait;
+package population.model.ColorGenerator;
 
 import javafx.scene.paint.Color;
 

@@ -5,17 +5,18 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.paint.Color;
+import population.model.ColorGenerator.ColorGenerator;
 import population.model.StateModel.State;
 import population.util.Cloneable;
 
 
 /**
- * parametric portrait state settings: state color and visibility in portrait
+ * Parametric portrait state settings: state color and visibility in portrait
  */
 public class StateSetting implements Cloneable<StateSetting> {
     private ObjectProperty<State> state = new SimpleObjectProperty<>();
     /** should state be shown in portrait */
-    private BooleanProperty show = new SimpleBooleanProperty();
+    private BooleanProperty show = new SimpleBooleanProperty(true);
     /** state color in parametric portrait */
     private ObjectProperty<Color> color = new SimpleObjectProperty<>();
 

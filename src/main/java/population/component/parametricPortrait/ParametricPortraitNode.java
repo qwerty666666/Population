@@ -48,7 +48,7 @@ public class ParametricPortraitNode extends GridPane {
     private Label xLabel = new Label();
     private Label yLabel = new Label();
     
-    private TaskCellGrid cellContainer = new TaskCellGrid();
+    private TaskCellGrid cellContainer;
 
     private ParametricPortrait parametricPortrait;
     
@@ -67,6 +67,7 @@ public class ParametricPortraitNode extends GridPane {
 
     public ParametricPortraitNode(ParametricPortrait parametricPortrait) {
         this.parametricPortrait = parametricPortrait;
+        this.cellContainer = new TaskCellGrid(parametricPortrait);
 
         this.setLayout();
 //this.setGridLinesVisible(true);
@@ -89,7 +90,9 @@ public class ParametricPortraitNode extends GridPane {
     private void setLayout() {
         this.initAxes();
         this.initAxesLabels();
+        this.setAxesUnits();
         this.initConstraints();
+        this.updateSize();
     }
     
 
@@ -171,13 +174,13 @@ public class ParametricPortraitNode extends GridPane {
         xAxis.setTickUnit(props.getStepDeltas().get(0).get());
         xAxis.setLowerBound(props.getStartValues().get(0).get());
         xAxis.setUpperBound(props.getStartValues().get(0).get() + 
-            props.getStepCounts().get(0).get() * props.getStepDeltas().get(0).get()
+            (props.getStepCounts().get(0).get() - 1) * props.getStepDeltas().get(0).get()
         );
 
         yAxis.setTickUnit(props.getStepDeltas().get(1).get());
         yAxis.setLowerBound(props.getStartValues().get(1).get());
         yAxis.setUpperBound(props.getStartValues().get(1).get() +
-            props.getStepCounts().get(1).get() * props.getStepDeltas().get(1).get()
+            (props.getStepCounts().get(1).get() - 1) * props.getStepDeltas().get(1).get()
         );
     }
     
@@ -197,16 +200,16 @@ public class ParametricPortraitNode extends GridPane {
      * set parametric portrait size depends on window size
      */
     private void updateSize() {
-        int xSteps = parametricPortrait.getProperties().getStepCounts().get(0).get();
-        int ySteps = parametricPortrait.getProperties().getStepCounts().get(1).get();
+        int xSteps = parametricPortrait.getColCount();
+        int ySteps = parametricPortrait.getRowCount();
         
         double availableWidth = this.availableWidth.get();
         double availableHeight = this.availableHeight.get();
 
         double minCellSize = cellContainer.getTaskCells().size() == 0 ? TaskCell.MIN_INNER_CELL_SIZE :
-                cellContainer.getTaskCells().get(0).get(0).numCols * TaskCell.MIN_INNER_CELL_SIZE;
+                cellContainer.getTaskCells().get(0).get(0).getRequestedSize() * TaskCell.MIN_INNER_CELL_SIZE;
         double maxCellSize = cellContainer.getTaskCells().size() == 0 ? TaskCell.MAX_INNER_CELL_SIZE :
-                cellContainer.getTaskCells().get(0).get(0).numCols * TaskCell.MAX_INNER_CELL_SIZE;
+                cellContainer.getTaskCells().get(0).get(0).getRequestedSize() * TaskCell.MAX_INNER_CELL_SIZE;
         double calculatedCellSize = Math.min(
                 (availableHeight - xAxis.getHeight() - xLabel.getHeight()) / ySteps,
                 (availableWidth - yAxis.getWidth() - yLabel.getHeight()) / xSteps);
@@ -229,6 +232,14 @@ public class ParametricPortraitNode extends GridPane {
         fontSize = 17./500 * Math.max(width, height);
         xLabel.setFont(new Font(fontSize));
         yLabel.setFont(new Font(fontSize));
+    }
+
+
+    /**
+     * redraw each cells in portrait node
+     */
+    public void redrawCells() {
+        this.cellContainer.redrawCells();
     }
 
 
@@ -448,7 +459,7 @@ public class ParametricPortraitNode extends GridPane {
         this.endValues = getListDeepCopy(endValues);
         this.stepsCnt = getListDeepCopy(stepsCnt);
 
-        cellContainer.newTaskCellsList(stepsCnt.get(0), stepsCnt.get(1));
+        cellContainer.initTaskCellsList(stepsCnt.get(0), stepsCnt.get(1));
 
         this.scale = scale;
     }
@@ -656,14 +667,14 @@ public class ParametricPortraitNode extends GridPane {
 
 
 
-
+*/
 
 
     public interface SubareaSelectedCallback {
-        *
+        /**
          * called when area in parametric portrait was selected
          * @param parametricPortrait new parametric portrait with new bounds
-
+         */
         void selected(ParametricPortraitNode parametricPortrait);
     }
 
@@ -673,7 +684,7 @@ public class ParametricPortraitNode extends GridPane {
 
 
 
-    *
+    /**
      *
      * @param list list to clone
      * @param <T> list type
