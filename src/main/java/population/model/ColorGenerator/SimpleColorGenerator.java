@@ -10,13 +10,13 @@ import java.util.*;
  * Generate colors sequence from javafx.scene.paint.Color constants
  */
 public class SimpleColorGenerator implements ColorGenerator {
-    private static List<Color> defaultColors;
+    private static List<Color> colors;
     static {
         /*
-         * set defaultColors from javafx.scene.paint.Color constants
+         * set colors from javafx.scene.paint.Color constants
          */
         // this colors will be first in color list
-        List<Color> customColors = new ArrayList<>(Arrays.asList(
+        List<Color> defaultColors = new ArrayList<>(Arrays.asList(
             Color.RED,
             Color.YELLOW,
             Color.GREEN,
@@ -28,7 +28,7 @@ public class SimpleColorGenerator implements ColorGenerator {
         );
 
         try {
-            List<Color> colors = new ArrayList<>();
+            List<Color> reflectionColors = new ArrayList<>();
             Class colorClass = Class.forName("javafx.scene.paint.Color");
 
             if (colorClass == null) {
@@ -39,20 +39,20 @@ public class SimpleColorGenerator implements ColorGenerator {
             for (Field field : fields) {
                 Object obj = field.get(null);
                 if (obj instanceof Color) {
-                    colors.add((Color) obj);
+                    reflectionColors.add((Color) obj);
                 }
             }
-            defaultColors = colors;
+            SimpleColorGenerator.colors = reflectionColors;
 
-            // use custom colors first
-            defaultColors.remove(Color.TRANSPARENT);
+            // use default colors first
+            SimpleColorGenerator.colors.remove(Color.TRANSPARENT);
             int i = 0;
-            for (Color color: customColors) {
-                Collections.swap(defaultColors, i++, defaultColors.indexOf(color));
+            for (Color color: defaultColors) {
+                Collections.swap(SimpleColorGenerator.colors, i++, SimpleColorGenerator.colors.indexOf(color));
             }
 
         } catch (Exception e) {
-            defaultColors = customColors;
+            SimpleColorGenerator.colors = defaultColors;
         }
     }
     private int nextIndex = 0;
@@ -60,7 +60,7 @@ public class SimpleColorGenerator implements ColorGenerator {
 
     @Override
     public Color getNext() {
-        return defaultColors.get(nextIndex++ % defaultColors.size());
+        return colors.get(nextIndex++ % colors.size());
     }
 }
 

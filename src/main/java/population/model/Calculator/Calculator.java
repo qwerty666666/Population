@@ -106,7 +106,7 @@ public class Calculator {
 
 
     /**
-     * add count to states according to transition
+     * push count to states according to transition
      * @param transition
      * @param step
      */

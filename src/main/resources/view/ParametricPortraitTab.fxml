@@ -50,9 +50,9 @@
             </center>
             <bottom>
                 <HBox styleClass="panel" alignment="CENTER_RIGHT" minHeight="70">
-                    <!--<Button text="%parametric_portrait_clear_history" onAction="#clearHistory" HBox.hgrow="NEVER">
+                    <Button text="%parametric_portrait_clear_history" onAction="#clearHistory" HBox.hgrow="NEVER">
                         <HBox.margin><Insets right="15" /></HBox.margin>
-                    </Button>-->
+                    </Button>
                 </HBox>
             </bottom>
         </BorderPane>

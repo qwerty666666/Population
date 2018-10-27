@@ -1,8 +1,9 @@
 package population.controller;
 
 import javafx.application.Platform;
-import javafx.collections.ListChangeListener;
+import javafx.concurrent.WorkerStateEvent;
 import population.App;
+import population.component.parametricPortrait.History.History;
 import population.model.ParametricPortrait.ParametricPortrait;
 import population.component.parametricPortrait.ParametricPortraitNode;
 import population.component.parametricPortrait.ParametricPortraitPropertiesNode;
@@ -16,7 +17,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
-import population.model.ParametricPortrait.StateSetting;
 
 
 public class ParametricPortraitTabController extends AbstractController {
@@ -43,13 +43,13 @@ public class ParametricPortraitTabController extends AbstractController {
     /** calculation precision used in task (digits after comma) */
     private int taskScale;
 
-    private PrimaryController primaryController;
-
     /** ParametricPortrait shown on scene */
     private ParametricPortraitNode shownParametricPortrait;
 
+    private ParametricPortraitPropertiesNode propertiesNode;
+    private StateSettingsTable stateSettingsTable;
 
-    private PortraitProperties portraitProperties;
+    private History history;
 
 
     /*********************************
@@ -62,13 +62,18 @@ public class ParametricPortraitTabController extends AbstractController {
      * initialize property section
      */
     private void initPropertiesSection() {
-        this.portraitProperties = new PortraitProperties();
-
-        ParametricPortraitPropertiesNode propNode = new ParametricPortraitPropertiesNode(App.getTask(), this.portraitProperties.getDimensions());
-        propNode.setPortraitProperties(this.portraitProperties);
-        portraitPropertiesContainer.getChildren().add(propNode);
+        this.propertiesNode = new ParametricPortraitPropertiesNode(App.getTask());
+        portraitPropertiesContainer.getChildren().add(this.propertiesNode);
 
         initStateSettingsTable();
+    }
+
+
+    /**
+     * @return PortraitProperties binded to this.propertiesNode
+     */
+    private PortraitProperties getPortraitProperties() {
+        return this.propertiesNode.getPortraitProperties();
     }
 
 
@@ -76,8 +81,10 @@ public class ParametricPortraitTabController extends AbstractController {
      * initialize state settings table
      */
     private void initStateSettingsTable() {
-        StateSettingsTable table = new StateSettingsTable(App.getTask(), this.portraitProperties.stateSettingProperty());
-        table.setColorGenerator(new SimpleColorGenerator());
+        this.stateSettingsTable = new StateSettingsTable(App.getTask(), this.getPortraitProperties().stateSettingProperty());
+        this.stateSettingsTable.setColorGenerator(new SimpleColorGenerator());
+
+        stateSettingsContainer.getChildren().add(this.stateSettingsTable);
 
         // TODO bind color property to shown PP
 //        table.getItems().addListener((ListChangeListener<? super StateSetting>) c -> {
@@ -85,8 +92,6 @@ public class ParametricPortraitTabController extends AbstractController {
 //                this.shownParametricPortrait.redrawCells();
 //            }
 //        });
-
-        stateSettingsContainer.getChildren().add(table);
     }
 
 
@@ -125,21 +130,47 @@ public class ParametricPortraitTabController extends AbstractController {
     }
 
 
+    /*********************************
+     *
+     *      HISTORY SECTION
+     *
+     *********************************/
+
+    /**
+     * Initialize history
+     */
+    private void initHistory() {
+        this.history = new History();
+        this.historySection.getChildren().add(history);
+
+        this.history.selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                this.setEnvironmentByParametricPortrait(newValue.getParametricPortraitNode().getParametricPortrait());
+            }
+        });
+    }
 
 
+    /**
+     * Clear whole history
+     */
+    @FXML
+    private void clearHistory() {
+        this.history.clear();
+    }
 
 
     @Override
     public void initialize() {
         initPropertiesSection();
         initParametricPortraitSection();
-//        initHistory();
+        initHistory();
 //
-        /*Platform.runLater(() ->
+        Platform.runLater(() ->
                 rootSplitPane.setDividerPositions(
                         history.getMinWidth() / rootSplitPane.getWidth(),
                         1 - propertiesSection.getMinWidth() / rootSplitPane.getWidth())
-        );*/
+        );
 //
 //
         if (getApplication().IS_DEVELOP) {
@@ -399,28 +430,9 @@ public class ParametricPortraitTabController extends AbstractController {
     }
 
 
-    /**
-     * enable / disable users controls
-     * @param disable should disable
-     */
-    private void setControlsDisable(boolean disable) {
-        primaryController.mCalculationProgressBar.setVisible(disable);
-
-        calculateButton.setDisable(disable);
-        primaryController.setControlsDisable(disable);
-    }
-
 
     /**
-     * remove parametric portrait. Set new stateSettingsGroup.
-     */
-    void clearEnvironment() {
-        parametricPortraitSection.getChildren().remove(shownParametricPortrait);
-    }
-
-
-    /**
-     * save shownParametricPortrait to .png file
+     * Save shownParametricPortrait to .png file
      */
     @FXML
     private void save() {
@@ -457,55 +469,37 @@ public class ParametricPortraitTabController extends AbstractController {
 
 
     /**
-     * set application task and properties from parametricPortrait
+     * Set application task and portrait properties from given portrait
+     *
      * @param parametricPortrait parametric portrait
      */
     private void setEnvironmentByParametricPortrait(ParametricPortrait parametricPortrait) {
+        // TODO remove it and set colors from portrait properties state
+        this.stateSettingsTable.setColorGenerator(new SimpleColorGenerator());
+
         // set application task from parametricPortrait
-        // there is no need update settingsGroup, so remove change listener while updated main states table
-        // TODO
-        /*primaryController.getStates().removeListener(updateStateSettingsOnStateChangeListener);
-        Task task = parametricPortrait.getCommonTask();
-        // steps count field displays number stepsCount-1
-        task.setStepsCount(task.getStepsCount() - 1);
-        primaryController.setTask(task);
-        task.setStepsCount(task.getStepsCount() + 1);
-        primaryController.getStates().addListener(updateStateSettingsOnStateChangeListener);*/
+        App.setTask(parametricPortrait.getTask());
 
         // set properties from parametricPortrait
-        /*for (int i = 0; i < startValueTextFields.size(); i++) {
-            instanceComboBoxes.get(i).getSelectionModel().select(parametricPortrait.getInstances().get(i));
-            propertyComboBoxes.get(i).getSelectionModel().select(parametricPortrait.getSelectedProperties().get(i));
-            startValueTextFields.get(i).setText(parametricPortrait.getStartValues().get(i).toString());
-            endValueTextFields.get(i).setText(parametricPortrait.getEndValues().get(i).toString());
-            stepCountTextFields.get(i).setText(parametricPortrait.getStepsCnt().get(i).toString());
-        }*/
+        this.propertiesNode.setPortraitPropertiesValues(parametricPortrait.getProperties());
+
+        // show PP Node
+        this.setShownParametricPortraitNode(new ParametricPortraitNode(parametricPortrait));
     }
 
 
     /**
-     * show parametric portrait on scene
-     * @param parametricPortrait shownParametricPortrait to show
-     */
-    private void showParametricPortraitOnScene(ParametricPortrait parametricPortrait) {
-        parametricPortraitSection.getChildren().remove(shownParametricPortrait);
-//        parametricPortraitSection.getChildren().add(parametricPortrait);
-//        shownParametricPortrait = parametricPortrait;
-        updateShownParametricPortraitSize();
-    }
-
-
-    /**
-     * create new ParametricPortrait and set standard onAreaSelected behavior
+     * Create new ParametricPortrait and set standard onAreaSelected behavior
+     *
      * @return created ParametricPortrait instance
      */
     private ParametricPortrait getNewParametricPortraitInstance() {
-        return new ParametricPortrait(App.getTask().clone(), this.portraitProperties.clone());
+        return new ParametricPortrait(App.getTask().clone(), this.getPortraitProperties().clone());
     }
 
 
     /**
-     * calculate parametric portrait
+     * Calculate parametric portrait and show it on scene
      */
     @FXML
     private void calculate() {
@@ -513,63 +507,57 @@ public class ParametricPortraitTabController extends AbstractController {
             return;
         }
 
-        // disable controls
-//        primaryController.setCalculating(true);
-//        primaryController.mCalculationProgressBar.setProgress(0);
-//        setControlsDisable(true);
-//
-        // create new parametric portrait
+        // remove all PP Node
         parametricPortraitSection.getChildren().remove(shownParametricPortrait);
         this.shownParametricPortrait = null;
 
+        // TODO show preloader
+
+        // create new parametric portrait
         ParametricPortrait portrait = getNewParametricPortraitInstance();
-        portrait.calculate();
 
-        shownParametricPortrait = new ParametricPortraitNode(portrait);
-        parametricPortraitSection.getChildren().add(shownParametricPortrait);
-        this.updateShownParametricPortraitSize();
-
-
-        // TODO
-        /*javafx.concurrent.Task<Void> calculationTask = new javafx.concurrent.Task<Void>() {
+        // and calculate async
+        javafx.concurrent.Task<Void> calculationTask = new javafx.concurrent.Task<Void>() {
             @Override
             protected Void call() throws Exception {
                 try {
-                    Task commonTask = new Task();
-                    commonTask.setStates(states);
-                    commonTask.setTransitions(transitions);
-                    commonTask.setStepsCount(calculateStepsCount);
-                    commonTask.setStartPoint(0);
-                    commonTask.setParallel(primaryController.mParallel.isSelected());
-                    commonTask.setAllowNegative(false);
-                    //commonTask.setScale(taskScale);
-                    shownParametricPortrait.calculate(commonTask, instances, properties, startValues, endValues, stepsCnt, taskScale);
+                    portrait.calculate();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 return null;
             }
-
         };
 
-
         calculationTask.setOnSucceeded( (WorkerStateEvent event) -> {
-            // show parametric portrait
-            shownParametricPortrait.updateView();
-            showParametricPortraitOnScene(shownParametricPortrait);
+            Platform.runLater(() -> {
+                // TODO hide preloader
 
-            // add to history
-            stateSettingsGroup.add(shownParametricPortrait);
-            history.add(shownParametricPortrait);
-            history.select(0);
+                // update properties from PP props
+                this.setShownParametricPortraitNode(new ParametricPortraitNode(portrait));
 
-            // enable controls
-            setControlsDisable(false);
-            primaryController.setCalculating(false);
+                // push to history
+                this.history.push(shownParametricPortrait);
+                this.history.select(0);
+            });
         });
 
-
         new Thread(calculationTask).start();
-*/
+    }
+
+
+    /**
+     * Set currently shown ParametricPortraitNode
+     */
+    private void setShownParametricPortraitNode(ParametricPortraitNode node) {
+        // remove previous node
+        parametricPortraitSection.getChildren().clear();
+
+        // show new one
+        shownParametricPortrait = node;
+        parametricPortraitSection.getChildren().add(shownParametricPortrait);
+
+        // and force available size update
+        this.updateShownParametricPortraitSize();
     }
 }

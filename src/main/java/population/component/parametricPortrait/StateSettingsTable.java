@@ -10,7 +10,6 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.paint.Color;
 import population.component.UIComponents.ColorTableCell;
 import population.model.ColorGenerator.ColorGenerator;
-import population.model.ParametricPortrait.PortraitProperties;
 import population.model.ParametricPortrait.StateSetting;
 import population.model.StateModel.State;
 import population.model.TaskV4;
@@ -29,8 +28,7 @@ public class StateSettingsTable extends TableView<StateSetting> {
      * It usually should be global task instance
      */
     private final TaskV4 task;
-    /** Portrait properties which will be changed by this inputs */
-    private PortraitProperties portraitProperties;
+
     /** table model */
     private ObservableList<StateSetting> stateSettings;
 
@@ -68,6 +66,8 @@ public class StateSettingsTable extends TableView<StateSetting> {
         TableColumn<StateSetting, Color> colorColumn = new TableColumn<>(StringResource.getString("parametric_portrait_color_header"));
         colorColumn.setSortable(false);
         colorColumn.setPrefWidth(150);
+        // TODO set editable
+        colorColumn.setEditable(false);
         colorColumn.setCellFactory(param -> new ColorTableCell<>(colorColumn));
         colorColumn.setCellValueFactory(param -> param.getValue().colorProperty());
         colorColumn.setOnEditCommit(t -> {

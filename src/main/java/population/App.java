@@ -8,17 +8,11 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import population.util.Resources.AppResource;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 
 /**
@@ -69,7 +63,7 @@ public class App {
     protected static ObjectProperty<TaskV4> task =  new SimpleObjectProperty<>(new TaskV4());
 
 
-    protected static void initTask() {
+    private static void initTask() {
         ObservableList<State> states = FXCollections.observableList(new ArrayList<>(),
             (State s) -> new Observable[] {s.nameProperty()}
         );
@@ -104,6 +98,10 @@ public class App {
         return getTask().getTransitions();
     }
 
+
+    /**
+     * Set global task properties according to newTask
+     */
     public static void setTask(TaskV4 newTask) {
         TaskV4 t = task.get();
 

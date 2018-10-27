@@ -51,18 +51,6 @@ public class ParametricPortraitNode extends GridPane {
     private TaskCellGrid cellContainer;
 
     private ParametricPortrait parametricPortrait;
-    
-
-    /**
-     * transitions and states properties which can be chosen as parametric portrait property for certain axe
-     */
-    public enum Property {
-        PROBABILITY,
-        SOURCE_DELAY,
-        STATE_IN,
-        STATE_OUT,
-        COUNT
-    }
 
 
     public ParametricPortraitNode(ParametricPortrait parametricPortrait) {
@@ -92,6 +80,7 @@ public class ParametricPortraitNode extends GridPane {
         this.initAxesLabels();
         this.setAxesUnits();
         this.initConstraints();
+        this.redrawCells();
         this.updateSize();
     }
     
@@ -236,42 +225,88 @@ public class ParametricPortraitNode extends GridPane {
 
 
     /**
-     * redraw each cells in portrait node
+     * Redraw each cells in portrait node
      */
     public void redrawCells() {
-        this.cellContainer.redrawCells();
+        if (cellContainer.getTaskCells() == null)
+            return;
+
+        int maxSize = 1;
+        for (List<TaskCell> rowCells: cellContainer.getTaskCells()) {
+            for (TaskCell taskCell : rowCells) {
+                maxSize = Math.max(taskCell.getRequestedSize(), maxSize);
+            }
+        }
+
+        cellContainer.redrawCells();
     }
-
-
 
 
     /**
-     * update parametric portrait depending on task. Set grid, axes, size etc...
+     * @return snapshot of parametric portrait
      */
-
-/*
-    public void updateView() {
-        List<IntegerProperty> stepCounts = parametricPortrait.getProperties().getStepCounts();
-        cellContainer.updateGrid(stepCounts.get(0).get(), stepCounts.get(1).get());
-        
-        setAxesUnits();
-
-        List<ObjectProperty> instances = parametricPortrait.getUniqueTaskProperties().getInstances();
-        List<ObjectProperty<ParametricPortrait.Property>> properties = parametricPortrait.getUniqueTaskProperties().getUniqueTaskProperties();
-        xLabel.setText(ParametricPortrait.INSTANCE_STRING_CONVERTER.toString(instances.get(0).get()) + " : " + 
-            ParametricPortrait.PROPERTY_STRING_CONVERTER.toString(properties.get(0).get())
-        );
-        yLabel.setText(ParametricPortrait.INSTANCE_STRING_CONVERTER.toString(instances.get(1).get()) + " : " +
-            ParametricPortrait.PROPERTY_STRING_CONVERTER.toString(properties.get(1).get())
-        );
-        
-        updateParametricPortraitFill();
-        updateSize();
+    public WritableImage getThumbnail() {
+        return takeSnapshot(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, false);
     }
-*/
 
 
+    /**
+     * Make portrait snapshot
+     *
+     * @param width snapshot width
+     * @param height snapshot height
+     * @param withLabels should show labels on snapshot
+     */
+    protected WritableImage takeSnapshot(double width, double height, boolean withLabels) {
+        // set size of this to snapshot size to fit all elements right
+        double w = availableWidth.doubleValue(),
+            h = availableHeight.doubleValue();
 
+        // remove this from parent to resize it without any impact
+        Pane parent = (Pane)this.getParent();
+        if (parent != null)
+            parent.getChildren().remove(this);
+        setLabelsVisibility(withLabels);
+
+        // put parametric portrait in container for centered it
+        BorderPane container = new BorderPane(this);
+        container.setPadding(new Insets(0));
+        container.setStyle("-fx-background-color: transparent;");
+        new Scene(container, width, height, Color.TRANSPARENT);
+        container.applyCss();
+        container.layout();
+        setAvailableSize(width, height);
+        WritableImage snapshot = container.snapshot(new SnapshotParameters(), null);
+
+        // return this back to parent
+        container.getChildren().remove(this);
+        if (parent != null)
+            parent.getChildren().add(this);
+        setLabelsVisibility(true);
+
+        // restore initial size
+        setAvailableSize(w, h);
+
+        return snapshot;
+    }
+
+
+    /**
+     * Set labels visibility on portrait
+     * @param visible should be visible
+     */
+    private void setLabelsVisibility(boolean visible) {
+        double maxSize = visible ? Double.MAX_VALUE : 0;
+        xLabel.setVisible(visible);
+        yLabel.setVisible(visible);
+        xLabel.setMaxHeight(maxSize);
+        //yLabel.setMaxWidth(maxSize);
+    }
+
+
+    public ParametricPortrait getParametricPortrait() {
+        return parametricPortrait;
+    }
 
     /**************************
      *
@@ -280,31 +315,6 @@ public class ParametricPortraitNode extends GridPane {
      ***************************/
 
 /*
-    *
-     * updateView parametric portrait decoration
-
-    public void updateParametricPortraitFill() {
-        if (cellContainer.getTaskCells() == null)
-            return;
-
-        int maxSize = 1;
-        for (List<TaskCell> rowCells: cellContainer.getTaskCells())
-            for (TaskCell taskCell: rowCells)
-                maxSize = Math.max(taskCell.getRequestedSize(), maxSize);
-
-        for (List<TaskCell> rowCells: cellContainer.getTaskCells())
-            for (TaskCell taskCell: rowCells)
-                taskCell.setSquareSize(maxSize);
-
-        for (List<TaskCell> rowCells: cellContainer.getTaskCells()) {
-            for (TaskCell taskCell : rowCells) {
-                taskCell.fill();
-            }
-        }
-    }
-
-
-    *
      * set new property value to instance
      * @param instance instance (state or transition)
      * @param property changed property
@@ -350,7 +360,7 @@ public class ParametricPortraitNode extends GridPane {
 
     private List<Object> getInstancesByInstanceDescription(Object instance) {
         List<Object> instancesByDescription = new ArrayList<>();
-        instancesByDescription.add(instance);
+        instancesByDescription.push(instance);
 
         // TODO do it on id
         if (instance instanceof State) {
@@ -542,7 +552,7 @@ public class ParametricPortraitNode extends GridPane {
             for (int row = 0; row < stepsCnt.get(1); row++) {
                 final int finalRow = row, finalCol = col;
 
-                tasksCalculations.add(() -> {
+                tasksCalculations.push(() -> {
                     TaskCell taskCell = cellContainer.getTaskCells().get(finalRow).get(finalCol);
                     taskCell.setTask(getTask(new int[]{finalCol, stepsCnt.get(1) - finalRow - 1}));
                     taskCell.calculateTask(
@@ -620,7 +630,7 @@ public class ParametricPortraitNode extends GridPane {
         // return this back to parent
         container.getChildren().remove(this);
         if (parent != null)
-            parent.getChildren().add(this);
+            parent.getChildren().push(this);
         setLabelsVisibility(true);
 
         // restore initial size
@@ -629,14 +639,6 @@ public class ParametricPortraitNode extends GridPane {
         return snapshot;
     }
 
-
-    *
-     *
-     * @return snapshot of parametric portrait
-
-    public WritableImage getThumbnail() {
-        return takeSnapshot(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, false);
-    }
 
 
     public double getMaxPortraitHeight() {

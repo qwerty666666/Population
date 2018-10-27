@@ -12,7 +12,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
-import javafx.util.StringConverter;
 import population.model.ParametricPortrait.ParametricPortrait;
 import population.model.ParametricPortrait.PortraitProperties;
 import population.model.StateModel.State;
@@ -49,10 +48,12 @@ public class ParametricPortraitPropertiesNode extends HBox {
 
 
 
-    public ParametricPortraitPropertiesNode(TaskV4 task, int dimensions) {
+    public ParametricPortraitPropertiesNode(TaskV4 task) {
         super();
         this.task = task;
-        this.dimensions = dimensions;
+
+        this.portraitProperties = new PortraitProperties();
+        this.dimensions = this.portraitProperties.getDimensions();
 
         this.setLayout();
 
@@ -60,14 +61,10 @@ public class ParametricPortraitPropertiesNode extends HBox {
         this.initPropertiesComboBoxes();
         this.initTextFields();
 
+        this.setPortraitPropertiesValues(this.portraitProperties);
+
         task.getStates().addListener(updateInstanceListOnStateChangeListener);
         task.getTransitions().addListener(updateInstanceListOnTransitionChangeListener);
-    }
-
-
-    public void setPortraitProperties(PortraitProperties properties) {
-        this.portraitProperties = properties;
-        this.setValuesFromPortraitProperties();
     }
 
 
@@ -75,7 +72,7 @@ public class ParametricPortraitPropertiesNode extends HBox {
      * Set input values from portraitProperties.
      * Call this method only after this.task is the same as task associated with portraitProperties
      */
-    private void setValuesFromPortraitProperties() {
+    public void setPortraitPropertiesValues(PortraitProperties portraitProperties) {
         for (int i = 0; i < this.dimensions; i++) {
             this.instanceComboBoxes.get(i).getSelectionModel().select(portraitProperties.getInstances().get(i).get());
             this.propertyComboBoxes.get(i).getSelectionModel().select(portraitProperties.getProperties().get(i).get());
@@ -95,7 +92,7 @@ public class ParametricPortraitPropertiesNode extends HBox {
 
 
     /**
-     * bind changes from transitions to instanceList
+     * Bind changes from transitions to instanceList
      * (transitions placed immediately after states in instanceList)
      */
     private ListChangeListener<Object> updateInstanceListOnTransitionChangeListener = new ListChangeListener<Object>() {
@@ -133,7 +130,7 @@ public class ParametricPortraitPropertiesNode extends HBox {
 
 
     /**
-     * bind changes from task's states to instanceList
+     * Bind changes from task's states to instanceList
      * (states placed on firsts positions in instanceList)
      */
     private ListChangeListener<Object> updateInstanceListOnStateChangeListener = new ListChangeListener<Object>() {
@@ -169,7 +166,7 @@ public class ParametricPortraitPropertiesNode extends HBox {
 
 
     /**
-     * bind properties shown in instance ComboBoxes to global task
+     * Bind properties shown in instance ComboBoxes to global task
      */
     private void initInstancesComboBoxes() {
         // instances shown in ComboBoxes
@@ -209,7 +206,7 @@ public class ParametricPortraitPropertiesNode extends HBox {
 
 
     /**
-     * add values to properties ComboBoxes
+     * Add values to properties ComboBoxes
      */
     private void initPropertiesComboBoxes() {
         final ObservableList<ParametricPortrait.Property> transitionChooseList = FXCollections.observableArrayList(
@@ -356,5 +353,10 @@ public class ParametricPortraitPropertiesNode extends HBox {
 
         node.setMaxWidth(Double.MAX_VALUE);
         gridPane.add(node, 1, row);
+    }
+
+
+    public PortraitProperties getPortraitProperties() {
+        return portraitProperties;
     }
 }

@@ -28,7 +28,7 @@ public class StateSetting implements Cloneable<StateSetting> {
         this.setColor(colorGenerator.getNext());
     }
 
-    protected StateSetting() {}
+    private StateSetting() {}
 
     public ObjectProperty<State> stateProperty() {
         return state;
