@@ -1,5 +1,6 @@
 package population.controller.Calculation;
 
+import javafx.scene.control.*;
 import population.component.ChartSeries;
 import population.component.TickLabelFormatter;
 import population.controller.base.AbstractController;
@@ -17,13 +18,9 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
-import javafx.scene.chart.Chart;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.layout.AnchorPane;
@@ -60,6 +57,11 @@ public class ResultChartController extends AbstractController {
     private LineChart<Number, Number> resultsChart;
     @FXML
     private AnchorPane resultsChartContainer;
+
+    @FXML
+    private TabPane calculationTabPane;
+    @FXML
+    private Tab calculationChartTab;
 
     protected ObservableList<ChartSeries> seriesData = FXCollections.observableArrayList();
     protected boolean isZoomingChart = false;
@@ -442,7 +444,7 @@ public class ResultChartController extends AbstractController {
      *************************************************/
 
     @FXML
-    protected void clear() {
+    public void clear() {
         this.seriesData.clear();
         this.resetResultsChartScale();
     }
@@ -498,5 +500,10 @@ public class ResultChartController extends AbstractController {
                     return chartSeries;
                 })
                 .collect(Collectors.toList());
+    }
+
+
+    public void openChartTab() {
+        this.calculationTabPane.getSelectionModel().select(this.calculationChartTab);
     }
 }

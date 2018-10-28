@@ -51,7 +51,7 @@
                         <fx:include source="Task/Transitions.fxml"/>
                     </content>
                 </Tab>
-                <Tab text="%Calculations.TabName">
+                <Tab fx:id="calculationTab" text="%Calculations.TabName">
                     <content>
                         <fx:include source="Calculation/Calculation.fxml"/>
                     </content>

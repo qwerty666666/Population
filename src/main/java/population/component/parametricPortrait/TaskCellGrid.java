@@ -1,10 +1,15 @@
 package population.component.parametricPortrait;
 
-import javafx.collections.ListChangeListener;
+import javafx.geometry.Insets;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import population.App;
 import population.model.ParametricPortrait.ParametricPortrait;
-import population.model.ParametricPortrait.StateSetting;
+import population.model.ParametricPortrait.PortraitProperties;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +28,6 @@ public class TaskCellGrid extends GridPane {
 
     private ParametricPortrait portrait;
 
-    private ParametricPortraitNode.SubareaSelectedCallback SubareaSelectedCallback = null;
-
 
     TaskCellGrid(ParametricPortrait portrait) {
         this.portrait = portrait;
@@ -36,18 +39,24 @@ public class TaskCellGrid extends GridPane {
     }
 
 
+    /**
+     * Init grid subarea selection
+     */
     private void initOverlay() {
-        /*overlay.setBackground(new Background(new BackgroundFill(new Color(177./255, 208./255, 255./255, 0.5),
+        overlay.setBackground(new Background(new BackgroundFill(new Color(177./255, 208./255, 255./255, 0.5),
             CornerRadii.EMPTY, Insets.EMPTY)));
         overlay.setBorder(new Border(new BorderStroke(new Color(0./255, 100./255, 255./255, 0.2),
             BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
 
+        // change subarea size and position on mouse dragged
         this.setOnMouseDragged(event -> {
             if (event.getButton() == MouseButton.PRIMARY) {
                 int endX = getColumnByXCoord(event.getX());
                 int endY = getRowByYCoord(event.getY());
-                int startX = dragStartX, startY = dragStartY;
+                int startX = dragStartX;
+                int startY = dragStartY;
 
+                // swap values if necessary
                 if (startX > endX) {
                     startX = endX;
                     endX = dragStartX;
@@ -56,11 +65,14 @@ public class TaskCellGrid extends GridPane {
                     startY = endY;
                     endY = dragStartY;
                 }
+
+                // set overlay size
                 int spanX = endX - startX + 1;
                 int spanY = endY - startY + 1;
                 overlay.setMaxWidth(taskCells.get(startY).get(startX).getWidth() * spanX);
                 overlay.setMaxHeight(taskCells.get(startY).get(startX).getHeight() * spanY);
 
+                // and set overlay to new position
                 this.getChildren().remove(overlay);
                 this.add(overlay, startX, startY, spanX, spanY);
             }
@@ -74,47 +86,49 @@ public class TaskCellGrid extends GridPane {
             }
         });
 
+        // on mouse released get new parametric portrait parameters and calculate it
         this.setOnMouseReleased(event -> {
             if (event.getButton() == MouseButton.PRIMARY) {
                 this.getChildren().remove(overlay);
 
-                if (SubareaSelectedCallback != null) {
-                    // get new parametric portrait bounds
-                    int endX = getColumnByXCoord(event.getX());
-                    int endY = getRowByYCoord(event.getY());
-                    if (dragStartX == endX && dragStartY == endY)
-                        return;
+                // get new parametric portrait bounds
+                int endX = getColumnByXCoord(event.getX());
+                int endY = getRowByYCoord(event.getY());
+                if (dragStartX == endX || dragStartY == endY) {
+                    return;
+                }
 
-                    PortraitProperties props = this.portrait.getUniqueTaskProperties();
+                PortraitProperties props = this.portrait.getProperties().clone();
 
-                    List<Double> start = Arrays.asList(
-                        getValueOnStep(props.getStartValues().get(0).get(), props.getStepDeltas().get(0).get(), Math.min(dragStartX, endX))
-                            .setScale(5, RoundingMode.HALF_UP).doubleValue(),
-                        getValueOnStep(props.getStartValues().get(1).get(), props.getStepDeltas().get(1).get(),
-                            Math.min(props.getStepCounts().get(1).get() - dragStartY - 1, props.getStepCounts().get(1).get() - endY - 1))
-                            .setScale(5, RoundingMode.HALF_UP).doubleValue()
-                    );
-                    List<Double> end = Arrays.asList(
-                        getValueOnStep(props.getStartValues().get(0).get(), props.getStepDeltas().get(0).get(), Math.max(dragStartX, endX))
-                            .setScale(5, RoundingMode.HALF_UP).doubleValue(),
-                        getValueOnStep(props.getStartValues().get(1).get(), props.getStepDeltas().get(1).get(),
-                            Math.max(props.getStepCounts().get(1).get() - dragStartY - 1, props.getStepCounts().get(1).get() - endY - 1))
-                            .setScale(5, RoundingMode.HALF_UP).doubleValue()
-                    );
-                    // TODO
-                    /*List<Integer> steps = getListDeepCopy(stepsCnt);
-                    for (int i = 0; i < start.size(); i++) {
-                        if (start.get(i).equals(end.get(i)))
-                            steps.set(i, 1);
-                    }
+                // replace start value and step delta with new values
+                double minXValue = this.portrait.getPropertyValueOnStep(0, Math.min(dragStartX, endX));
+                double maxXValue = this.portrait.getPropertyValueOnStep(0, Math.max(dragStartX, endX));
+                double xStepDelta = new BigDecimal((maxXValue - minXValue) / (props.getStepCounts().get(0).get() - 1))
+                    .setScale(5, RoundingMode.HALF_UP)
+                    .doubleValue();
 
-                    ParametricPortraitNode parametricPortrait = new ParametricPortraitNode();
-                    parametricPortrait.setParameters(commonTask, instances, properties, start, end, steps, scale);
+                double minYValue = this.portrait.getPropertyValueOnStep(1, Math.min(
+                    this.portrait.getRowCount() - dragStartY - 1,
+                    this.portrait.getRowCount() - endY - 1
+                ));
+                double maxYValue = this.portrait.getPropertyValueOnStep(1, Math.max(
+                    this.portrait.getRowCount() - dragStartY - 1,
+                    this.portrait.getRowCount() - endY - 1
+                ));
+                double yStepDelta = new BigDecimal((maxYValue - minYValue) / (props.getStepCounts().get(1).get() - 1))
+                    .setScale(5, RoundingMode.HALF_UP)
+                    .doubleValue();
 
-                    SubareaSelectedCallback.selected(parametricPortrait);*/
-                /*}
+                props.getStartValues().get(0).set(minXValue);
+                props.getStepDeltas().get(0).set(xStepDelta);
+                props.getStartValues().get(1).set(minYValue);
+                props.getStepDeltas().get(1).set(yStepDelta);
+
+                // and calculate new parametric portrait
+                App.setParametricPortraitEnviroment(new ParametricPortrait(this.portrait.getTask(), props));
+                App.calculateParametricPortrait();
             }
-        });*/
+        });
     }
 
 

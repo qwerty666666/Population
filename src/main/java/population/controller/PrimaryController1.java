@@ -36,11 +36,14 @@ import java.util.*;
 
 public class PrimaryController1 extends AbstractController {
     @FXML
-    protected HBox debugPanel;
-    protected File taskFile = null;
-
+    private HBox debugPanel;
     @FXML
     private TabPane mainTabPane;
+    @FXML
+    protected Tab calculationTab;
+
+    private File taskFile = null;
+
 
     private FileChooser getTaskFileChooser(String title) {
         FileChooser fileChooser = getFileChooser(title);
@@ -111,7 +114,8 @@ public class PrimaryController1 extends AbstractController {
     }
 
 
-    public void openTask() {
+    @FXML
+    private void openTask() {
         File file = getTaskFileChooser(getString("App.OpenTaskDialogTitle"))
                 .showOpenDialog(this.getStage().getScene().getWindow());
         openTaskFromFile(file);
@@ -201,5 +205,11 @@ public class PrimaryController1 extends AbstractController {
             application.showAlert(resources.getString("TopMenu.Lang"), null,
                     resources.getString("App.ChangeLang.Info"), Alert.AlertType.INFORMATION);
         }
+    }
+
+
+
+    public void openCalculationTab() {
+        this.mainTabPane.getSelectionModel().select(this.calculationTab);
     }
 }

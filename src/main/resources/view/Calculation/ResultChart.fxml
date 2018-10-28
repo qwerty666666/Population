@@ -17,13 +17,14 @@
 <TabPane xmlns="http://javafx.com/javafx/8.0.71"
          xmlns:fx="http://javafx.com/fxml/1"
          fx:controller="population.controller.Calculation.ResultChartController"
+         fx:id="calculationTabPane"
          layoutY="68.0" prefHeight="395.0" prefWidth="870.0"
          side="BOTTOM"
          tabClosingPolicy="UNAVAILABLE"
          AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="66.0"
 >
     <tabs>
-        <Tab text="%Calculations.ResultChart.TabName">
+        <Tab fx:id="calculationChartTab" text="%Calculations.ResultChart.TabName">
             <content>
                 <AnchorPane fx:id="resultsChartContainer">
                     <children>

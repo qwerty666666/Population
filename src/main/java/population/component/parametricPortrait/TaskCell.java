@@ -1,12 +1,13 @@
 package population.component.parametricPortrait;
 
 import javafx.geometry.Insets;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
-import population.component.Calculator;
+import population.App;
 import population.model.ParametricPortrait.ParametricPortrait;
 import population.model.StateModel.State;
 
@@ -49,28 +50,14 @@ public class TaskCell extends GridPane {
 
         this.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
 
+        // open cell task on mouse clicked
         this.setOnMouseClicked(event -> {
-            // TODO
-            /*if (task == null || primaryController.isCalculating())
-                return;
-
             if (event.getButton() == MouseButton.SECONDARY) {
-                // clear graphic and table
-                primaryController.clearResultsTable();
-                primaryController.clearResultsChart();
-                // open graphic tab
-                primaryController.mCalculationsTabPane.getSelectionModel().select(
-                    primaryController.mResultChartTab);
-                // save portrait properties selections because they losed when set new task to primaryController
-                //Map<ComboBox, Integer> selections = primaryController.mParametricPortraitTabController.getSelectionModel();
-                // need set task steps - 1 because of steps increase in PrimaryController validation
-                Task task = this.getTask();
-                task.setStepsCount(task.getStepsCount() - 1);
-                primaryController.setTask(this.getTask());
-                task.setStepsCount(task.getStepsCount() + 1);
-                primaryController.calculateTask(task);
-                //primaryController.mParametricPortraitTabController.setSelectionModel(selections);
-            }*/
+                App.clearCalculationEnvironment();
+                App.setTask(this.portrait.getTask(row, col));
+                App.openChartTab();
+                App.calculateTask();
+            }
         });
     }
 
@@ -235,7 +222,7 @@ public class TaskCell extends GridPane {
             }*/
         List<List<State>> aliveStates = this.portrait.getCalculationResult(this.row, this.col);
         // FILL BY PROPORTION
-        if (aliveStates.size() == 0) {
+        if (aliveStates == null || aliveStates.size() == 0) {
             return;
         }
 

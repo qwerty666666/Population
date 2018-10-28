@@ -17,6 +17,8 @@
  */
 package population;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.stage.WindowEvent;
@@ -183,14 +185,14 @@ public final class PopulationApplication extends Application {
         mPrimaryStage.setTitle(StringResource.getString("application_name"));
         mPrimaryStage.setMinWidth(PRIMARY_STAGE_MIN_WIDTH);
         mPrimaryStage.setMinHeight(PRIMARY_STAGE_MIN_HEIGHT);
-        mPrimaryStage.getIcons()
-                .add(new Image(getClass().getResourceAsStream("resource/images/icon.png")));
-        FXMLLoader sceneLoader =
-                new FXMLLoader(getClass().getResource("resource/view/PrimaryView.fxml"),
-                        StringResource.getBundle());
+        mPrimaryStage.getIcons().add(new Image(getClass().getResourceAsStream("resource/images/icon.png")));
+
+        FXMLLoader sceneLoader = new FXMLLoader(getClass().getResource("resource/view/PrimaryView.fxml"), StringResource.getBundle());
+        Injector injector = Guice.createInjector(new GuiceModule());
+
         sceneLoader.setControllerFactory(controllerClass -> {
             try {
-                Object controller = controllerClass.newInstance();
+                Object controller = injector.getInstance(controllerClass);
                 if (controller instanceof AbstractController) {
                     AbstractController abstractController = (AbstractController) controller;
                     abstractController.setApplication(PopulationApplication.this);
@@ -201,7 +203,7 @@ public final class PopulationApplication extends Application {
                 }
                 App.setController(controllerClass, controller);
                 return controller;
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
@@ -251,8 +253,6 @@ public final class PopulationApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-
-
         Thread.currentThread().setUncaughtExceptionHandler(mUncaughtExceptionHandler);
         loadSettings();
         initializeSettings();

@@ -7,6 +7,8 @@ import population.model.TaskV4;
 import population.model.TransitionModel.Transition;
 import population.util.Resources.StringResource;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -147,6 +149,9 @@ public class ParametricPortrait {
      * @return calculation cell result
      */
     public List<List<State>> getCalculationResult(int row, int col) {
+        if (this.calculationResult.size() <= row || this.calculationResult.get(row).size() <= col) {
+            return null;
+        }
         return this.calculationResult.get(row).get(col);
     }
 
@@ -185,13 +190,17 @@ public class ParametricPortrait {
 
 
     /**
-     *
      * @param propertyIndex index of property in this properties
      * @param step step index
      * @return value of property on step
      */
-    protected double getPropertyValueOnStep(int propertyIndex, int step) {
-        return this.properties.getStartValues().get(propertyIndex).get() +
+    public double getPropertyValueOnStep(int propertyIndex, int step) {
+        double res = this.properties.getStartValues().get(propertyIndex).get() +
             this.properties.getStepDeltas().get(propertyIndex).get() * step;
+
+        // round value
+        return new BigDecimal(res)
+            .setScale(5, RoundingMode.HALF_UP)
+            .doubleValue();
     }
 }

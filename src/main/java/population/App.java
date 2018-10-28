@@ -1,5 +1,11 @@
 package population;
 
+import population.controller.Calculation.CalculationController;
+import population.controller.Calculation.ResultChartController;
+import population.controller.Calculation.ResultTableController;
+import population.controller.ParametricPortraitTabController;
+import population.controller.PrimaryController1;
+import population.model.ParametricPortrait.ParametricPortrait;
 import population.model.StateModel.State;
 import population.model.TaskV4;
 import population.model.TransitionModel.Transition;
@@ -33,6 +39,43 @@ public class App {
         return AppResource.getString("version");
     }
 
+    /**
+     * Clear calculation graphic and table
+     */
+    public static void clearCalculationEnvironment() {
+        App.getResultChartController().clear();
+        App.getResultTableController().clear();
+    }
+
+    /**
+     * Open chart tab
+     */
+    public static void openChartTab() {
+        App.getPrimaryController().openCalculationTab();
+        App.getResultChartController().openChartTab();
+    }
+
+    /**
+     * Calculate global task
+     */
+    public static void calculateTask() {
+        App.getCalculationController().calculate();
+    }
+
+    /**
+     * Set application task and portrait properties from given portrait
+     */
+    public static void setParametricPortraitEnviroment(ParametricPortrait parametricPortrait) {
+        App.getParametricPortraitController().setEnvironmentByParametricPortrait(parametricPortrait);
+    }
+
+    /**
+     * Calculate parametric portrait and show it on scene
+     */
+    public static void calculateParametricPortrait() {
+        App.getParametricPortraitController().calculate();
+    }
+
 
     /************************************************
      *
@@ -49,6 +92,29 @@ public class App {
         controllers.put(classType, controller);
     }
 
+    private static Object getController(Class classType) {
+        return controllers.get(classType);
+    }
+
+    public static PrimaryController1 getPrimaryController() {
+        return (PrimaryController1)App.getController(PrimaryController1.class);
+    }
+
+    public static ResultChartController getResultChartController() {
+        return (ResultChartController)App.getController(ResultChartController.class);
+    }
+
+    public static ResultTableController getResultTableController() {
+        return (ResultTableController)App.getController(ResultTableController.class);
+    }
+
+    public static CalculationController getCalculationController() {
+        return (CalculationController)App.getController(CalculationController.class);
+    }
+
+    public static ParametricPortraitTabController getParametricPortraitController() {
+        return (ParametricPortraitTabController)App.getController(ParametricPortraitTabController.class);
+    }
 
     /************************************************
      *

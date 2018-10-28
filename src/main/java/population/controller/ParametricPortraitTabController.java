@@ -473,7 +473,7 @@ public class ParametricPortraitTabController extends AbstractController {
      *
      * @param parametricPortrait parametric portrait
      */
-    private void setEnvironmentByParametricPortrait(ParametricPortrait parametricPortrait) {
+    public void setEnvironmentByParametricPortrait(ParametricPortrait parametricPortrait) {
         // TODO remove it and set colors from portrait properties state
         this.stateSettingsTable.setColorGenerator(new SimpleColorGenerator());
 
@@ -502,7 +502,7 @@ public class ParametricPortraitTabController extends AbstractController {
      * Calculate parametric portrait and show it on scene
      */
     @FXML
-    private void calculate() {
+    public void calculate() {
         if (!validateUserInput()) {
             return;
         }
