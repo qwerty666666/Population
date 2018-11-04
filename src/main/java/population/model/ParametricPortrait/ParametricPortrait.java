@@ -1,5 +1,7 @@
 package population.model.ParametricPortrait;
 
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.util.StringConverter;
 import population.model.Exception.ParametricPortrait.UnsupportedParametricPortraitProperty;
 import population.model.StateModel.State;
@@ -19,6 +21,8 @@ public class ParametricPortrait {
     private TaskV4 task;
     /** grid of portrait cells [row][col] */
     private List<List<List<List<State>>>> calculationResult = new ArrayList<>();
+    /** progress of calculation [0..1] */
+    private ReadOnlyDoubleWrapper calculationProgress = new ReadOnlyDoubleWrapper(0);
 
 
     /**
@@ -140,6 +144,8 @@ public class ParametricPortrait {
                 );
                 calculator.calculate();
                 rowResults.add(((SimpleParametricPortraitCalculator) calculator).getCalculationResult());
+
+                this.calculationProgress.set((double)(row * this.getColCount() + col) / (this.getRowCount() * this.getColCount()));
             }
         }
     }
@@ -202,5 +208,13 @@ public class ParametricPortrait {
         return new BigDecimal(res)
             .setScale(5, RoundingMode.HALF_UP)
             .doubleValue();
+    }
+
+
+    /**
+     * @return progress of calculation [0..1]
+     */
+    public ReadOnlyDoubleProperty calculationProgressProperty() {
+        return this.calculationProgress.getReadOnlyProperty();
     }
 }

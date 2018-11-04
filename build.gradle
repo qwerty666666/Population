@@ -21,25 +21,29 @@ ext {
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 
 dependencies {
     testImplementation (
-            'org.junit.jupiter:junit-jupiter-api:5.2.0',
-            'org.junit.jupiter:junit-jupiter-params:5.2.0'
+        'org.junit.jupiter:junit-jupiter-api:5.2.0',
+        'org.junit.jupiter:junit-jupiter-params:5.2.0'
     )
     testRuntimeOnly (
-            'org.junit.jupiter:junit-jupiter-engine:5.2.0'
+        'org.junit.jupiter:junit-jupiter-engine:5.2.0'
     )
-    implementation 'com.google.inject:guice:4.1.0'
+    implementation (
+        'com.google.inject:guice:4.1.0',
+        'com.github.torakiki:fx-progress-circle:98eb6efa6c'
+    )
 }
 
 
 jar {
     manifest {
         attributes(
-                'Main-Class': 'population.PopulationApplication'
+            'Main-Class': 'population.PopulationApplication'
         )
     }
 }

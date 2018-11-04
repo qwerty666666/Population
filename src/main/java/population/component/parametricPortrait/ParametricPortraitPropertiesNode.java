@@ -80,6 +80,9 @@ public class ParametricPortraitPropertiesNode extends HBox {
             this.stepDeltaValueTextFields.get(i).setText(Converter.DOUBLE_STRING_CONVERTER.toString(portraitProperties.getStepDeltas().get(i).get()));
             this.stepCountTextFields.get(i).setText(Integer.toString(portraitProperties.getStepCounts().get(i).get()));
         }
+
+        this.portraitProperties.stateSettingProperty().clear();
+        this.portraitProperties.stateSettingProperty().addAll(portraitProperties.stateSettingProperty());
     }
 
 

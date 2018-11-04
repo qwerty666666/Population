@@ -9,6 +9,7 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import population.App;
 import population.model.ParametricPortrait.ParametricPortrait;
+import population.model.ParametricPortrait.PortraitProperties;
 import population.model.StateModel.State;
 
 import java.util.List;
@@ -53,8 +54,13 @@ public class TaskCell extends GridPane {
         // open cell task on mouse clicked
         this.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.SECONDARY) {
+                PortraitProperties portraitProperties = App.getParametricPortraitController().getPortraitProperties().clone();
+
                 App.clearCalculationEnvironment();
                 App.setTask(this.portrait.getTask(row, col));
+
+                App.getParametricPortraitController().setPortraitPropertiesValues(portraitProperties);
+
                 App.openChartTab();
                 App.calculateTask();
             }

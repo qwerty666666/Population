@@ -1,7 +1,10 @@
 package population.controller;
 
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.WorkerStateEvent;
+import javafx.scene.Node;
+import org.pdfsam.ui.FillProgressIndicator;
 import population.App;
 import population.component.parametricPortrait.History.History;
 import population.model.ParametricPortrait.ParametricPortrait;
@@ -14,7 +17,6 @@ import population.controller.base.AbstractController;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
 
@@ -25,8 +27,6 @@ public class ParametricPortraitTabController extends AbstractController {
 
     @FXML
     private SplitPane rootSplitPane;
-    @FXML
-    private Button calculateButton;
     @FXML
     private VBox propertiesSection;
     @FXML
@@ -72,7 +72,7 @@ public class ParametricPortraitTabController extends AbstractController {
     /**
      * @return PortraitProperties binded to this.propertiesNode
      */
-    private PortraitProperties getPortraitProperties() {
+    public PortraitProperties getPortraitProperties() {
         return this.propertiesNode.getPortraitProperties();
     }
 
@@ -481,10 +481,18 @@ public class ParametricPortraitTabController extends AbstractController {
         App.setTask(parametricPortrait.getTask());
 
         // set properties from parametricPortrait
-        this.propertiesNode.setPortraitPropertiesValues(parametricPortrait.getProperties());
+        this.setPortraitPropertiesValues(parametricPortrait.getProperties());
 
         // show PP Node
         this.setShownParametricPortraitNode(new ParametricPortraitNode(parametricPortrait));
+    }
+
+
+    /**
+     * Set values in properties node from passed properties
+     */
+    public void setPortraitPropertiesValues(PortraitProperties properties) {
+        this.propertiesNode.setPortraitPropertiesValues(properties);
     }
 
 
@@ -511,15 +519,18 @@ public class ParametricPortraitTabController extends AbstractController {
         parametricPortraitSection.getChildren().remove(shownParametricPortrait);
         this.shownParametricPortrait = null;
 
-        // TODO show preloader
-
         // create new parametric portrait
         ParametricPortrait portrait = getNewParametricPortraitInstance();
+
+        // show preloader
+        Node preloader = this.getPreloader(portrait);
+        this.parametricPortraitSection.getChildren().clear();
+        this.parametricPortraitSection.getChildren().add(preloader);
 
         // and calculate async
         javafx.concurrent.Task<Void> calculationTask = new javafx.concurrent.Task<Void>() {
             @Override
-            protected Void call() throws Exception {
+            protected Void call() {
                 try {
                     portrait.calculate();
                 } catch (Exception e) {
@@ -531,7 +542,8 @@ public class ParametricPortraitTabController extends AbstractController {
 
         calculationTask.setOnSucceeded( (WorkerStateEvent event) -> {
             Platform.runLater(() -> {
-                // TODO hide preloader
+                // hide preloader
+                this.parametricPortraitSection.getChildren().remove(preloader);
 
                 // update properties from PP props
                 this.setShownParametricPortraitNode(new ParametricPortraitNode(portrait));
@@ -543,6 +555,32 @@ public class ParametricPortraitTabController extends AbstractController {
         });
 
         new Thread(calculationTask).start();
+    }
+
+
+    /**
+     * Creates preloader and binds its progress property to portrait calculation progress
+     *
+     * @return preloader instance
+     */
+    private Node getPreloader(ParametricPortrait portrait) {
+        FillProgressIndicator indicator = new FillProgressIndicator();
+
+        portrait.calculationProgressProperty().addListener(new ChangeListener<Number>() {
+            private int prevValue = 0;
+
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                // update only when value changed
+                int newVal = (int)(newValue.doubleValue() * 100);
+                if (newVal != this.prevValue) {
+                    this.prevValue = newVal;
+                    Platform.runLater(() -> indicator.setProgress(newVal));
+                }
+            }
+        });
+
+        return indicator;
     }
 
 
