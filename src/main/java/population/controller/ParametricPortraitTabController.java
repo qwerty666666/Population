@@ -1,5 +1,6 @@
 package population.controller;
 
+import com.google.inject.Inject;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.WorkerStateEvent;
@@ -7,10 +8,12 @@ import javafx.scene.Node;
 import org.pdfsam.ui.FillProgressIndicator;
 import population.App;
 import population.component.parametricPortrait.History.History;
+import population.component.parametricPortrait.ParametricPortraitSubareaSelectListener;
 import population.model.ParametricPortrait.ParametricPortrait;
 import population.component.parametricPortrait.ParametricPortraitNode;
 import population.component.parametricPortrait.ParametricPortraitPropertiesNode;
 import population.component.parametricPortrait.StateSettingsTable;
+import population.model.ParametricPortrait.ParametricPortraitCalculatorFactory;
 import population.model.ParametricPortrait.PortraitProperties;
 import population.model.ColorGenerator.SimpleColorGenerator;
 import population.controller.base.AbstractController;
@@ -19,6 +22,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
+import population.model.TaskV4;
 
 
 public class ParametricPortraitTabController extends AbstractController {
@@ -50,6 +54,9 @@ public class ParametricPortraitTabController extends AbstractController {
     private StateSettingsTable stateSettingsTable;
 
     private History history;
+
+    @Inject
+    private ParametricPortraitCalculatorFactory parametricPortraitCalculatorFactory;
 
 
     /*********************************
@@ -165,14 +172,13 @@ public class ParametricPortraitTabController extends AbstractController {
         initPropertiesSection();
         initParametricPortraitSection();
         initHistory();
-//
+
         Platform.runLater(() ->
                 rootSplitPane.setDividerPositions(
                         history.getMinWidth() / rootSplitPane.getWidth(),
                         1 - propertiesSection.getMinWidth() / rootSplitPane.getWidth())
         );
-//
-//
+
         if (getApplication().IS_DEVELOP) {
 
         }
@@ -473,7 +479,7 @@ public class ParametricPortraitTabController extends AbstractController {
      *
      * @param parametricPortrait parametric portrait
      */
-    public void setEnvironmentByParametricPortrait(ParametricPortrait parametricPortrait) {
+    private void setEnvironmentByParametricPortrait(ParametricPortrait parametricPortrait) {
         // TODO remove it and set colors from portrait properties state
         this.stateSettingsTable.setColorGenerator(new SimpleColorGenerator());
 
@@ -484,7 +490,7 @@ public class ParametricPortraitTabController extends AbstractController {
         this.setPortraitPropertiesValues(parametricPortrait.getProperties());
 
         // show PP Node
-        this.setShownParametricPortraitNode(new ParametricPortraitNode(parametricPortrait));
+        this.setShownParametricPortraitNode(this.createParametricPortraitNode(parametricPortrait));
     }
 
 
@@ -502,7 +508,11 @@ public class ParametricPortraitTabController extends AbstractController {
      * @return created ParametricPortrait instance
      */
     private ParametricPortrait getNewParametricPortraitInstance() {
-        return new ParametricPortrait(App.getTask().clone(), this.getPortraitProperties().clone());
+        return new ParametricPortrait(
+            App.getTask().clone(),
+            this.getPortraitProperties().clone(),
+            parametricPortraitCalculatorFactory
+        );
     }
 
 
@@ -546,7 +556,7 @@ public class ParametricPortraitTabController extends AbstractController {
                 this.parametricPortraitSection.getChildren().remove(preloader);
 
                 // update properties from PP props
-                this.setShownParametricPortraitNode(new ParametricPortraitNode(portrait));
+                this.setShownParametricPortraitNode(this.createParametricPortraitNode(portrait));
 
                 // push to history
                 this.history.push(shownParametricPortrait);
@@ -597,5 +607,20 @@ public class ParametricPortraitTabController extends AbstractController {
 
         // and force available size update
         this.updateShownParametricPortraitSize();
+    }
+
+
+    private ParametricPortraitSubareaSelectListener subareaSelectListener = new ParametricPortraitSubareaSelectListener() {
+        @Override
+        public void onSubareaSelected(TaskV4 task, PortraitProperties props) {
+            setEnvironmentByParametricPortrait(new ParametricPortrait(task, props, parametricPortraitCalculatorFactory));
+            calculate();
+        }
+    };
+
+    private ParametricPortraitNode createParametricPortraitNode(ParametricPortrait portrait) {
+        ParametricPortraitNode node = new ParametricPortraitNode(portrait);
+        node.addSubareaSelectedListener(subareaSelectListener);
+        return node;
     }
 }

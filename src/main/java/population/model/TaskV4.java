@@ -7,6 +7,7 @@ import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import population.util.ListUtils;
 
+import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -21,6 +22,18 @@ public class TaskV4 {
     protected IntegerProperty stepsCount = new SimpleIntegerProperty(0);
     protected BooleanProperty isAllowNegative = new SimpleBooleanProperty(false);
 
+
+    public TaskV4() {
+        this.id = ID_COUNTER.incrementAndGet();
+    }
+
+
+    /************************
+     *
+     *  allow negative prop
+     *
+     ************************/
+
     public boolean getIsAllowNegative() {
         return isAllowNegative.get();
     }
@@ -33,9 +46,12 @@ public class TaskV4 {
         return this.isAllowNegative;
     }
 
-    public TaskV4() {
-        this.id = ID_COUNTER.incrementAndGet();
-    }
+
+    /************************
+     *
+     *       name prop
+     *
+     ************************/
 
     public String getName() {
         return name.get();
@@ -49,6 +65,13 @@ public class TaskV4 {
         this.name.set(name);
     }
 
+
+    /************************
+     *
+     *       states prop
+     *
+     ************************/
+
     public ObservableList<State> getStates() {
         return states;
     }
@@ -56,6 +79,13 @@ public class TaskV4 {
     public void setStates(ObservableList<State> states) {
         this.states = states;
     }
+
+
+    /************************
+     *
+     *    transitions prop
+     *
+     ************************/
 
     public ObservableList<Transition> getTransitions() {
         return transitions;
@@ -65,17 +95,31 @@ public class TaskV4 {
         this.transitions = transitions;
     }
 
+
+    /************************
+     *
+     *    start point prop
+     *
+     ************************/
+
     public int getStartPoint() {
         return startPoint.get();
+    }
+
+    public void setStartPoint(int startPoint) {
+        this.startPoint.set(startPoint);
     }
 
     public IntegerProperty startPointProperty() {
         return startPoint;
     }
 
-    public void protectedStartPoint(int startPoint) {
-        this.startPoint.set(startPoint);
-    }
+
+    /************************
+     *
+     *    steps count prop
+     *
+     ************************/
 
     public int getStepsCount() {
         return stepsCount.get();
@@ -83,10 +127,6 @@ public class TaskV4 {
 
     public IntegerProperty stepsCountProperty() {
         return stepsCount;
-    }
-
-    public void setStartPoint(int startPoint) {
-        this.startPoint.set(startPoint);
     }
 
     public void setStepsCount(int stepsCount) {
@@ -135,5 +175,14 @@ public class TaskV4 {
             .filter(state -> state.getId() == id)
             .findFirst()
             .orElse(null);
+    }
+
+
+    public int getMaxDelay() {
+         return this.transitions.stream()
+             .flatMap(transition -> transition.getActualStates().stream())
+             .map(StateInTransition::getDelay)
+             .max(Comparator.comparingInt(o -> o))
+             .orElse(0);
     }
 }

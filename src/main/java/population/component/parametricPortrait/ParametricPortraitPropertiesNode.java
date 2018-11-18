@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
@@ -24,7 +25,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ParametricPortraitPropertiesNode extends HBox {
+public class ParametricPortraitPropertiesNode extends VBox {
+    private final int DEFAULT_PRECISION_VALUE = 3;
+
     /** dimension of the parametric portrait */
     private final int dimensions;
     /**
@@ -44,6 +47,7 @@ public class ParametricPortraitPropertiesNode extends HBox {
     private List<TextField> stepCountTextFields = new ArrayList<>();
     private List<ComboBox<Object>> instanceComboBoxes = new ArrayList<>();
     private List<ComboBox<ParametricPortrait.Property>> propertyComboBoxes = new ArrayList<>();
+    private TextField precisionTextField;
 
 
 
@@ -245,6 +249,14 @@ public class ParametricPortraitPropertiesNode extends HBox {
 
 
     private void initTextFields() {
+        this.precisionTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                this.portraitProperties.getPrecision().set(Math.pow(10., -Integer.valueOf(newValue.replaceAll("\\.$", ""))));
+            } catch (NumberFormatException e) {
+                // ignore if input is invalid
+            }
+        });
+
         for (int i = 0; i < dimensions; i++) {
             int finalInd = i;
 
@@ -286,15 +298,22 @@ public class ParametricPortraitPropertiesNode extends HBox {
      * set layout for this Node
      */
     private void setLayout() {
-        this.setAlignment(Pos.CENTER);
-        this.setSpacing(25);
-        this.setPadding(new Insets(25, 0, 0, 0));
-        HBox.setHgrow(this, Priority.ALWAYS);
+        this.getChildren().add(this.getPrecisionTextFieldLayout());
+        this.getChildren().add(this.getPropertiesGrid());
+    }
+
+
+    private Node getPropertiesGrid() {
+        HBox hbox = new HBox();
+        hbox.setAlignment(Pos.CENTER);
+        hbox.setSpacing(25);
+        hbox.setPadding(new Insets(25, 0, 0, 0));
+        HBox.setHgrow(hbox, Priority.ALWAYS);
 
         for (int i = 0; i < dimensions; i++) {
             GridPane gridPane = this.getGridPane();
 
-            this.getChildren().add(gridPane);
+            hbox.getChildren().add(gridPane);
 
             ComboBox<Object> instanceComboBox = new ComboBox<>();
             this.addGridPaneItem(gridPane, instanceComboBox, StringResource.getString("parametric_portrait_instance_label"), 0);
@@ -319,9 +338,28 @@ public class ParametricPortraitPropertiesNode extends HBox {
             if (i < dimensions - 1) {
                 Separator separator = new Separator(Orientation.VERTICAL);
                 separator.setPadding(new Insets(15, 0, 15, 0));
-                this.getChildren().add(separator);
+                hbox.getChildren().add(separator);
             }
         }
+
+        return hbox;
+    }
+
+
+    private Node getPrecisionTextFieldLayout() {
+        HBox hbox = new HBox();
+        hbox.setPadding(new Insets(25, 0, 0, 0));
+
+        Label label = new Label(StringResource.getString("Transitions.Settings.Precision"));
+        label.setWrapText(true);
+        label.setPadding(new Insets(0, 25, 0, 0));
+
+        this.precisionTextField = new TextField(Integer.toString(this.DEFAULT_PRECISION_VALUE));
+
+        hbox.getChildren().add(label);
+        hbox.getChildren().add(this.precisionTextField);
+
+        return hbox;
     }
 
 

@@ -1,23 +1,42 @@
 package population.model.ParametricPortrait;
 
-import population.model.StateModel.State;
-import population.model.TaskV4;
-
-import java.util.List;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleWrapper;
+import population.model.Calculator.TaskCalculator;
 
 
 /**
- *
- * @param <T> type of calculation result
+ * Calculator for parametric portrait. It determines which States will be dominant in task calculation.
  */
-public interface ParametricPortraitCalculator<T> {
+public abstract class ParametricPortraitCalculator {
+    protected TaskCalculator taskCalculator;
+    protected PortraitProperties properties;
+    /** calculation progress form 0 to 1 */
+    protected ReadOnlyDoubleWrapper progress = new ReadOnlyDoubleWrapper(0);
+
+
+    ParametricPortraitCalculator(TaskCalculator taskCalculator, PortraitProperties properties) {
+        this.taskCalculator = taskCalculator;
+        this.properties = properties;
+    }
+
+
     /**
-     * do task calculation
+     * Do task calculation
      */
-    void calculate();
+    abstract void calculate();
+
 
     /**
      * @return result of calculation
      */
-    T getCalculationResult();
+    abstract ParametricPortraitCalculationResult getCalculationResult();
+
+
+    /**
+     * calculation progress form 0 to 1
+     */
+    public ReadOnlyDoubleProperty progressProperty() {
+        return this.progress.getReadOnlyProperty();
+    }
 }

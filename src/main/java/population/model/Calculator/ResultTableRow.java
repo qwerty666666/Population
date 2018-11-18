@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
+/**
+ * Model for table row of calculation result
+ */
 public class ResultTableRow {
     protected IntegerProperty step = new SimpleIntegerProperty();
     protected ObservableList<DoubleProperty> statesCount = FXCollections.observableArrayList();

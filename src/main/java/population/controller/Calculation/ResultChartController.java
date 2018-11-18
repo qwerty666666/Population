@@ -4,15 +4,12 @@ import javafx.scene.control.*;
 import population.component.ChartSeries;
 import population.component.TickLabelFormatter;
 import population.controller.base.AbstractController;
-import population.model.Calculator.CalculationFinishedEvent;
-import population.model.Calculator.Calculator;
+import population.model.Calculator.CalculationResult;
+import population.model.TaskV4;
 import population.util.Converter;
-import population.util.Event.EventManager;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -79,15 +76,6 @@ public class ResultChartController extends AbstractController {
     public void initialize() {
         initSettingsTable();
         initChart();
-
-        EventManager.addEventHandler(Calculator.FINISHED_EVENT, event -> {
-            Platform.runLater(() -> {
-                this.seriesData.addAll(this.getChartSeriesData(((CalculationFinishedEvent)event).getCalculator()));
-                this.refreshResultsChart();
-                this.resetResultsChartScale();
-            });
-            return true;
-        });
     }
 
 
@@ -455,19 +443,32 @@ public class ResultChartController extends AbstractController {
      *
      *************************************************/
 
-    protected List<ChartSeries> getChartSeriesData(Calculator calc) {
+
+    /**
+     * Add charts for calculation result
+     */
+    public void addChartForCalculationResult(CalculationResult result) {
+        this.seriesData.addAll(this.getChartSeriesData(result));
+        this.refreshResultsChart();
+        this.resetResultsChartScale();
+    }
+
+
+    protected List<ChartSeries> getChartSeriesData(CalculationResult result) {
+        TaskV4 task = result.getTask();
+        double[][] calculationResult = result.getStatesCount();
+
         // build X Y coordinates data
         List<XYChart.Series<Number, Number>> chart = new ArrayList<>();
-        int startPoint = calc.getStartPoint();
-        double[][] stateCount = calc.getStatesCount();
-        for (int i = 0; i < calc.getStates().size(); i++) {
+        int startPoint = task.getStartPoint();
+        for (int i = 0; i < task.getStates().size(); i++) {
             ObservableList<XYChart.Data<Number, Number>> data = FXCollections.observableArrayList();
-            for (int step = 0; step < calc.getStepsCount(); step++) {
-                data.add(new XYChart.Data<>(step + startPoint, stateCount[step][i]));
+            for (int step = 0; step < task.getStepsCount(); step++) {
+                data.add(new XYChart.Data<>(step + startPoint, calculationResult[step][i]));
             }
 
             XYChart.Series<Number, Number> series = new XYChart.Series<>(data);
-            series.setName(calc.getStates().get(i).getName());
+            series.setName(task.getStates().get(i).getName());
             chart.add(series);
         }
 
@@ -482,7 +483,7 @@ public class ResultChartController extends AbstractController {
                     int color = size.get() % colorsCount;
                     int dash = (size.get() / colorsCount) % dashesCount;
                     int thickness = (size.get() / (colorsCount * dashesCount)) % thicknessesCount;
-                    ChartSeries chartSeries = new ChartSeries(series, calc.getStartPoint(), color, dash, thickness, true);
+                    ChartSeries chartSeries = new ChartSeries(series, task.getStartPoint(), color, dash, thickness, true);
 
                     // refresh chart when properties change
                     Stream.of(

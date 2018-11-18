@@ -20,9 +20,11 @@ public class ParametricPortrait {
     /** common task for all cells */
     private TaskV4 task;
     /** grid of portrait cells [row][col] */
-    private List<List<List<List<State>>>> calculationResult = new ArrayList<>();
+    private List<List<ParametricPortraitCalculationResult>> calculationResult = new ArrayList<>();
     /** progress of calculation [0..1] */
     private ReadOnlyDoubleWrapper calculationProgress = new ReadOnlyDoubleWrapper(0);
+
+    private ParametricPortraitCalculatorFactory parametricPortraitCalculatorFactory;
 
 
     /**
@@ -91,9 +93,14 @@ public class ParametricPortrait {
      * @param task common task for all cell
      * @param portraitProperties properties for PP
      */
-    public ParametricPortrait(TaskV4 task, PortraitProperties portraitProperties) {
+    public ParametricPortrait(
+        TaskV4 task,
+        PortraitProperties portraitProperties,
+        ParametricPortraitCalculatorFactory parametricPortraitCalculatorFactory
+    ) {
         this.task = task;
         this.properties = portraitProperties;
+        this.parametricPortraitCalculatorFactory = parametricPortraitCalculatorFactory;
     }
 
 
@@ -135,15 +142,15 @@ public class ParametricPortrait {
         this.calculationResult = new ArrayList<>();
 
         for (int row = 0; row < this.getRowCount(); row++) {
-            List<List<List<State>>> rowResults = new ArrayList<>();
+            List<ParametricPortraitCalculationResult> rowResults = new ArrayList<>();
             this.calculationResult.add(rowResults);
 
             for (int col = 0; col < this.getColCount(); col++) {
-                ParametricPortraitCalculator calculator = new SimpleParametricPortraitCalculator(
-                    this.getTask(row, col), this.properties.getShownStateList()
+                ParametricPortraitCalculator calculator = this.parametricPortraitCalculatorFactory.create(
+                    this.getTask(row, col), this.properties
                 );
                 calculator.calculate();
-                rowResults.add(((SimpleParametricPortraitCalculator) calculator).getCalculationResult());
+                rowResults.add(calculator.getCalculationResult());
 
                 this.calculationProgress.set((double)(row * this.getColCount() + col) / (this.getRowCount() * this.getColCount()));
             }
@@ -154,7 +161,7 @@ public class ParametricPortrait {
     /**
      * @return calculation cell result
      */
-    public List<List<State>> getCalculationResult(int row, int col) {
+    public ParametricPortraitCalculationResult getCalculationResult(int row, int col) {
         if (this.calculationResult.size() <= row || this.calculationResult.get(row).size() <= col) {
             return null;
         }

@@ -1,6 +1,8 @@
 package population.model.Calculator;
 
 
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import population.model.Exception.UnknownTransitionType;
 import population.model.StateModel.State;
 import population.model.TaskV4;
@@ -8,7 +10,6 @@ import population.model.TransitionModel.StateInTransition;
 import population.model.TransitionModel.StateMode;
 import population.model.TransitionModel.Transition;
 import population.model.TransitionType;
-import population.util.Event.EventManager;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -17,30 +18,27 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
-public class Calculator {
-    protected TaskV4 task;
-
+/**
+ * Calculator implementing Euler method with step 1
+ */
+public class EulerCalculator extends TaskCalculator {
     protected List<State> states;
     protected List<Transition> transitions;
     protected int startPoint;
     protected int stepsCount;
 
-    /** [step][state index] */
-    protected double[][] statesCount;
-
     protected boolean isTaskStable = false;
     protected int maxDelay;
     protected Integer scale = 16;
 
-    protected double previousProgress = 0;
+    protected boolean isFinished = false;
+
+    protected int currentCalculatedStep = 0;
 
 
-    public final static CalculationProgressEvent PROGRESS_EVENT = new CalculationProgressEvent();
-    public final static CalculationFinishedEvent FINISHED_EVENT = new CalculationFinishedEvent();
-
-
-    public Calculator(TaskV4 task) {
-        this.task = task;
+    @AssistedInject
+    public EulerCalculator(@Assisted TaskV4 task) {
+        super(task);
         init();
     }
 
@@ -73,35 +71,29 @@ public class Calculator {
     }
 
 
-    public void calculateAsync() {
-        new Thread(this::calculate).start();
-    }
-
-
-    public void calculate() {
-        for (int step = 0; step < this.stepsCount - 1; step++) {
-            this.copyStep(step);
+    @Override
+    public void calculateToStep(int step) {
+        while (this.currentCalculatedStep < step) {
+            this.copyStep(this.currentCalculatedStep);
 
             for (Transition transition: this.transitions) {
-                this.applyTransition(transition, step + 1);
+                this.applyTransition(transition, this.currentCalculatedStep + 1);
             }
 
             if (this.scale != null) {
-                this.roundStates(step + 1, scale);
+                this.roundStates(this.currentCalculatedStep + 1, scale);
             }
 
             if (!this.task.getIsAllowNegative()) {
-                this.restrictNegativeness(step + 1);
+                this.restrictNegativeness(this.currentCalculatedStep + 1);
             }
 
-            if ((double)step / (this.stepsCount - 1) - previousProgress > 0.01) {
-                Calculator.PROGRESS_EVENT.setProgress((double)step / (this.stepsCount - 1));
-                EventManager.fireEvent(Calculator.PROGRESS_EVENT);
-            }
+            this.progress.set((double)this.currentCalculatedStep / (this.stepsCount - 1));
+
+            this.currentCalculatedStep++;
         }
 
-        Calculator.FINISHED_EVENT.setCalculator(this);
-        EventManager.fireEvent(Calculator.FINISHED_EVENT);
+        this.isFinished = true;
     }
 
 
@@ -404,5 +396,10 @@ public class Calculator {
 
     public List<State> getStates() {
         return states;
+    }
+
+    @Override
+    public boolean isFinished() {
+        return this.isFinished;
     }
 }

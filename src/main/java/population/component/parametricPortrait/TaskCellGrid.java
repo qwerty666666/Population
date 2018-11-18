@@ -4,9 +4,9 @@ import javafx.geometry.Insets;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import population.App;
 import population.model.ParametricPortrait.ParametricPortrait;
 import population.model.ParametricPortrait.PortraitProperties;
+import population.model.TaskV4;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -124,9 +124,7 @@ public class TaskCellGrid extends GridPane {
                 props.getStartValues().get(1).set(minYValue);
                 props.getStepDeltas().get(1).set(yStepDelta);
 
-                // and calculate new parametric portrait
-                App.setParametricPortraitEnviroment(new ParametricPortrait(this.portrait.getTask(), props));
-                App.calculateParametricPortrait();
+                this.emitSubareaSelectedEvent(this.portrait.getTask(), props);
             }
         });
     }
@@ -227,6 +225,25 @@ public class TaskCellGrid extends GridPane {
     public void redrawCells() {
         this.taskCells.forEach(list -> {
             list.forEach(TaskCell::fill);
+        });
+    }
+
+
+    /**************************
+     *
+     *    subarea selection
+     *
+     *************************/
+
+    private List<ParametricPortraitSubareaSelectListener> subareaSelectedListeners = new ArrayList<>();
+
+    public void addSubareaSelectedListener(ParametricPortraitSubareaSelectListener listener) {
+        this.subareaSelectedListeners.add(listener);
+    }
+
+    private void emitSubareaSelectedEvent(TaskV4 task, PortraitProperties props) {
+        this.subareaSelectedListeners.forEach(listener -> {
+            listener.onSubareaSelected(task, props);
         });
     }
 }

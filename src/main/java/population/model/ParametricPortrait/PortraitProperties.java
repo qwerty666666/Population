@@ -11,7 +11,6 @@ import population.util.ListUtils;
 import population.util.Cloneable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,6 +39,8 @@ public class PortraitProperties implements Cloneable<PortraitProperties> {
         }
     );
 
+    private DoubleProperty precision = new SimpleDoubleProperty(0.001);
+
 
     public PortraitProperties() { }
 
@@ -58,6 +59,10 @@ public class PortraitProperties implements Cloneable<PortraitProperties> {
 
     public List<ObjectProperty> getInstances() {
         return instances;
+    }
+
+    public DoubleProperty getPrecision() {
+        return this.precision;
     }
 
     public List<ObjectProperty<ParametricPortrait.Property>> getProperties() {
@@ -115,6 +120,7 @@ public class PortraitProperties implements Cloneable<PortraitProperties> {
             .map(val -> new SimpleObjectProperty<>(val.getValue()))
             .collect(Collectors.toList());
         clone.stateSettings = ListUtils.cloneObservableList(this.stateSettings);
+        clone.precision.set(this.precision.get());
 
         return clone;
     }

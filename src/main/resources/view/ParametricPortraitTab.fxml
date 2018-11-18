@@ -78,18 +78,6 @@
                 <Button fx:id="calculateButton" mnemonicParsing="false" onAction="#calculate" text="%parametric_portrait_calculate">
                     <VBox.margin><Insets left="20"/></VBox.margin>
                 </Button>
-                <HBox alignment="CENTER_LEFT" spacing="10.0" >
-                    <padding>
-                        <Insets top="25" />
-                    </padding>
-                    <Label text="%Transitions.Settings.Precision" wrapText="true">
-                        <padding>
-                            <Insets right = "25" />
-                        </padding>
-                    </Label>
-                    <TextField fx:id="tfPrecision" text="3" maxWidth="Infinity"/>
-                </HBox>
-                <!-- <CheckBox fx:id="humanLike" text="humanLike" /> -->
 
                 <StackPane fx:id="portraitPropertiesContainer"/>
 

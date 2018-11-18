@@ -3,9 +3,8 @@ package population.controller.Calculation;
 import population.controller.base.AbstractController;
 import population.model.Calculator.*;
 import population.model.StateModel.State;
-import population.util.Event.EventManager;
+import population.model.TaskV4;
 import population.util.Utils;
-import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,7 +28,7 @@ public class ResultTableController extends AbstractController {
     @FXML
     private TextField precisionTextField;
 
-    protected List<Result> results = new ArrayList<>();
+    private List<CalculationResult> results = new ArrayList<>();
 
     protected int precision = 3;
 
@@ -48,20 +47,6 @@ public class ResultTableController extends AbstractController {
             if (!newPropertyValue) {
                 applyPrecision();
             }
-        });
-
-        EventManager.addEventHandler(Calculator.FINISHED_EVENT, event -> {
-            Platform.runLater(() -> {
-                Calculator calculator = ((CalculationFinishedEvent)event).getCalculator();
-                results.add(new Result(
-                        calculator.getStatesCount(),
-                        calculator.getStates(),
-                        calculator.getStartPoint(),
-                        calculator.getStepsCount()
-                ));
-                this.refreshTable();
-            });
-            return true;
         });
     }
 
@@ -101,6 +86,19 @@ public class ResultTableController extends AbstractController {
 
 
     /**
+     * Add calculation result to table
+     */
+    public void addCalculationResult(CalculationResult result) {
+        TaskV4 task = result.getTask();
+        double[][] calculationResult = result.getStatesCount();
+
+        results.add(result);
+
+        this.refreshTable();
+    }
+
+
+    /**
      * rebuild whole table by {@link ResultTableController#results}
      */
     protected void refreshTable() {
@@ -117,8 +115,8 @@ public class ResultTableController extends AbstractController {
         resultTable.getColumns().add(getStepColumn());
 
         int index = 0;
-        for (Result result: this.results) {
-            for (State state: result.getStates()) {
+        for (CalculationResult result: this.results) {
+            for (State state: result.getTask().getStates()) {
                 resultTable.getColumns().add(getValueColumn(state.getName(), index));
                 index++;
             }
@@ -127,9 +125,9 @@ public class ResultTableController extends AbstractController {
         // find first and last step
         int first = Integer.MAX_VALUE;
         int last = Integer.MIN_VALUE;
-        for (Result result: this.results) {
-            int f = result.getStartPoint();
-            int l = f + result.getStepsCount();
+        for (CalculationResult result: this.results) {
+            int f = result.getTask().getStartPoint();
+            int l = f + result.getTask().getStepsCount();
             first = Math.min(first, f);
             last = Math.max(last, l);
         }
@@ -138,9 +136,9 @@ public class ResultTableController extends AbstractController {
         ObservableList<ResultTableRow> rows = FXCollections.observableArrayList();
         for (int step = first; step < last; step++) {
             List<Double> statesCount = new ArrayList<>();
-            for (Result result: this.results) {
-                int f = result.getStartPoint();
-                int l = f + result.getStepsCount();
+            for (CalculationResult result: this.results) {
+                int f = result.getTask().getStartPoint();
+                int l = f + result.getTask().getStepsCount();
                 if (step >= f && step < l) {
                     statesCount.addAll(
                             Arrays.stream(result.getStatesCount()[step - f])
@@ -148,7 +146,7 @@ public class ResultTableController extends AbstractController {
                                 .collect(Collectors.toList())
                     );
                 } else {
-                    statesCount.addAll(Collections.nCopies(result.getStates().size(), null));
+                    statesCount.addAll(Collections.nCopies(result.getTask().getStates().size(), null));
                 }
             }
             rows.add(new ResultTableRow(step, statesCount));

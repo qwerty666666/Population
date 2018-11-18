@@ -9,10 +9,12 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import population.App;
 import population.model.ParametricPortrait.ParametricPortrait;
+import population.model.ParametricPortrait.ParametricPortraitCalculationResult;
 import population.model.ParametricPortrait.PortraitProperties;
 import population.model.StateModel.State;
 
 import java.util.List;
+
 
 /**
  * class represents view for each task
@@ -27,18 +29,11 @@ public class TaskCell extends GridPane {
     /** own rows count */
     private int numRows;
 
-    private Type type = Type.STABLE;
-
     private ParametricPortrait portrait;
     /** row in portrait */
     private int row;
     /** col in portrait */
     private int col;
-
-    public enum Type {
-        STABLE,
-        CYCLIC
-    }
 
 
     TaskCell(ParametricPortrait portrait, int row, int col) {
@@ -94,25 +89,10 @@ public class TaskCell extends GridPane {
         this.getChildren().clear();
         for (int col = 0; col < numCols; col++)
             for (int row = 0; row < numRows; row++) {
-                switch (type) {
-                    case CYCLIC:
-                            /*Polygon polygon = new Polygon();
-                            polygon.getPoints().addAll(
-                                    0.0, 0.0,
-                                    0.0, 30.0,
-                                    30.0, 0.0
-                            );
-                            polygon.setFill(Color.BLACK);
-                            add(polygon, col, row);
-                            break;*/
-
-                    default:
-                        Pane rect = new Pane();
-                        rect.setBorder(new Border(new BorderStroke(Color.GRAY,
-                            BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT, new Insets(-0))));
-                        add(rect, col, row);
-                }
-
+                Pane rect = new Pane();
+                rect.setBorder(new Border(new BorderStroke(Color.GRAY,
+                    BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT, new Insets(-0))));
+                add(rect, col, row);
             }
     }
 
@@ -132,10 +112,10 @@ public class TaskCell extends GridPane {
      * @return max needed square size to fill all aliveStates
      */
     public int getRequestedSize() {
-        List<List<State>> calculationResult = this.portrait.getCalculationResult(this.row, this.col);
-        if (calculationResult != null && calculationResult.size() > 0) {
+        ParametricPortraitCalculationResult result = this.portrait.getCalculationResult(this.row, this.col);
+        if (result != null && result.getResult().size() > 0) {
             int size = 0, mul = 1;
-            for (List<State> states : calculationResult) {
+            for (List<State> states : result.getResult()) {
                 size += states.size() * mul;
                 mul++;
             }
@@ -145,24 +125,18 @@ public class TaskCell extends GridPane {
     }
 
 
-    public void setSquareSize(int size) {
-        this.numCols = this.numRows = size;
-        setGrid();
-    }
-
-
     /**
      * fill background in all colors proportionality to state volume
      */
-    private void fillCyclic() {
-        List<List<State>> aliveStates = this.portrait.getCalculationResult(this.row, this.col);
+    private void fillCyclic(ParametricPortraitCalculationResult result) {
+        List<List<State>> aliveStates = result.getResult();
 
         if (aliveStates.size() == 0) {
             return;
         }
 
         if (aliveStates.size() == 1 && aliveStates.get(0).size() == 1) {
-            fillStable();
+            fillStable(result);
             return;
         }
 
@@ -200,7 +174,7 @@ public class TaskCell extends GridPane {
     /**
      * fill background by colors of dominant states
      */
-    private void fillStable() {
+    private void fillStable(ParametricPortraitCalculationResult result) {
         // FILL REPEATED SQUARE
             /*List<StateModel> aliveStates = this.aliveStates.get(this.aliveStates.size() - 1);
 
@@ -226,7 +200,7 @@ public class TaskCell extends GridPane {
                         getPane(row, col).setBackground(backgrounds.get((numCols * row + col) % backgrounds.size()));
                     }
             }*/
-        List<List<State>> aliveStates = this.portrait.getCalculationResult(this.row, this.col);
+        List<List<State>> aliveStates = result.getResult();
         // FILL BY PROPORTION
         if (aliveStates == null || aliveStates.size() == 0) {
             return;
@@ -269,12 +243,24 @@ public class TaskCell extends GridPane {
      * set background
      */
     public void fill() {
-//        if (type == ParametricPortraitNode.TaskCellType.STABLE) {
-//            fillStable();
-//        } else {
-//            fillCyclic();
-//        }
-        fillStable();
+        ParametricPortraitCalculationResult result = this.portrait.getCalculationResult(this.row, this.col);
+        if (result == null) {
+            return;
+        }
+
+        switch (result.getType()) {
+            case STABLE:
+                fillStable(result);
+                break;
+            case TRENDS:
+                fillStable(result);
+                break;
+            case INTEGRAL_SUM:
+                fillCyclic(result);
+                break;
+            default:
+                throw new RuntimeException("Unexpected parametric portrait CalculationResultType");
+        }
     }
 
 

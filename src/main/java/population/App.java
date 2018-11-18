@@ -62,20 +62,6 @@ public class App {
         App.getCalculationController().calculate();
     }
 
-    /**
-     * Set application task and portrait properties from given portrait
-     */
-    public static void setParametricPortraitEnviroment(ParametricPortrait parametricPortrait) {
-        App.getParametricPortraitController().setEnvironmentByParametricPortrait(parametricPortrait);
-    }
-
-    /**
-     * Calculate parametric portrait and show it on scene
-     */
-    public static void calculateParametricPortrait() {
-        App.getParametricPortraitController().calculate();
-    }
-
 
     /************************************************
      *

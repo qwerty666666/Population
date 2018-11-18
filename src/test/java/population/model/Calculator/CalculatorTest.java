@@ -67,13 +67,13 @@ public class CalculatorTest {
 
     @Test
     public void getMaxDelay() {
-        Assertions.assertEquals(2, new Calculator(task).getMaxDelay());
+        Assertions.assertEquals(2, new EulerCalculator(task).getMaxDelay());
     }
 
 
     @Test
     public void getTotalCount() {
-        Calculator calc = new Calculator(task);
+        EulerCalculator calc = new EulerCalculator(task);
         double expected;
 
         task.getTransitions().get(0).setType(TransitionType.LINEAR);
@@ -92,7 +92,7 @@ public class CalculatorTest {
 
     @Test
     public void getIntensity() {
-        Calculator calc = new Calculator(task);
+        EulerCalculator calc = new EulerCalculator(task);
         Transition transition = task.getTransitions().get(1);
         transition.getStates().get(0).setDelay(0);
         transition.getStates().get(1).setDelay(0);
@@ -148,7 +148,7 @@ public class CalculatorTest {
 
     @Test
     public void applyResidualTransition() {
-        Calculator calc = new Calculator(task);
+        EulerCalculator calc = new EulerCalculator(task);
         Transition transition = task.getTransitions().get(1);
         transition.setType(TransitionType.SOLUTE);
         transition.setProbability(0.1);

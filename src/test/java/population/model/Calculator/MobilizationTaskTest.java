@@ -203,7 +203,7 @@ public class MobilizationTaskTest {
         task.getTransitions().get(1).setType(secondTransitionType);
         task.getTransitions().get(1).normalizeStates();
 
-        Calculator calculator = new Calculator(task);
+        EulerCalculator calculator = new EulerCalculator(task);
         calculator.calculate();
         double[][] calculationResult = calculator.getStatesCount();
 
