@@ -156,4 +156,10 @@ public class Transition implements Cloneable<Transition> {
         this.getStates().clear();
         this.getStates().addAll(states);
     }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null && obj instanceof Transition && ((Transition)obj).getId() == this.getId();
+    }
 }
