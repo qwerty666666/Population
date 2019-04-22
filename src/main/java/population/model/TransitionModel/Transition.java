@@ -23,6 +23,12 @@ public class Transition implements Cloneable<Transition> {
     protected ObservableList<StateInTransition> states = FXCollections.observableArrayList();
 
 
+    /*************************
+     *
+     *      properties
+     *
+     *************************/
+
     public Transition() {
         this.id = ID_COUNTER.incrementAndGet();
     }
@@ -88,6 +94,21 @@ public class Transition implements Cloneable<Transition> {
     public void setBlock(String block) {
         this.block.set(block);
     }
+
+
+    /*******************************
+     *
+     *      public interface
+     *
+     *******************************/
+
+
+    public boolean isResidual() {
+        return getActualStates().stream().anyMatch(state -> state.getMode() == StateMode.RESIDUAL);
+    }
+
+
+
 
     /**
      * @return Transition transition clone with the same states

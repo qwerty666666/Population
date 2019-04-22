@@ -47,8 +47,7 @@ public class EulerCalculator extends TaskCalculator {
         this.transitions = task.getTransitions();
         this.startPoint = task.getStartPoint();
         this.stepsCount = task.getStepsCount();
-
-        this.maxDelay = this.getMaxDelay();
+        this.maxDelay = task.getMaxDelay();
 
         // init first step
         this.statesCount = new double[task.getStepsCount()][task.getStates().size()];
@@ -57,17 +56,6 @@ public class EulerCalculator extends TaskCalculator {
                 this.statesCount[0][getStateIndex(state)] = state.getCount();
             }
         }
-    }
-
-
-    protected int getMaxDelay() {
-        int maxDelay = 0;
-        for (Transition transition : this.task.getTransitions()) {
-            for (StateInTransition state: transition.getActualStates()) {
-                maxDelay = Math.max(maxDelay, state.getDelay());
-            }
-        }
-        return maxDelay;
     }
 
 
@@ -103,7 +91,7 @@ public class EulerCalculator extends TaskCalculator {
      * @param step
      */
     protected void applyTransition(Transition transition, int step) {
-        if (this.isTransitionResidual(transition)) {
+        if (transition.isResidual()) {
             this.applyResidualTransition(transition, step);
             return;
         }
@@ -172,17 +160,17 @@ public class EulerCalculator extends TaskCalculator {
 
         switch (transition.getType()) {
             case TransitionType.LINEAR: {
-                intensity = states.stream()
-                        .mapToDouble(stateInTransition -> {
-                            double count = getDelayedStateCount(stateInTransition, step);
-                            double res = count / stateInTransition.getIn();
-                            if (stateInTransition.getMode() == StateMode.INHIBITOR) {
-                                res = count - res;
-                            }
-                            return res;
-                        })
-                        .min()
-                        .orElse(0);
+                    intensity = states.stream()
+                            .mapToDouble(stateInTransition -> {
+                                double count = getDelayedStateCount(stateInTransition, step);
+                                double res = count / stateInTransition.getIn();
+                                if (stateInTransition.getMode() == StateMode.INHIBITOR) {
+                                    res = count - res;
+                                }
+                                return res;
+                            })
+                            .min()
+                            .orElse(0);
                 break;
             }
 
@@ -207,7 +195,7 @@ public class EulerCalculator extends TaskCalculator {
             }
 
             default: {
-                throw new UnknownTransitionType("Can't' get intensity for transition with unknown type");
+                throw new UnknownTransitionType("Can't get intensity for transition with unknown type");
             }
         }
 
@@ -368,15 +356,6 @@ public class EulerCalculator extends TaskCalculator {
         }
     }
 
-
-    protected boolean isTransitionResidual(Transition transition) {
-        for (StateInTransition state: transition.getActualStates()) {
-            if (state.getMode() == StateMode.RESIDUAL) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     /**
      *

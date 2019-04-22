@@ -66,12 +66,6 @@ public class CalculatorTest {
 
 
     @Test
-    public void getMaxDelay() {
-        Assertions.assertEquals(2, new EulerCalculator(task).getMaxDelay());
-    }
-
-
-    @Test
     public void getTotalCount() {
         EulerCalculator calc = new EulerCalculator(task);
         double expected;

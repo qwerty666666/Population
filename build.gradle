@@ -40,6 +40,15 @@ dependencies {
         // Preloader
         'com.github.torakiki:fx-progress-circle:98eb6efa6c'
     )
+    implementation (
+            // Guice
+            'com.google.inject:guice:4.1.0',
+            'com.google.inject.extensions:guice-assistedinject:4.2.2',
+            // Preloader
+            'com.github.torakiki:fx-progress-circle:98eb6efa6c',
+            // RPNResolver
+            'com.github.qwerty666666:RPNResolver:1.0.0'
+    )
 }
 
 
