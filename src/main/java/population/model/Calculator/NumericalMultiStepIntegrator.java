@@ -12,7 +12,9 @@ import population.model.TaskV4;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Interface for all numerical integration multi stepSize methods implementations.
@@ -29,8 +31,8 @@ public abstract class NumericalMultiStepIntegrator<T> extends TaskCalculator {
     protected int currentCalculatedStep = 1;
     protected FunctionExecutorProvider<Double> fep;
     protected OperatorExecutorProvider<Double> oep;
-    /** calculated delta on one stepSize */
-    protected double[] deltas;
+    /** variables representing expressions in system. Sorted by expressions order in system */
+    protected List<StateOperandSupplier> stateVariables;
 
 
 
@@ -58,7 +60,11 @@ public abstract class NumericalMultiStepIntegrator<T> extends TaskCalculator {
             this.statesCount[0][i] = differentialEquationSystem.getOdeVariable(ODEs.get(i)).get();
         }
 
-        this.deltas = new double[task.getStates().size()];
+        this.stateVariables = this.variables.stream()
+            .filter(var -> var instanceof StateOperandSupplier)
+            .map(StateOperandSupplier.class::cast)
+            .sorted(Comparator.comparingInt(o -> task.getStates().indexOf(o.getState())))
+            .collect(Collectors.toList());
     }
 
 
@@ -70,7 +76,7 @@ public abstract class NumericalMultiStepIntegrator<T> extends TaskCalculator {
 
     @Override
     public void calculateToStep(int toStep) {
-        for (int step = this.currentCalculatedStep; step <= toStep; step += this.stepSize) {
+        for (int step = this.currentCalculatedStep; step <= toStep; step += 1) {
             applyStep(step);
 
             if (this.roundScale != null) {
@@ -100,10 +106,7 @@ public abstract class NumericalMultiStepIntegrator<T> extends TaskCalculator {
      * Set variable values from the stepSize i.e. set Yi = f(Xstep)
      */
     protected void setVariablesFromStep(int step) {
-        this.variables.stream()
-            .filter(var -> var instanceof StateOperandSupplier)
-            .map(StateOperandSupplier.class::cast)
-            .forEach(var -> var.setVal(getDelayedStateCount(step, var.getState(), var.getDelay())));
+        this.stateVariables.forEach(var -> var.setVal(getDelayedStateCount(step, var.getState(), var.getDelay())));
     }
 
 

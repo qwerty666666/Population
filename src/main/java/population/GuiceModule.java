@@ -5,10 +5,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import expression.FunctionExecutorProvider;
 import expression.OperatorExecutorProvider;
-import population.model.Calculator.CalculatorFactory;
-import population.model.Calculator.EulerCalculator;
-import population.model.Calculator.EulerNumericalIntegrator;
-import population.model.Calculator.TaskCalculator;
+import population.model.Calculator.*;
 import population.model.ParametricPortrait.ParametricPortraitCalculator;
 import population.model.ParametricPortrait.ParametricPortraitCalculatorFactory;
 import population.model.ParametricPortrait.SimpleParametricPortraitCalculator;
@@ -24,8 +21,9 @@ public class GuiceModule extends AbstractModule {
         bind(new TypeLiteral<FunctionExecutorProvider<Double>>(){}).to(DoubleFunctionExecutorProvider.class);
 
         install(new FactoryModuleBuilder()
-            //.implement(TaskCalculator.class, EulerCalculator.class)
-            .implement(TaskCalculator.class, EulerNumericalIntegrator.class)
+//            .implement(TaskCalculator.class, EulerCalculator.class)
+//            .implement(TaskCalculator.class, EulerNumericalIntegrator.class)
+            .implement(TaskCalculator.class, RK4NumericalIntegrator.class)
             .build(CalculatorFactory.class)
         );
 

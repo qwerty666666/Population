@@ -13,7 +13,6 @@ import population.model.TransitionType;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Convert task model to system of differential equations presented by array of
@@ -124,17 +123,17 @@ public class RPNConverter {
     }
 
 
-    private void buildNormalExpression(Transition transition) {
-        ExpressionBuilder<Double> intensity = new ExpressionBuilder<Double>()
-            .add(transition.getProbability())
-            .multiply(getIntensity(transition))
-            .multiply(getTotalCount(transition));
+        private void buildNormalExpression(Transition transition) {
+            ExpressionBuilder<Double> intensity = new ExpressionBuilder<Double>()
+                .add(transition.getProbability())
+                .multiply(getIntensity(transition))
+                .multiply(getTotalCount(transition));
 
-        transition.getActualStates().forEach(stateInTransition -> {
-            this.ODEs.get(stateInTransition.getState())
-                .add(getStateInTransitionCoefficient(stateInTransition))
-                .multiply(intensity);
-        });
+            transition.getActualStates().forEach(stateInTransition -> {
+                this.ODEs.get(stateInTransition.getState())
+                    .add(getStateInTransitionCoefficient(stateInTransition))
+                    .multiply(intensity);
+            });
     }
 
 
