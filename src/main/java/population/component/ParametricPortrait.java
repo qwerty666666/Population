@@ -503,7 +503,7 @@ public class ParametricPortrait extends GridPane {
 
         cellContainer.newTaskCellsList(stepsCnt.get(0), stepsCnt.get(1));
 
-        this.scale = scale;*/
+        this.roundScale = roundScale;*/
     }
 
 
@@ -957,7 +957,7 @@ public class ParametricPortrait extends GridPane {
         ) {
             // TODO
             /*final TaskAnalyser taskAnalyser = new TaskAnalyser(task);
-            taskAnalyser.setStablePrecision(scale);
+            taskAnalyser.setStablePrecision(roundScale);
             taskAnalyser.buildGraph();
             taskAnalyser.setAnalysedStatesList(statesListShownOnParametricPortrait);
             this.taskAnalyser = taskAnalyser;

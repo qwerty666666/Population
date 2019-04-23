@@ -14,6 +14,9 @@ public class DoubleFunctionExecutorProvider implements FunctionExecutorProvider<
     static {
         DOUBLE_FUNCTIONS_MAP.put(SumFunction.class, (Object... args) -> Stream.of(args).mapToDouble(Double.class::cast).sum());
         DOUBLE_FUNCTIONS_MAP.put(MinFunction.class, (Object... args) -> Stream.of(args).mapToDouble(Double.class::cast).min().orElse(0));
+        DOUBLE_FUNCTIONS_MAP.put(MultiplyFunction.class, (Object... args) -> Stream.of(args).mapToDouble(Double.class::cast).reduce(1, (a, b) -> a * b));
+        DOUBLE_FUNCTIONS_MAP.put(PowFunction.class, (Object... args) -> Math.pow((double)args[0], (double)args[1]));
+        DOUBLE_FUNCTIONS_MAP.put(ProbabilisticFactorialFunction.class, ProbabilisticFactorialFunction.EXECUTOR);
     }
 
 

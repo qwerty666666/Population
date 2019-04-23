@@ -1,28 +1,39 @@
 package population.model.Calculator;
 
-import expression.ExpressionBuilder;
 import expression.RPNExpression;
-import population.model.RPNConverter.StateOperandSupplier;
-import population.model.StateModel.State;
+import population.model.RPNConverter.VariableOperandSupplier;
 
 import java.util.List;
 import java.util.Map;
 
+
 public class DifferentialEquationSystem<T> {
-    private Map<State, RPNExpression<Double>> ODEs;
-    private List<StateOperandSupplier<T>> variables;
+    private List<RPNExpression<T>> ODEs;
+    /** variables in ODEs */
+    private List<VariableOperandSupplier<T>> variables;
+    /** variables representing ODEs */
+    private Map<RPNExpression<T>, VariableOperandSupplier<T>> expressionVariables;
 
 
-    public DifferentialEquationSystem(Map<State, RPNExpression<Double>> ODEs, List<StateOperandSupplier<T>> variables) {
+    public DifferentialEquationSystem(
+        List<RPNExpression<T>> ODEs,
+        List<VariableOperandSupplier<T>> variables,
+        Map<RPNExpression<T>, VariableOperandSupplier<T>> expressionVariables
+    ) {
         this.ODEs = ODEs;
         this.variables = variables;
+        this.expressionVariables = expressionVariables;
     }
 
-    public Map<State, RPNExpression<Double>> getODEs() {
+    public List<RPNExpression<T>> getODEs() {
         return ODEs;
     }
 
-    public List<StateOperandSupplier<T>> getVariables() {
+    public List<VariableOperandSupplier<T>> getVariables() {
         return variables;
+    }
+
+    public VariableOperandSupplier<T> getOdeVariable(RPNExpression<T> expr) {
+        return this.expressionVariables.get(expr);
     }
 }

@@ -10,4 +10,9 @@ public class VariableOperandSupplier<T> extends OperandSupplier<T> {
     public void setVal(T val) {
         this.val = val;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj;
+    }
 }

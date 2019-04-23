@@ -42,12 +42,13 @@ public class RPNConverter {
 
 
     private StateOperandSupplier<Double> getStateOperandSupplier(State state, int delay) {
-        if (this.stateOperandSuppliers.containsKey(state)) {
-            return this.stateOperandSuppliers.get(state);
+        StateOperandSupplierKey key = new StateOperandSupplierKey(state, delay);
+
+        if (this.stateOperandSuppliers.containsKey(key)) {
+            return this.stateOperandSuppliers.get(key);
         }
 
-        StateOperandSupplierKey key = new StateOperandSupplierKey(state, delay);
-        this.stateOperandSuppliers.put(key, new StateOperandSupplier<>(state.getCount(), delay));
+        this.stateOperandSuppliers.put(key, new StateOperandSupplier<>(state.getCount(), state, delay));
 
         return this.stateOperandSuppliers.get(key);
     }
@@ -56,12 +57,18 @@ public class RPNConverter {
     public DifferentialEquationSystem<Double> convert() {
         task.getTransitions().forEach(this::buildTransitionODE);
 
-        Map<State, RPNExpression<Double>> ODEs = new HashMap<>();
-        this.ODEs.forEach((state, eb) -> {
-            ODEs.put(state, new ShuntingYardRPNConverter<Double>().convert(new ExpressionBuilderTokenizer<>(eb).tokenize()));
-        });
+        List<RPNExpression<Double>> ODEs = this.task.getStates().stream()
+            .map(state -> new ShuntingYardRPNConverter<Double>().convert(new ExpressionBuilderTokenizer<>(this.ODEs.get(state)).tokenize()))
+            .collect(Collectors.toList());
 
-        return new DifferentialEquationSystem<>(ODEs, new ArrayList<>(this.stateOperandSuppliers.values()));
+        List<VariableOperandSupplier<Double>> variables = new ArrayList<>(this.stateOperandSuppliers.values());
+
+        Map<RPNExpression<Double>, VariableOperandSupplier<Double>> expressionVariablesMap = new HashMap<>();
+        for (int i = 0; i < this.task.getStates().size(); i++) {
+            expressionVariablesMap.put(ODEs.get(i), this.getStateOperandSupplier(task.getStates().get(i)));
+        }
+
+        return new DifferentialEquationSystem<>(ODEs, variables, expressionVariablesMap);
     }
 
 
