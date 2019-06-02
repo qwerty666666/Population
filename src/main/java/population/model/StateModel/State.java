@@ -19,9 +19,6 @@ public class State implements Cloneable<State> {
     private final StringProperty name = new SimpleStringProperty("");
     private final StringProperty alias = new SimpleStringProperty("");
     private final DoubleProperty count = new SimpleDoubleProperty();
-    private final DoubleProperty delay = new SimpleDoubleProperty();
-    private final DoubleProperty delayedCount = new SimpleDoubleProperty();
-    private final SimpleObjectProperty growthRate = new SimpleObjectProperty<ExpressionManager>();
 
 
     public State() {
@@ -39,22 +36,6 @@ public class State implements Cloneable<State> {
 
     public StringProperty aliasProperty() {
         return this.alias;
-    }
-
-    public DoubleProperty delayProperty() {
-        return this.delay;
-    }
-
-    public DoubleProperty delayedCountProperty() {
-        return this.delayedCount;
-    }
-
-    public DoubleProperty countProperty() {
-        return this.count;
-    }
-
-    public SimpleObjectProperty growthRateProperty() {
-        return this.growthRate;
     }
 
     public String getName() {

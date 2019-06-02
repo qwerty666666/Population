@@ -127,7 +127,7 @@ public class ResultTableController extends AbstractController {
         int last = Integer.MIN_VALUE;
         for (CalculationResult result: this.results) {
             int f = result.getTask().getStartPoint();
-            int l = f + result.getTask().getStepsCount();
+            int l = f + result.getStepsCount();
             first = Math.min(first, f);
             last = Math.max(last, l);
         }
@@ -138,7 +138,7 @@ public class ResultTableController extends AbstractController {
             List<Double> statesCount = new ArrayList<>();
             for (CalculationResult result: this.results) {
                 int f = result.getTask().getStartPoint();
-                int l = f + result.getTask().getStepsCount();
+                int l = f + result.getStepsCount();
                 if (step >= f && step < l) {
                     statesCount.addAll(
                             Arrays.stream(result.getStatesCount()[step - f])

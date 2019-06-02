@@ -4,9 +4,8 @@ package population.model.Calculator;
 import expression.FunctionExecutorProvider;
 import expression.OperatorExecutorProvider;
 import expression.RPNExpression;
-import population.model.RPNConverter.RPNConverter;
-import population.model.RPNConverter.StateOperandSupplier;
-import population.model.RPNConverter.VariableOperandSupplier;
+import population.App;
+import population.model.RPNConverter.*;
 import population.model.StateModel.State;
 import population.model.TaskV4;
 
@@ -15,12 +14,12 @@ import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Interface for all numerical integration multi stepSize methods implementations.
- * @param <T>
  */
-public abstract class NumericalMultiStepIntegrator<T> extends TaskCalculator {
+public abstract class NumericalTaskIntegrator extends TaskCalculator {
     protected Integer roundScale = null;
     protected boolean isAllowNegative = false;
     protected double stepSize;
@@ -43,13 +42,13 @@ public abstract class NumericalMultiStepIntegrator<T> extends TaskCalculator {
      *
      * @param task
      */
-    public NumericalMultiStepIntegrator(TaskV4 task, FunctionExecutorProvider<Double> fep, OperatorExecutorProvider<Double> oep) {
+    public NumericalTaskIntegrator(TaskV4 task, double stepSize, FunctionExecutorProvider<Double> fep, OperatorExecutorProvider<Double> oep) {
         super(task);
 
         this.oep = oep;
         this.fep = fep;
 
-        this.stepSize = 1;
+        this.stepSize = stepSize;
 
         this.differentialEquationSystem = new RPNConverter(task).convert();
         this.variables = differentialEquationSystem.getVariables();
@@ -148,5 +147,26 @@ public abstract class NumericalMultiStepIntegrator<T> extends TaskCalculator {
             return statesCount[0][ind];
         }
         return statesCount[step - delay][ind];
+    }
+
+
+    @Override
+    public CalculationResult getCalculationResult() {
+        if (!this.isFinished()) {
+            throw new IllegalStateException("Calculation should be finished before getCalculationResult() call");
+        }
+
+        // linearly approximate result to int steps (1, 2, 3...)
+        int steps = (int)(this.task.getStepsCount() * this.stepSize);
+        int statesCnt = this.task.getStates().size();
+        double[][] states = new double[steps][statesCnt];
+        for (int i = 0; i < statesCnt; i++) {
+            for (int step = 0; step < steps; step++) {
+                int s = (int)(step / this.stepSize);
+                states[step][i] = this.statesCount[s][i] + (this.statesCount[Math.min(s + 1, this.task.getStepsCount() - 1)][i] - this.statesCount[s][i]) * (step - this.stepSize * s) / this.stepSize;
+            }
+        }
+
+        return new CalculationResult(this.task, states);
     }
 }

@@ -21,10 +21,17 @@ public class GuiceModule extends AbstractModule {
         bind(new TypeLiteral<FunctionExecutorProvider<Double>>(){}).to(DoubleFunctionExecutorProvider.class);
 
         install(new FactoryModuleBuilder()
-//            .implement(TaskCalculator.class, EulerCalculator.class)
+            .implement(TaskCalculator.class, EulerCalculator.class)
+//            .implement(TaskCalculator.class, EulerNumericalIntegrator.class)
+//            .implement(TaskCalculator.class, RK4NumericalIntegrator.class)
+            .build(CalculatorFactory.class)
+        );
+
+        install(new FactoryModuleBuilder()
+//                .implement(TaskCalculator.class, EulerCalculator.class)
 //            .implement(TaskCalculator.class, EulerNumericalIntegrator.class)
             .implement(TaskCalculator.class, RK4NumericalIntegrator.class)
-            .build(CalculatorFactory.class)
+            .build(NumericalIntegratorCalculatorFactory.class)
         );
 
         install(new FactoryModuleBuilder()

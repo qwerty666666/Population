@@ -36,9 +36,11 @@
                 <HBox alignment="CENTER_LEFT" spacing="10.0">
                     <children>
                         <Label text="%Calculations.StartPoint" />
-                        <TextField fx:id="startPointTextField" />
+                        <TextField fx:id="startPointTextField" prefWidth="100"/>
                         <Label text="%Calculations.StepCount" />
-                        <TextField fx:id="stepsCountTextField" />
+                        <TextField fx:id="stepsCountTextField" prefWidth="100"/>
+                        <Label text="%Calculations.StepSize"/>
+                        <TextField fx:id="stepSizeTextField" prefWidth="100"/>
                         <Button fx:id="calculationButton" mnemonicParsing="false" onAction="#calculate" text="%Calculations.CalculateButton" textOverrun="CLIP" />
                         <ProgressBar fx:id="calculationProgressBar" maxWidth="+Infinity" prefWidth="25.0" progress="0.0" HBox.hgrow="ALWAYS" visible="false"/>
                     </children>

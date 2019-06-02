@@ -22,6 +22,7 @@ import com.google.inject.Injector;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.stage.WindowEvent;
+import population.controller.HelpPopupController;
 import population.controller.PrimaryController;
 import population.controller.base.AbstractAboutController;
 import population.controller.base.AbstractController;
@@ -283,8 +284,7 @@ public final class PopulationApplication extends Application {
                     AbstractAboutController aboutController = (AbstractAboutController) controller;
                     aboutController.setApplication(PopulationApplication.this);
                     aboutController.setStage(aboutStage);
-                    aboutController.setImage(
-                            new Image(getClass().getResourceAsStream("resource/icon.png")));
+                    aboutController.setImage(new Image(getClass().getResourceAsStream("resource/images/icon.png")));
                 }
                 return controller;
             } catch (InstantiationException | IllegalAccessException e) {
@@ -298,6 +298,42 @@ public final class PopulationApplication extends Application {
             aboutStage.setX(primaryStage.getX() + WINDOW_OFFSET);
             aboutStage.setY(primaryStage.getY() + WINDOW_OFFSET);
             aboutStage.show();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void showHelpDialog() {
+        Stage stage = new Stage(StageStyle.UTILITY);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        Stage primaryStage = mPrimaryStage;
+        stage.initOwner(primaryStage.getOwner());
+        stage.setResizable(false);
+        stage.setTitle(StringResource.getString("Help.Title"));
+        FXMLLoader sceneLoader =
+            new FXMLLoader(getClass().getResource("resource/view/HelpView.fxml"));
+        sceneLoader.setResources(StringResource.getBundle());
+        sceneLoader.setControllerFactory(controllerClass -> {
+            try {
+                Object controller = controllerClass.newInstance();
+                if (controller instanceof HelpPopupController) {
+                    HelpPopupController helpController = (HelpPopupController) controller;
+                    helpController.setApplication(PopulationApplication.this);
+                    helpController.setStage(stage);
+                    helpController.setImage(new Image(getClass().getResourceAsStream("resource/images/icon.png")));
+                }
+                return controller;
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        try {
+            Scene aboutScene = new Scene(sceneLoader.load(), -1, -1);
+            aboutScene.getStylesheets().add("com//population/resource/style/help.css");
+            stage.setScene(aboutScene);
+            stage.setX(primaryStage.getX() + WINDOW_OFFSET);
+            stage.setY(primaryStage.getY() + WINDOW_OFFSET);
+            stage.show();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

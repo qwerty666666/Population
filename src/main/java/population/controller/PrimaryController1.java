@@ -107,10 +107,12 @@ public class PrimaryController1 extends AbstractController {
 
         this.setTitle(this.getDefaultTitle());
 
-        mainTabPane.getSelectionModel().select(2);
-        //((TabPane)this.getStage().getScene().lookup("#resultsChartTabs")).getSelectionModel().select(3);
-        File file = new File("C:\\Users\\user\\Desktop\\test.pmt");
-        openTaskFromFile(file);
+        if (!App.isDev()) {
+            mainTabPane.getSelectionModel().select(2);
+            //((TabPane)this.getStage().getScene().lookup("#resultsChartTabs")).getSelectionModel().select(3);
+            File file = new File("C:\\Users\\user\\Desktop\\qwe.pmt");
+            openTaskFromFile(file);
+        }
     }
 
 
@@ -178,7 +180,7 @@ public class PrimaryController1 extends AbstractController {
 
 
     public void about() {
-//        getApplication().showAboutDialog();
+        getApplication().showAboutDialog();
     }
 
 
@@ -205,6 +207,11 @@ public class PrimaryController1 extends AbstractController {
             application.showAlert(resources.getString("TopMenu.Lang"), null,
                     resources.getString("App.ChangeLang.Info"), Alert.AlertType.INFORMATION);
         }
+    }
+
+
+    public void help() {
+        getApplication().showHelpDialog();
     }
 
 

@@ -34,4 +34,9 @@ public class CalculationResult {
     public int getStateIndex(State state) {
         return this.task.getStates().indexOf(state);
     }
+
+
+    public int getStepsCount() {
+        return this.stepsCount.length;
+    }
 }

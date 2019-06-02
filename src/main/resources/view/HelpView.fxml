@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+
+<?import java.net.URL?>
+<GridPane hgap="14.0" maxHeight="+Infinity" maxWidth="+Infinity"
+          minHeight="-Infinity" minWidth="-Infinity" vgap="20.0" xmlns="http://javafx.com/javafx/8"
+          xmlns:fx="http://javafx.com/fxml/1" fx:controller="population.controller.HelpPopupController">
+  <stylesheets>
+    <URL value="@../style/help.css" />
+  </stylesheets>
+  <children>
+    <ImageView fx:id="appIcon" fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="0" GridPane.halignment="CENTER" GridPane.rowIndex="0" GridPane.valignment="TOP"/>
+    <ScrollPane styleClass="scroll-pane" prefHeight="300.0" prefWidth="400.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+      <VBox spacing="7.0" prefWidth="380.0">
+        <children>
+          <Label styleClass="title" textAlignment="LEFT" wrapText="true">Раствор. </Label>
+          <Label wrapText="true">
+            В растворах автоматы распределены равномерно на всем множестве размера N мест.
+            Как примером таких типов переходов можно привести популяции белых медведей, которые не собираются в одном месте
+            для воспроизводства потомства. Основная проблема таких популяций — это низкая частота встреч особей,
+            и если общая численность популяции окажется слишком маленькой относительно ареала обитания,
+            то популяция может исчезнуть.
+          </Label>
+
+          <Label styleClass="title" textAlignment="LEFT" wrapText="true">Смесь. </Label>
+          <Label wrapText="true">
+            В переходах типа смесь автоматы собираются в ограниченной области для взаимодействия. Например, птичьи базары, так что вероятность взаимодействия данной пары не зависит от общего числа мест, а зависит только от количества автоматов, собравшихся вместе.
+          </Label>
+        </children>
+      </VBox>
+    </ScrollPane>
+    <HBox maxHeight="-Infinity" maxWidth="+Infinity" minHeight="-Infinity" minWidth="-Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1">
+      <children>
+        <Pane maxWidth="+Infinity" HBox.hgrow="ALWAYS" />
+      <Button minWidth="80.0" mnemonicParsing="false" onAction="#close" text="%close" HBox.hgrow="NEVER">
+        <HBox.margin>
+          <Insets left="14.0" />
+        </HBox.margin>
+      </Button>
+      </children>
+    </HBox>
+  </children>
+  <columnConstraints>
+    <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" />
+    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="+Infinity" minWidth="-Infinity" />
+  </columnConstraints>
+  <padding>
+    <Insets bottom="14.0" left="14.0" right="14.0" top="14.0" />
+  </padding>
+  <rowConstraints>
+    <RowConstraints maxHeight="+Infinity" minHeight="-Infinity" valignment="CENTER" vgrow="ALWAYS" />
+    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="NEVER" />
+  </rowConstraints>
+</GridPane>

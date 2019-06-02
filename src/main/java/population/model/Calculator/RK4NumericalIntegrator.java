@@ -6,27 +6,27 @@ import com.google.inject.assistedinject.AssistedInject;
 import expression.FunctionExecutorProvider;
 import expression.OperatorExecutorProvider;
 import population.model.RPNConverter.StateOperandSupplier;
-import population.model.RPNConverter.VariableOperandSupplier;
 import population.model.TaskV4;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 /**
  * Fourth-order Runge-Kutta method implementation
  */
-public class RK4NumericalIntegrator extends NumericalMultiStepIntegrator<Double> {
+public class RK4NumericalIntegrator extends NumericalTaskIntegrator {
     private double K[][];
     private double[] offsets;
 
 
     @AssistedInject
-    public RK4NumericalIntegrator(@Assisted TaskV4 task, FunctionExecutorProvider<Double> fep, OperatorExecutorProvider<Double> oep) {
-        super(task, fep, oep);
+    public RK4NumericalIntegrator(
+        @Assisted TaskV4 task,
+        @Assisted double stepSize,
+        FunctionExecutorProvider<Double> fep,
+        OperatorExecutorProvider<Double> oep
+    ) {
+        super(task, stepSize, fep, oep);
         K = new double[4][task.getStates().size()];
         offsets = new double[task.getStates().size()];
-        stepSize = 0.1;
     }
 
 

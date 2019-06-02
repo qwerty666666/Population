@@ -8,14 +8,19 @@ import expression.OperatorExecutorProvider;
 import population.model.TaskV4;
 
 
-public class EulerNumericalIntegrator extends NumericalMultiStepIntegrator<Double> {
+public class EulerNumericalIntegrator extends NumericalTaskIntegrator {
     /** calculated delta on one stepSize */
     private double[] deltas;
 
 
     @AssistedInject
-    public EulerNumericalIntegrator(@Assisted TaskV4 task, FunctionExecutorProvider<Double> fep, OperatorExecutorProvider<Double> oep) {
-        super(task, fep, oep);
+    public EulerNumericalIntegrator(
+        @Assisted TaskV4 task,
+        @Assisted double stepSize,
+        FunctionExecutorProvider<Double> fep,
+        OperatorExecutorProvider<Double> oep
+    ) {
+        super(task, stepSize, fep, oep);
         this.deltas = new double[task.getStates().size()];
     }
 

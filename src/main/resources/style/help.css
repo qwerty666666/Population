@@ -1,0 +1,10 @@
+.title {
+    -fx-font-weight: bold;
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+.scroll-pane:focused {
+    -fx-background-color: transparent;
+}

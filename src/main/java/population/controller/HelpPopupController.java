@@ -17,23 +17,23 @@
  */
 package population.controller;
 
-import population.App;
-import population.Launcher;
-import population.controller.base.AbstractAboutController;
-
-import java.util.Locale;
-
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import population.App;
+import population.controller.base.AbstractController;
 
-public class AboutController extends AbstractAboutController {
-    public ImageView mApplicationIcon;
-    public Label mApplicationDetails;
+public class HelpPopupController extends AbstractController {
+    private Image image;
+    public ImageView appIcon;
 
     @Override
     public void initialize() {
-        mApplicationIcon.setImage(getImage());
-        mApplicationDetails.setText(getString("About.Version") + ": " + App.getVersion());
+        appIcon.setImage(image);
+    }
+
+    public final void setImage(Image image) {
+        this.image = image;
     }
 
     public void close() {

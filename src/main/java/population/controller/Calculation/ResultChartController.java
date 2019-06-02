@@ -463,12 +463,15 @@ public class ResultChartController extends AbstractController {
         int startPoint = task.getStartPoint();
         for (int i = 0; i < task.getStates().size(); i++) {
             ObservableList<XYChart.Data<Number, Number>> data = FXCollections.observableArrayList();
-            for (int step = 0; step < task.getStepsCount(); step++) {
+            for (int step = 0; step < result.getStepsCount(); step++) {
                 data.add(new XYChart.Data<>(step + startPoint, calculationResult[step][i]));
             }
 
             XYChart.Series<Number, Number> series = new XYChart.Series<>(data);
-            series.setName(task.getStates().get(i).getName());
+            series.setName(!task.getStates().get(i).getAlias().isEmpty() ?
+                task.getStates().get(i).getAlias() :
+                task.getStates().get(i).getName()
+            );
             chart.add(series);
         }
 
